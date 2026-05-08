@@ -63,7 +63,7 @@ export default function Home() {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.2 }}
-              className="relative"
+              className="relative hidden md:block"
             >
               <div className="glass-card rounded-2xl p-8 shadow-2xl relative z-10 border border-white/50">
                 <div className="flex items-center justify-between mb-8">
