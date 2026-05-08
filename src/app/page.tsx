@@ -20,9 +20,9 @@ export default function Home() {
           <span className="text-2xl font-bold tracking-tight text-primary">RemuneraLab</span>
           <a
             href="/formulario"
-            className="hidden sm:block bg-primary text-on-primary font-bold px-6 py-2 rounded-lg hover:opacity-90 transition-all text-sm shadow-sm"
+            className="bg-primary text-on-primary font-bold px-4 py-2 rounded-lg hover:opacity-90 transition-all text-xs sm:text-sm sm:px-6 shadow-sm whitespace-nowrap"
           >
-            Descubre tu percentil
+            Comenzar
           </a>
         </div>
       </header>
@@ -63,9 +63,9 @@ export default function Home() {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.2 }}
-              className="relative hidden md:block"
+              className="relative"
             >
-              <div className="glass-card rounded-2xl p-8 shadow-2xl relative z-10 border border-white/50">
+              <div className="glass-card rounded-2xl p-4 sm:p-8 shadow-2xl relative z-10 border border-white/50">
                 <div className="flex items-center justify-between mb-8">
                   <div>
                     <p className="text-xs font-bold text-on-surface-variant uppercase tracking-widest">
@@ -81,7 +81,7 @@ export default function Home() {
                   <div className="h-2 w-full bg-surface-container rounded-full overflow-hidden">
                     <div className="h-full bg-primary w-[78%] rounded-full" />
                   </div>
-                  <div className="grid grid-cols-3 gap-2">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                     <div className="bg-surface p-2 sm:p-4 rounded-lg border border-outline-variant/30">
                       <p className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider mb-1">P50</p>
                       <p className="text-lg font-bold text-primary">$3.1M</p>
