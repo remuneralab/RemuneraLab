@@ -146,7 +146,7 @@ export default function Formulario() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="glass-panel rounded-2xl p-10 shadow-sm border border-outline-variant/30"
+            className="glass-panel rounded-2xl p-6 sm:p-10 shadow-sm border border-outline-variant/30"
           >
             <div className="mb-8">
               <h1 className="text-3xl font-bold text-primary mb-2">Aporta tu transparencia</h1>

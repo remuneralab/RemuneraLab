@@ -70,7 +70,7 @@ export default async function ResultadoPage({ params }: Props) {
               <Sparkles size={12} />
               Benchmark verificado
             </span>
-            <h1 className="text-5xl font-bold text-primary mb-4 leading-tight">
+            <h1 className="text-3xl sm:text-5xl font-bold text-primary mb-4 leading-tight">
               Tu salario está en el{" "}
               <span className="text-secondary">percentil {percentil}</span> del mercado.
             </h1>
@@ -119,7 +119,7 @@ export default async function ResultadoPage({ params }: Props) {
                     Tu posición
                   </span>
                 </div>
-                <p className="text-7xl font-bold text-white leading-none mb-2">{percentil}</p>
+                <p className="text-5xl sm:text-7xl font-bold text-white leading-none mb-2">{percentil}</p>
                 <p className="text-on-primary-container text-sm mb-6">percentil</p>
                 <p className="text-on-primary-container text-sm leading-relaxed">
                   Superas al{" "}

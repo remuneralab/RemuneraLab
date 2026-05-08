@@ -20,7 +20,7 @@ export default function Home() {
           <span className="text-2xl font-bold tracking-tight text-primary">RemuneraLab</span>
           <a
             href="/formulario"
-            className="bg-primary text-on-primary font-bold px-6 py-2 rounded-lg hover:opacity-90 transition-all text-sm shadow-sm"
+            className="hidden sm:block bg-primary text-on-primary font-bold px-6 py-2 rounded-lg hover:opacity-90 transition-all text-sm shadow-sm"
           >
             Descubre tu percentil
           </a>
@@ -42,7 +42,7 @@ export default function Home() {
                   Benchmark salarial — Chile 2025
                 </span>
               </div>
-              <h1 className="text-5xl font-bold text-primary leading-tight">
+              <h1 className="text-3xl sm:text-5xl font-bold text-primary leading-tight">
                 ¿Estás ganando lo que mereces?
               </h1>
               <p className="text-lg text-on-surface-variant max-w-lg">
@@ -81,20 +81,20 @@ export default function Home() {
                   <div className="h-2 w-full bg-surface-container rounded-full overflow-hidden">
                     <div className="h-full bg-primary w-[78%] rounded-full" />
                   </div>
-                  <div className="grid grid-cols-3 gap-4">
-                    <div className="bg-surface p-4 rounded-lg border border-outline-variant/30">
-                      <p className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider mb-1">P50 mercado</p>
+                  <div className="grid grid-cols-3 gap-2">
+                    <div className="bg-surface p-2 sm:p-4 rounded-lg border border-outline-variant/30">
+                      <p className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider mb-1">P50</p>
                       <p className="text-lg font-bold text-primary">$3.1M</p>
                       <span className="text-[10px] text-emerald-600 flex items-center gap-1">
                         <TrendingUp size={10} /> Tecnología
                       </span>
                     </div>
-                    <div className="bg-surface p-4 rounded-lg border border-outline-variant/30">
+                    <div className="bg-surface p-2 sm:p-4 rounded-lg border border-outline-variant/30">
                       <p className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider mb-1">P75</p>
                       <p className="text-lg font-bold text-primary">$4.2M</p>
                       <span className="text-[10px] text-secondary font-medium">Stgo.</span>
                     </div>
-                    <div className="bg-surface p-4 rounded-lg border border-outline-variant/30">
+                    <div className="bg-surface p-2 sm:p-4 rounded-lg border border-outline-variant/30">
                       <p className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider mb-1">Confianza</p>
                       <p className="text-lg font-bold text-primary">Alta</p>
                       <span className="text-[10px] text-on-tertiary-container font-medium">Verificado</span>
@@ -204,11 +204,11 @@ export default function Home() {
 
         {/* CTA */}
         <section className="py-24 px-6">
-          <div className="max-w-7xl mx-auto bg-primary-container rounded-[2.5rem] p-12 md:p-24 text-center relative overflow-hidden">
+          <div className="max-w-7xl mx-auto bg-primary-container rounded-[2.5rem] p-8 sm:p-12 md:p-24 text-center relative overflow-hidden">
             <div className="absolute inset-0 opacity-5 pointer-events-none flex items-end justify-end">
               <LayoutDashboard size={400} className="text-white -mb-24 -mr-24 rotate-12" />
             </div>
-            <h2 className="text-4xl font-bold text-white mb-6 relative z-10">
+            <h2 className="text-2xl sm:text-4xl font-bold text-white mb-6 relative z-10">
               Únete a la transparencia salarial
             </h2>
             <p className="text-on-primary-container text-lg max-w-xl mx-auto mb-10 relative z-10">
