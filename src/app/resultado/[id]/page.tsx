@@ -3,6 +3,7 @@ import { supabase } from "@/lib/supabase";
 import { calcularBenchmark } from "@/lib/benchmark";
 import { Sparkles, ShieldCheck, TrendingUp } from "lucide-react";
 import ChartResult from "./ChartResult";
+import AIInterpretacion from "./AIInterpretacion";
 
 function formatCLP(n: number) {
   return new Intl.NumberFormat("es-CL", {
@@ -202,6 +203,20 @@ export default async function ResultadoPage({ params }: Props) {
             </p>
           </div>
         </div>
+
+        <AIInterpretacion
+          cargo={registro.cargo}
+          industria={registro.industria}
+          anios_experiencia={registro.anios_experiencia}
+          region={registro.region}
+          salario_mid={salario_mid}
+          percentil={percentil}
+          p25={bench.p25 ?? null}
+          p50={bench.p50 ?? null}
+          p75={bench.p75 ?? null}
+          n={bench.n}
+          confianza={bench.confianza}
+        />
 
         {/* Mensajes del spec */}
         {bench.confianza === "baja" && (
