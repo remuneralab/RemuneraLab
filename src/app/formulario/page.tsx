@@ -1,19 +1,49 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "motion/react";
 import { Lock, ShieldCheck, ArrowRight } from "lucide-react";
+import { clasificarCargo, type CiuoMatch } from "@/lib/ciuo08";
 
-const INDUSTRIAS = [
-  "Tecnología",
-  "Retail",
-  "Finanzas",
-  "Salud",
-  "Educación",
-  "Manufactura",
-  "Servicios",
-  "Otro",
+// CIUO 2-digit prefix → industrias donde ese grupo es habitual.
+// Solo subgrupos con mapping claro para evitar falsos positivos.
+const CIUO_INDUSTRIA_ESPERADA: Record<string, { industrias: string[]; sector: string }> = {
+  "22": { industrias: ["Salud"],                                                sector: "salud" },
+  "23": { industrias: ["Educación", "Gobierno / Sector Público"],               sector: "educación" },
+  "61": { industrias: ["Agricultura"],                                           sector: "agricultura" },
+  "62": { industrias: ["Agricultura"],                                           sector: "agricultura" },
+  "71": { industrias: ["Construcción", "Manufactura / Industria"],              sector: "construcción" },
+  "72": { industrias: ["Construcción", "Manufactura / Industria"],              sector: "oficios industriales" },
+  "81": { industrias: ["Manufactura / Industria", "Minería", "Transporte y Logística"], sector: "operaciones industriales" },
+  "82": { industrias: ["Manufactura / Industria", "Minería"],                   sector: "manufactura" },
+  "83": { industrias: ["Transporte y Logística"],                               sector: "transporte" },
+};
+
+function detectarMalaCombo(ciuo: CiuoMatch | null, industriaValue: string): string | null {
+  if (!ciuo || !industriaValue) return null;
+  const prefijo = ciuo.codigo.slice(0, 2);
+  const esperada = CIUO_INDUSTRIA_ESPERADA[prefijo];
+  if (!esperada || esperada.industrias.includes(industriaValue)) return null;
+  return `Este cargo suele pertenecer al sector ${esperada.sector}. ¿Estás seguro de que tu industria es correcta?`;
+}
+
+// label → valor guardado en DB (permite granularidad en UI sin fragmentar el benchmark)
+const INDUSTRIAS: { label: string; value: string }[] = [
+  { label: "Tecnología",               value: "Tecnología" },
+  { label: "Retail / Comercio",        value: "Retail / Comercio" },
+  { label: "Finanzas",                 value: "Finanzas y Seguros" },
+  { label: "Seguros",                  value: "Finanzas y Seguros" },
+  { label: "Salud",                    value: "Salud" },
+  { label: "Educación",                value: "Educación" },
+  { label: "Manufactura / Industria",  value: "Manufactura / Industria" },
+  { label: "Minería",                  value: "Minería" },
+  { label: "Construcción",             value: "Construcción" },
+  { label: "Transporte y Logística",   value: "Transporte y Logística" },
+  { label: "Agricultura",              value: "Agricultura" },
+  { label: "Sector Público",           value: "Gobierno / Sector Público" },
+  { label: "Servicios",                value: "Servicios" },
+  { label: "Otro",                     value: "Otro" },
 ];
 
 const REGIONES = [
@@ -36,10 +66,10 @@ const REGIONES = [
 ];
 
 const TAMANOS_EMPRESA = [
-  "Startup (1–50 empleados)",
-  "Pyme (51–200 empleados)",
-  "Empresa grande (201–1.000 empleados)",
-  "Corporación (más de 1.000 empleados)",
+  "Microempresa (1–9 empleados)",
+  "Pequeña empresa (10–49 empleados)",
+  "Mediana empresa (50–199 empleados)",
+  "Gran empresa (200+ empleados)",
 ];
 
 export const RANGOS_SALARIALES = [
@@ -50,7 +80,9 @@ export const RANGOS_SALARIALES = [
   { label: "$1.800.000 – $2.500.000", min: 1800000, max: 2500000 },
   { label: "$2.500.000 – $4.000.000", min: 2500000, max: 4000000 },
   { label: "$4.000.000 – $6.000.000", min: 4000000, max: 6000000 },
-  { label: "Más de $6.000.000", min: 6000000, max: 12000000 },
+  { label: "$6.000.000 – $9.000.000", min: 6000000, max: 9000000 },
+  { label: "$9.000.000 – $14.000.000", min: 9000000, max: 14000000 },
+  { label: "Más de $14.000.000", min: 14000000, max: 25000000 },
 ];
 
 interface FormData {
@@ -80,9 +112,20 @@ export default function Formulario() {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [ciuo, setCiuo] = useState<CiuoMatch | null>(null);
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  }
+
+  function handleCargoChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const value = e.target.value;
+    setForm((prev) => ({ ...prev, cargo: value }));
+    clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => {
+      setCiuo(clasificarCargo(value));
+    }, 350);
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -91,25 +134,27 @@ export default function Formulario() {
     setError("");
 
     const rango = RANGOS_SALARIALES[parseInt(form.salario_rango)];
+    const industriaDB = INDUSTRIAS.find((i) => i.label === form.industria)?.value ?? form.industria;
 
     const res = await fetch("/api/contribuir", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         cargo: form.cargo,
-        industria: form.industria,
+        industria: industriaDB,
         anios_experiencia: parseInt(form.anios_experiencia),
         region: form.region,
         tamano_empresa: form.tamano_empresa,
         salario_min: rango.min,
         salario_max: rango.max,
+        ciuo_codigo: ciuo?.codigo ?? null,
       }),
     });
 
     const data = await res.json();
 
     if (!res.ok || !data.id) {
-      setError("No se pudo guardar la información. Intenta nuevamente.");
+      setError(data.error ?? "No se pudo guardar la información. Intenta nuevamente.");
       setLoading(false);
       return;
     }
@@ -125,6 +170,14 @@ export default function Formulario() {
           <a href="/" className="text-2xl font-bold tracking-tight text-primary">
             RemuneraLab
           </a>
+          <nav className="flex items-center gap-6">
+            <a
+              href="/empresas"
+              className="text-sm text-on-surface-variant hover:text-primary transition-colors"
+            >
+              Para empresas
+            </a>
+          </nav>
         </div>
       </header>
 
@@ -183,9 +236,22 @@ export default function Formulario() {
                     required
                     placeholder="Ej: Ingeniero de Software"
                     value={form.cargo}
-                    onChange={handleChange}
+                    onChange={handleCargoChange}
                     className={fieldClass}
                   />
+                  {ciuo && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -4 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="mt-2 flex items-center gap-2 ml-1"
+                    >
+                      <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-primary/70 bg-primary/6 border border-primary/15 rounded-full px-3 py-1">
+                        <span className="font-mono text-primary/50">{ciuo.codigo}</span>
+                        <span className="text-on-surface-variant/60">·</span>
+                        <span>{ciuo.grupo}</span>
+                      </span>
+                    </motion.div>
+                  )}
                 </div>
 
                 {/* Industria */}
@@ -200,8 +266,17 @@ export default function Formulario() {
                     className={fieldClass}
                   >
                     <option value="" disabled>Selecciona...</option>
-                    {INDUSTRIAS.map((i) => <option key={i} value={i}>{i}</option>)}
+                    {INDUSTRIAS.map((i) => <option key={i.label} value={i.label}>{i.label}</option>)}
                   </select>
+                  {(() => {
+                    const industriaValue = INDUSTRIAS.find(i => i.label === form.industria)?.value ?? form.industria;
+                    const aviso = detectarMalaCombo(ciuo, industriaValue);
+                    return aviso ? (
+                      <p className="mt-2 ml-1 text-[11px] text-amber-700 font-medium">
+                        ⚠ {aviso}
+                      </p>
+                    ) : null;
+                  })()}
                 </div>
 
                 {/* Años experiencia */}
