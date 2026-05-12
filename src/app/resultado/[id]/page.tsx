@@ -74,6 +74,8 @@ export default async function ResultadoPage({ params }: Props) {
           p75={bench.p75 ?? null}
           n={bench.n}
           n_esi={bench.n_esi}
+          n_aviso={bench.n_aviso}
+          n_trab={bench.n_trab}
           confianza={bench.confianza}
           cargo={registro.cargo}
           industria={registro.industria}

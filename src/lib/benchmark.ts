@@ -1,5 +1,6 @@
 import { supabase } from "@/lib/supabase";
 import { clasificarCargo } from "@/lib/ciuo08";
+import { matchTrabajandoPrior } from "@/lib/priors_trabajando";
 
 function midpoint(min: number, max: number) {
   return Math.round((min + max) / 2);
@@ -28,7 +29,10 @@ function weightedMean(records: Weighted[]): number {
   return Math.round(sumVW / sumW);
 }
 
-const ESI_MIN = 30;
+const ESI_MIN    = 30;
+const AVISO_MIN  = 5;
+// Cada aviso equivale al 20% de un registro ESI — son ofertas, no salarios negociados.
+const AVISO_WEIGHT = 0.2;
 
 function calcularK(n_esi: number): number {
   if (n_esi >= 200) return 40;
@@ -98,6 +102,8 @@ const CIUO2_NOMBRE: Record<number, string> = {
 export interface BenchmarkResult {
   n: number;
   n_esi: number;
+  n_aviso: number;
+  n_trab: number;
   promedio: number | null;
   p25: number | null;
   p50: number | null;
@@ -105,7 +111,7 @@ export interface BenchmarkResult {
   percentil_usuario: number | null;
   confianza: "alta" | "media" | "baja";
   expanded: boolean;
-  fuentes: { remuneralab: number; esi: number };
+  fuentes: { remuneralab: number; esi: number; avisos: number; trabajando: number };
   fuente_descripcion: string;
 }
 
@@ -267,11 +273,73 @@ export async function calcularBenchmark(
 
   if (!esiData) esiData = [];
 
+  // ── 2b. Avisos scrapeados (registros_avisos) — corrección temporal ──────
+  // Cascada: CIUO exacto + región → CIUO exacto nacional → industria + región
+  // Experiencia: preferir avisos con experiencia_anios dentro de ±2 años del usuario.
+  // Si no hay suficientes con match de experiencia, incluir también los que tienen NULL.
+  type AvisoRow = { salario_mid: number; experiencia_anios: number | null };
+  let avisosData: { salario_mid: number }[] | null = null;
+
+  function filtrarPorExp(rows: AvisoRow[]): { salario_mid: number }[] {
+    const match  = rows.filter(r => r.experiencia_anios != null &&
+      Math.abs(r.experiencia_anios - anios_experiencia) <= 2);
+    const unknown = rows.filter(r => r.experiencia_anios == null);
+    if (match.length >= AVISO_MIN) return match;
+    return [...match, ...unknown];
+  }
+
+  if (ciuo4) {
+    const { data, error } = await supabase
+      .from("registros_avisos")
+      .select("salario_mid, experiencia_anios")
+      .eq("ciuo4", ciuo4)
+      .eq("region", region)
+      .not("salario_mid", "is", null);
+    if (!error && data) {
+      const filtered = filtrarPorExp(data);
+      if (filtered.length >= AVISO_MIN) avisosData = filtered;
+    }
+  }
+
+  if (!avisosData && ciuo4) {
+    const { data, error } = await supabase
+      .from("registros_avisos")
+      .select("salario_mid, experiencia_anios")
+      .eq("ciuo4", ciuo4)
+      .not("salario_mid", "is", null);
+    if (!error && data) {
+      const filtered = filtrarPorExp(data);
+      if (filtered.length >= AVISO_MIN) avisosData = filtered;
+    }
+  }
+
+  if (!avisosData) {
+    const { data, error } = await supabase
+      .from("registros_avisos")
+      .select("salario_mid, experiencia_anios")
+      .eq("industria", industria)
+      .eq("region", region)
+      .not("salario_mid", "is", null);
+    if (!error && data) {
+      const filtered = filtrarPorExp(data);
+      if (filtered.length >= AVISO_MIN) avisosData = filtered;
+    }
+  }
+
+  avisosData = avisosData ?? [];
+
+  // ── 2c. Prior nacional Trabajando.cl ────────────────────────────────────
+  // Medianas por cargo con grandes muestras nacionales.
+  // Sin desglose regional ni de experiencia — ancla el prior cuando ESI/avisos son escasos.
+  const trabPrior = matchTrabajandoPrior(cargo);
+  const TRAB_EQUIV = 50;
+
   // ── 3. Arrays de salarios ────────────────────────────────────────────────
   const userRecords = userData ?? [];
-  const esiRecords = esiData ?? [];
-  const n = userRecords.length;
+  const esiRecords  = esiData ?? [];
+  const n     = userRecords.length;
   const n_esi = esiRecords.length;
+  const n_aviso = avisosData.length;
 
   const userMids = userRecords.map((r) => midpoint(r.salario_min, r.salario_max));
   const userSorted = [...userMids].sort((a, b) => a - b);
@@ -282,66 +350,121 @@ export async function calcularBenchmark(
     w: (r.factor_expansion ?? 1) * decayFactor(r.ano_encuesta ?? 2024),
   }));
   const esiSortedW = [...esiWeighted].sort((a, b) => a.v - b.v);
-  const esiTotalW = esiSortedW.reduce((a, r) => a + r.w, 0);
+  const esiTotalW  = esiSortedW.reduce((a, r) => a + r.w, 0);
+
+  // Avisos: sin factor de expansión (cada registro = 1 aviso)
+  const avisoSorted = [...avisosData.map(r => r.salario_mid)].sort((a, b) => a - b);
 
   // ── 4. Percentiles por fuente ───────────────────────────────────────────
-  const uP25 = n > 0 ? at(userSorted, 25) : null;
-  const uP50 = n > 0 ? at(userSorted, 50) : null;
-  const uP75 = n > 0 ? at(userSorted, 75) : null;
-  const uProm = n > 0 ? Math.round(userMids.reduce((a, b) => a + b, 0) / n) : null;
+  const uP25  = n > 0     ? at(userSorted, 25)                    : null;
+  const uP50  = n > 0     ? at(userSorted, 50)                    : null;
+  const uP75  = n > 0     ? at(userSorted, 75)                    : null;
+  const uProm = n > 0     ? Math.round(userMids.reduce((a,b) => a+b, 0) / n) : null;
 
-  const eP25 = n_esi > 0 ? weightedAt(esiSortedW, 25, esiTotalW) : null;
-  const eP50 = n_esi > 0 ? weightedAt(esiSortedW, 50, esiTotalW) : null;
-  const eP75 = n_esi > 0 ? weightedAt(esiSortedW, 75, esiTotalW) : null;
-  const eProm = n_esi > 0 ? weightedMean(esiWeighted) : null;
+  const eP25  = n_esi > 0 ? weightedAt(esiSortedW, 25, esiTotalW) : null;
+  const eP50  = n_esi > 0 ? weightedAt(esiSortedW, 50, esiTotalW) : null;
+  const eP75  = n_esi > 0 ? weightedAt(esiSortedW, 75, esiTotalW) : null;
+  const eProm = n_esi > 0 ? weightedMean(esiWeighted)              : null;
 
-  // ── 5. Blend por shrinkage ──────────────────────────────────────────────
-  // K crece con n_esi: prior robusto cede menos ante pocos datos de usuario
-  const K = calcularK(n_esi);
-  const w_user = n / (n + K);
-  const w_esi = K / (n + K);
+  const aP25  = n_aviso > 0 ? at(avisoSorted, 25)                  : null;
+  const aP50  = n_aviso > 0 ? at(avisoSorted, 50)                  : null;
+  const aP75  = n_aviso > 0 ? at(avisoSorted, 75)                  : null;
+  const aProm = n_aviso > 0 ? Math.round(avisoSorted.reduce((a,b)=>a+b,0)/n_aviso) : null;
 
-  const blend = (u: number | null, e: number | null): number | null => {
-    if (u != null && e != null) return Math.round(w_user * u + w_esi * e);
-    return u ?? e ?? null;
+  // ── 5. Prior blended (ESI + avisos + Trabajando.cl) ────────────────────
+  const n_aviso_equiv = n_aviso * AVISO_WEIGHT;
+  const n_trab_equiv  = trabPrior ? TRAB_EQUIV : 0;
+
+  const tP50 = trabPrior?.p50 ?? null;
+  const tP25 = trabPrior ? Math.round(trabPrior.p50 * 0.78) : null;
+  const tP75 = trabPrior ? Math.round(trabPrior.p50 * 1.30) : null;
+
+  const blendPrior = (e: number | null, a: number | null, t: number | null): number | null => {
+    const parts: { v: number; w: number }[] = [];
+    if (e != null && n_esi > 0)        parts.push({ v: e, w: n_esi });
+    if (a != null && n_aviso_equiv > 0) parts.push({ v: a, w: n_aviso_equiv });
+    if (t != null && n_trab_equiv > 0)  parts.push({ v: t, w: n_trab_equiv });
+    if (parts.length === 0) return null;
+    const wTotal = parts.reduce((s, p) => s + p.w, 0);
+    if (wTotal === 0) return null;
+    return Math.round(parts.reduce((s, p) => s + p.v * p.w, 0) / wTotal);
   };
 
-  const p25 = blend(uP25, eP25);
-  const p50 = blend(uP50, eP50);
-  const p75 = blend(uP75, eP75);
-  const promedio = blend(uProm, eProm);
+  const priorP25  = blendPrior(eP25,  aP25,  tP25);
+  const priorP50  = blendPrior(eP50,  aP50,  tP50);
+  const priorP75  = blendPrior(eP75,  aP75,  tP75);
+  const priorProm = blendPrior(eProm, aProm, tP50);
 
-  // ── 6. Percentil del usuario ────────────────────────────────────────────
+  // ── 6. Shrinkage usuario ↔ prior ───────────────────────────────────────
+  const effectivePriorN = Math.max(n_esi, Math.round(n_aviso_equiv), n_trab_equiv);
+  const K       = calcularK(effectivePriorN);
+  const w_user  = n / (n + K);
+  const w_prior = K / (n + K);
+
+  const blend = (u: number | null, prior: number | null): number | null => {
+    if (u != null && prior != null) return Math.round(w_user * u + w_prior * prior);
+    return u ?? prior ?? null;
+  };
+
+  const p25     = blend(uP25,  priorP25);
+  const p50     = blend(uP50,  priorP50);
+  const p75     = blend(uP75,  priorP75);
+  const promedio = blend(uProm, priorProm);
+
+  if (n_aviso > 0) {
+    fuente_descripcion += ` + ${n_aviso} avisos actuales`;
+  }
+  if (trabPrior) {
+    fuente_descripcion += ` · prior Trabajando.cl`;
+  }
+
+  // ── 7. Percentil del usuario ────────────────────────────────────────────
   let percentil_usuario: number | null = null;
   if (salario_mid != null) {
     const rank_user =
       n > 0
         ? ((userMids.filter((v) => v < salario_mid).length +
-            0.5 * userMids.filter((v) => v === salario_mid).length) /
-            n) *
-          100
+            0.5 * userMids.filter((v) => v === salario_mid).length) / n) * 100
         : null;
 
     const rank_esi =
       n_esi > 0
-        ? (esiWeighted.filter((r) => r.v < salario_mid).reduce((a, r) => a + r.w, 0) /
-            esiTotalW) *
-          100
+        ? (esiWeighted.filter((r) => r.v < salario_mid).reduce((a, r) => a + r.w, 0) / esiTotalW) * 100
         : null;
 
-    const raw = blend(rank_user, rank_esi);
+    const rank_aviso =
+      n_aviso > 0
+        ? (avisoSorted.filter((v) => v < salario_mid).length / n_aviso) * 100
+        : null;
+
+    // Interpolación lineal entre p25/p50/p75 de Trabajando.cl
+    const rank_trab =
+      tP25 != null && tP50 != null && tP75 != null
+        ? salario_mid <= tP25
+          ? Math.max(1, Math.round((salario_mid / tP25) * 25))
+          : salario_mid <= tP50
+          ? Math.round(25 + ((salario_mid - tP25) / (tP50 - tP25)) * 25)
+          : salario_mid <= tP75
+          ? Math.round(50 + ((salario_mid - tP50) / (tP75 - tP50)) * 25)
+          : Math.min(99, Math.round(75 + ((salario_mid - tP75) / tP75) * 12))
+        : null;
+
+    const rank_prior = blendPrior(rank_esi, rank_aviso, rank_trab);
+    const raw = blend(rank_user, rank_prior);
     if (raw != null) percentil_usuario = Math.min(99, Math.max(1, Math.round(raw)));
   }
 
-  // ── 7. Confianza — combina datos propios (calidad) y ESI (volumen) ──────
+  // ── 8. Confianza ────────────────────────────────────────────────────────
   const confianza: "alta" | "media" | "baja" =
-    n >= 15 || (n >= 3 && n_esi >= 100) ? "alta"
-    : n >= 5  || n_esi >= 30            ? "media"
+    n >= 15 || (n >= 3 && (n_esi >= 100 || n_aviso >= 30)) ? "alta"
+    : n >= 5  || n_esi >= 30 || n_aviso >= 10 || !!trabPrior ? "media"
     : "baja";
 
   return {
     n,
     n_esi,
+    n_aviso,
+    n_trab: trabPrior ? TRAB_EQUIV : 0,
     promedio,
     p25,
     p50,
@@ -349,7 +472,7 @@ export async function calcularBenchmark(
     percentil_usuario,
     confianza,
     expanded,
-    fuentes: { remuneralab: n, esi: n_esi },
+    fuentes: { remuneralab: n, esi: n_esi, avisos: n_aviso, trabajando: trabPrior ? TRAB_EQUIV : 0 },
     fuente_descripcion,
   };
 }

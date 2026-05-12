@@ -49,6 +49,8 @@ interface Props {
   p75: number | null;
   n: number;
   n_esi: number;
+  n_aviso: number;
+  n_trab: number;
   confianza: string;
   cargo: string;
   industria: string;
@@ -61,7 +63,7 @@ interface Props {
 }
 
 export default function ResultadoBento({
-  percentil, hasData, p25, p50, p75, n, n_esi, confianza,
+  percentil, hasData, p25, p50, p75, n, n_esi, n_aviso, n_trab, confianza,
   cargo, industria, region, salario_mid, brechaP75, competitividad, anios_experiencia,
   fuente_descripcion,
 }: Props) {
@@ -104,7 +106,7 @@ export default function ResultadoBento({
             <div>
               <h2 className="text-2xl font-bold text-primary">Distribución Salarial</h2>
               <p className="text-sm text-on-surface-variant font-medium mt-1">
-                {industria} · {n > 0 ? `${n} contribuciones` : `ESI 2024 INE · ${n_esi} registros`}
+                {industria} · {n > 0 ? `${n} contribuciones` : n_aviso > 0 ? `${n_esi} registros ESI + ${n_aviso} avisos` : `ESI 2024 INE · ${n_esi} registros`}
               </p>
             </div>
           </div>
@@ -172,26 +174,53 @@ export default function ResultadoBento({
               <ShieldCheck size={20} className="text-outline-variant" />
             </div>
             <div className="space-y-3">
-              <div className="flex justify-between items-center">
-                <span className="text-xs text-on-surface-variant">RemuneraLab</span>
-                <span className="text-sm font-bold text-primary">{n} registros</span>
-              </div>
-              <div className="w-full bg-outline-variant/15 rounded-full h-1.5">
-                <div
-                  className="bg-primary h-1.5 rounded-full transition-all"
-                  style={{ width: n + n_esi > 0 ? `${Math.round((n / (n + n_esi)) * 100)}%` : "0%" }}
-                />
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-xs text-on-surface-variant">ESI 2024 · INE</span>
-                <span className="text-sm font-bold text-secondary">{n_esi} registros</span>
-              </div>
-              <div className="w-full bg-outline-variant/15 rounded-full h-1.5">
-                <div
-                  className="bg-secondary h-1.5 rounded-full transition-all"
-                  style={{ width: n + n_esi > 0 ? `${Math.round((n_esi / (n + n_esi)) * 100)}%` : "100%" }}
-                />
-              </div>
+              {(() => {
+                const total = n + n_esi + n_aviso + n_trab;
+                return (
+                  <>
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs text-on-surface-variant">RemuneraLab</span>
+                      <span className="text-sm font-bold text-primary">{n} registros</span>
+                    </div>
+                    <div className="w-full bg-outline-variant/15 rounded-full h-1.5">
+                      <div className="bg-primary h-1.5 rounded-full transition-all"
+                        style={{ width: total > 0 ? `${Math.round((n / total) * 100)}%` : "0%" }} />
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs text-on-surface-variant">ESI 2024 · INE</span>
+                      <span className="text-sm font-bold text-secondary">{n_esi} registros</span>
+                    </div>
+                    <div className="w-full bg-outline-variant/15 rounded-full h-1.5">
+                      <div className="bg-secondary h-1.5 rounded-full transition-all"
+                        style={{ width: total > 0 ? `${Math.round((n_esi / total) * 100)}%` : "100%" }} />
+                    </div>
+                    {n_aviso > 0 && (
+                      <>
+                        <div className="flex justify-between items-center">
+                          <span className="text-xs text-on-surface-variant">Avisos actuales</span>
+                          <span className="text-sm font-bold text-tertiary">{n_aviso} avisos</span>
+                        </div>
+                        <div className="w-full bg-outline-variant/15 rounded-full h-1.5">
+                          <div className="bg-tertiary h-1.5 rounded-full transition-all"
+                            style={{ width: `${Math.round((n_aviso / total) * 100)}%` }} />
+                        </div>
+                      </>
+                    )}
+                    {n_trab > 0 && (
+                      <>
+                        <div className="flex justify-between items-center">
+                          <span className="text-xs text-on-surface-variant">Trabajando.cl · nacional</span>
+                          <span className="text-sm font-bold text-violet-600">prior</span>
+                        </div>
+                        <div className="w-full bg-outline-variant/15 rounded-full h-1.5">
+                          <div className="bg-violet-500 h-1.5 rounded-full transition-all"
+                            style={{ width: `${Math.round((n_trab / total) * 100)}%` }} />
+                        </div>
+                      </>
+                    )}
+                  </>
+                );
+              })()}
               <div className="pt-3 mt-1 border-t border-outline-variant/20">
                 <p className="text-[10px] font-bold text-on-surface-variant uppercase tracking-[0.15em] mb-1">
                   Comparado con
