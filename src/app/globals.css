@@ -1,43 +1,94 @@
 @import "tailwindcss";
 
 @theme {
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-sans:  var(--font-dm-sans),  ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-dm-serif), "Georgia", serif;
+  --font-mono:  var(--font-space-mono), "Courier New", monospace;
 
-  --color-primary:                   #00152a;
-  --color-primary-container:         #102a43;
-  --color-on-primary:                #ffffff;
-  --color-on-primary-container:      #7a92b0;
+  /* ── Marca RemuneraLab ─────────────────────────────────── */
+  --color-primary:             #0D2240;   /* Azul Noche — base 60% */
+  --color-primary-container:   #1B4F8A;   /* Azul Confianza */
+  --color-on-primary:          #ffffff;
+  --color-on-primary-container: #7a92b0;
 
-  --color-secondary:                 #376476;
-  --color-secondary-container:       #b9e6fb;
-  --color-on-secondary-container:    #3c687a;
+  --color-cian:                #00B4D8;   /* Acento tecnológico 25% */
+  --color-verde-teal:          #2EC4B6;   /* Tendencias / gráficos */
+  --color-verde-exito:         #06D6A0;   /* CTA, resultados positivos 10% */
+  --color-dorado:              #F7C948;   /* Énfasis selectivo 5% */
+  --color-arena:               #F4F1E8;   /* Fondos claros neutros */
+  --color-rojo-alerta:         #E63946;
 
-  --color-tertiary:                  #001816;
-  --color-tertiary-fixed:            #9cf2e8;
+  --color-secondary:           #1B4F8A;
+  --color-secondary-container: #b9e6fb;
+  --color-on-secondary-container: #3c687a;
+
+  --color-tertiary:            #001816;
+  --color-tertiary-fixed:      #9cf2e8;
   --color-on-tertiary-container:     #004d47;
   --color-on-tertiary-fixed-variant: #00504a;
 
-  --color-surface:                   #faf9fb;
-  --color-surface-container:         #efedf0;
+  --color-surface:             #faf9fb;
+  --color-surface-container:   #efedf0;
   --color-surface-container-high:    #e9e8ea;
   --color-surface-container-highest: #e3e2e4;
-  --color-on-surface:                #1b1c1e;
-  --color-on-surface-variant:        #43474d;
-
-  --color-outline-variant:           #c3c6ce;
+  --color-on-surface:          #1b1c1e;
+  --color-on-surface-variant:  #43474d;
+  --color-outline-variant:     #c3c6ce;
 }
 
 @layer base {
   body {
     background-color: #faf9fb;
     color: #1b1c1e;
-    font-family: "Inter", ui-sans-serif, system-ui, sans-serif;
+    font-family: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
 }
 
+@media print {
+  @page {
+    margin: 1.5cm 2cm;
+    size: A4;
+  }
+
+  /* Fondo blanco, texto negro para impresión */
+  body {
+    background: white !important;
+    color: #111 !important;
+  }
+
+  /* Eliminar glows, grids y efectos visuales */
+  [style*="radial-gradient"],
+  [style*="linear-gradient(rgba"] {
+    display: none !important;
+  }
+
+  /* Eliminar sombras y backdrop-filter */
+  * {
+    box-shadow: none !important;
+    text-shadow: none !important;
+    backdrop-filter: none !important;
+  }
+
+  /* Evitar cortes en medio de filas de tabla */
+  tr {
+    break-inside: avoid;
+  }
+
+  /* Evitar cortes en tarjetas de sección */
+  section, .rounded-xl {
+    break-inside: avoid;
+  }
+}
+
 @layer utilities {
+  .font-serif-display {
+    font-family: var(--font-dm-serif), Georgia, serif;
+  }
+  .font-space-mono {
+    font-family: var(--font-space-mono), "Courier New", monospace;
+  }
   .glass-panel {
     background: rgba(255, 255, 255, 0.8);
     backdrop-filter: blur(12px);

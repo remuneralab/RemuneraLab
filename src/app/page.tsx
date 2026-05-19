@@ -1,29 +1,25 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
+import Image from "next/image";
 import { motion, useInView } from "motion/react";
-import { ArrowRight, ShieldCheck, RefreshCw, BarChart2, Building2 } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import { ArrowRight } from "lucide-react";
+import { supabase } from "@/lib/supabase";
 
 const E = [0.16, 1, 0.3, 1] as const;
 
-function useScrolled(threshold = 24) {
-  const [scrolled, setScrolled] = useState(false);
-  useEffect(() => {
-    const fn = () => setScrolled(window.scrollY > threshold);
-    window.addEventListener("scroll", fn, { passive: true });
-    return () => window.removeEventListener("scroll", fn);
-  }, [threshold]);
-  return scrolled;
-}
+type Sector = { sector: string; count: number };
 
-function CountUp({ target, suffix = "" }: { target: number; suffix?: string }) {
+function CountUp({ target }: { target: number }) {
   const [count, setCount] = useState(0);
-  const ref    = useRef<HTMLSpanElement>(null);
+  const ref = useRef<HTMLSpanElement>(null);
   const inView = useInView(ref, { once: true });
   useEffect(() => {
     if (!inView) return;
     const start = performance.now();
-    const dur = 1200;
+    const dur = 1400;
     const tick = (now: number) => {
       const p = Math.min((now - start) / dur, 1);
       setCount(Math.round((1 - Math.pow(1 - p, 3)) * target));
@@ -31,371 +27,322 @@ function CountUp({ target, suffix = "" }: { target: number; suffix?: string }) {
     };
     requestAnimationFrame(tick);
   }, [inView, target]);
-  return <span ref={ref}>{count}{suffix}</span>;
+  return <span ref={ref}>{count.toLocaleString("es-CL")}</span>;
 }
-
-function PercentilViz() {
-  const ref    = useRef(null);
-  const inView = useInView(ref, { once: true });
-  return (
-    <div ref={ref} className="border border-outline-variant/40 rounded-lg p-8 bg-white space-y-8">
-      <div>
-        <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-on-surface-variant mb-1">
-          Análisis de ejemplo
-        </p>
-        <p className="text-base font-semibold text-primary">Desarrollador Senior</p>
-        <p className="text-xs text-on-surface-variant mt-0.5">Tecnología · Santiago · 5 años exp.</p>
-      </div>
-
-      <div className="space-y-2">
-        <div className="flex justify-between text-[9px] font-bold uppercase tracking-widest text-on-surface-variant">
-          <span>P25</span><span>P50</span><span>P75</span>
-        </div>
-        <div className="relative h-1 bg-surface-container rounded-full overflow-hidden">
-          <motion.div
-            className="absolute inset-y-0 left-0 bg-primary rounded-full"
-            initial={{ width: 0 }}
-            animate={inView ? { width: "78%" } : { width: 0 }}
-            transition={{ duration: 1.4, ease: E, delay: 0.5 }}
-          />
-        </div>
-        <div className="flex justify-between text-[10px] font-mono text-on-surface-variant">
-          <span>$2.1M</span><span>$3.1M</span><span>$4.2M</span>
-        </div>
-      </div>
-
-      <div className="pt-5 border-t border-outline-variant/20 grid grid-cols-2 gap-4">
-        <motion.div
-          initial={{ opacity: 0, y: 6 }}
-          animate={inView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.4, ease: E, delay: 1.1 }}
-        >
-          <p className="text-[9px] font-bold uppercase tracking-widest text-on-surface-variant mb-2">
-            Tu posición
-          </p>
-          <p className="text-5xl font-bold text-primary tabular-nums leading-none">78</p>
-          <p className="text-xs text-on-surface-variant mt-1.5">percentil del mercado</p>
-        </motion.div>
-        <motion.div
-          initial={{ opacity: 0, y: 6 }}
-          animate={inView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.4, ease: E, delay: 1.2 }}
-          className="text-right"
-        >
-          <p className="text-[9px] font-bold uppercase tracking-widest text-on-surface-variant mb-2">
-            Confianza
-          </p>
-          <p className="text-sm font-bold text-emerald-600 mt-3">Alta</p>
-          <p className="text-[10px] text-on-surface-variant mt-0.5">106 respuestas reales</p>
-        </motion.div>
-      </div>
-    </div>
-  );
-}
-
-const PASOS = [
-  {
-    n: "01",
-    titulo: "Ingresa tu perfil",
-    desc: "Cargo, industria, años de experiencia y región de Chile. Sin nombre ni email — completamente anónimo.",
-  },
-  {
-    n: "02",
-    titulo: "Comparte tu rango salarial",
-    desc: "Selecciona el rango mensual bruto que corresponde a tu situación actual.",
-  },
-  {
-    n: "03",
-    titulo: "Recibe tu posición en el mercado",
-    desc: "Ve tu percentil exacto comparado con profesionales en tu mismo cargo, industria y región.",
-  },
-];
-
-const PILARES = [
-  {
-    Icon: ShieldCheck,
-    titulo: "100% anónimo",
-    desc: "Sin registro ni email. Tus datos se agregan al benchmark colectivo sin identificarte.",
-  },
-  {
-    Icon: BarChart2,
-    titulo: "Datos reales",
-    desc: "Basado en registros ESI 2024 INE y CASEN 2022. Cada respuesta mejora la precisión.",
-  },
-  {
-    Icon: RefreshCw,
-    titulo: "Gratuito siempre",
-    desc: "El acceso al benchmark es y será gratuito. Tu contribución tiene valor por sí sola.",
-  },
-];
 
 export default function Home() {
-  const scrolled = useScrolled();
+  const router = useRouter();
+  const [sectores, setSectores]     = useState<Sector[]>([]);
+  const [authChecked, setAuthChecked] = useState(false);
+  const totalAvisos = sectores.reduce((a, s) => a + s.count, 0);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
+        router.push("/perfil");
+      } else {
+        setAuthChecked(true);
+      }
+    });
+  }, [router]);
+
+  useEffect(() => {
+    fetch("/api/sectores")
+      .then((r) => r.json())
+      .then(setSectores)
+      .catch(() => {});
+  }, []);
+
+  const maxCount = Math.max(...sectores.map((s) => s.count), 1);
+
+  if (!authChecked) return <div className="min-h-screen" style={{ background: "#180b3b" }} />;
 
   return (
-    <div className="min-h-screen flex flex-col bg-white">
+    <div style={{ background: "#180b3b" }}>
 
-      {/* ── Navbar ──────────────────────────────────────────────────────── */}
-      <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrolled
-          ? "bg-white/95 backdrop-blur-md border-b border-outline-variant/30"
-          : "bg-white border-b border-outline-variant/10"
-      }`}>
-        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-          <a href="/" className="text-xs font-bold tracking-[0.12em] uppercase text-primary">
-            RemuneraLab
-          </a>
-          <nav className="flex items-center gap-6">
-            <a
-              href="/empresas"
-              className="hidden sm:block text-sm text-on-surface-variant hover:text-primary transition-colors"
-            >
-              Para empresas
-            </a>
-            <a
-              href="/formulario"
-              className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary border border-primary px-4 py-2 rounded hover:bg-primary hover:text-white transition-all duration-200"
-            >
-              Comenzar <ArrowRight size={13} />
-            </a>
-          </nav>
-        </div>
-      </header>
+      {/* ══════════════ HERO ══════════════ */}
+      <section className="relative min-h-screen flex flex-col items-center justify-center px-6 overflow-hidden">
 
-      <main className="flex-grow">
+        {/* Fondo: glows + grid */}
+        <div className="pointer-events-none absolute -top-32 -right-32 w-[700px] h-[700px] rounded-full"
+          style={{ background: "radial-gradient(circle, rgba(133,104,243,0.20) 0%, transparent 65%)" }} />
+        <div className="pointer-events-none absolute -bottom-24 -left-24 w-[500px] h-[500px] rounded-full"
+          style={{ background: "radial-gradient(circle, rgba(133,104,243,0.12) 0%, transparent 65%)" }} />
+        <div className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[600px] rounded-full"
+          style={{ background: "radial-gradient(ellipse, rgba(133,104,243,0.07) 0%, transparent 70%)" }} />
+        <div className="pointer-events-none absolute inset-0"
+          style={{
+            backgroundImage:
+              "linear-gradient(rgba(133,104,243,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(133,104,243,0.06) 1px, transparent 1px)",
+            backgroundSize: "64px 64px",
+          }} />
 
-        {/* ── Hero ────────────────────────────────────────────────────── */}
-        <section className="pt-40 pb-24 border-b border-outline-variant/20">
-          <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-16 lg:gap-24 items-center">
+        <div className="relative flex flex-col items-center text-center gap-7 max-w-4xl w-full">
 
-            <div className="flex flex-col gap-8">
-              <motion.p
-                initial={{ opacity: 0, y: 6 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, ease: E }}
-                className="text-[10px] font-bold uppercase tracking-[0.3em] text-on-surface-variant"
-              >
-                Benchmark salarial · Chile 2025
-              </motion.p>
-
-              <div className="border-l-2 border-primary pl-6">
-                <motion.h1
-                  initial={{ opacity: 0, y: 18 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.65, ease: E, delay: 0.07 }}
-                  className="text-5xl sm:text-6xl lg:text-[4.25rem] font-bold text-primary leading-[1.03] tracking-tight"
-                >
-                  ¿Estás ganando<br />lo que mereces?
-                </motion.h1>
-              </div>
-
-              <motion.p
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, ease: E, delay: 0.15 }}
-                className="text-base text-on-surface-variant leading-relaxed max-w-sm"
-              >
-                En 2 minutos sabes exactamente en qué posición del mercado laboral chileno estás.
-              </motion.p>
-
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, ease: E, delay: 0.22 }}
-                className="flex flex-col sm:flex-row items-start sm:items-center gap-5"
-              >
-                <a
-                  href="/formulario"
-                  className="inline-flex items-center gap-2 bg-primary text-white text-sm font-semibold px-6 py-3 rounded hover:bg-primary/90 transition-colors"
-                >
-                  Descubre tu posición <ArrowRight size={15} />
-                </a>
-                <p className="text-xs text-on-surface-variant tracking-wide">
-                  Sin registro · Sin email · Gratis
-                </p>
-              </motion.div>
-            </div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, ease: E, delay: 0.2 }}
-            >
-              <PercentilViz />
-            </motion.div>
-          </div>
-        </section>
-
-        {/* ── Stats band ──────────────────────────────────────────────── */}
-        <section className="bg-surface border-b border-outline-variant/20">
-          <div className="max-w-7xl mx-auto px-6">
-            <div className="grid grid-cols-3 divide-x divide-outline-variant/20">
-              {[
-                { value: <CountUp target={106} suffix="+" />, label: "Salarios registrados" },
-                { value: "100%",    label: "Anónimo · sin email" },
-                { value: "Gratis",  label: "Siempre, sin excepciones" },
-              ].map((s, i) => (
-                <div key={i} className="flex flex-col items-center py-8 px-4 text-center">
-                  <p className="text-2xl sm:text-3xl font-bold text-primary tabular-nums">{s.value}</p>
-                  <p className="text-xs text-on-surface-variant mt-1.5">{s.label}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* ── Cómo funciona ───────────────────────────────────────────── */}
-        <section className="py-24 border-b border-outline-variant/20">
-          <div className="max-w-7xl mx-auto px-6">
-            <motion.p
-              initial={{ opacity: 0, y: 8 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.4, ease: E }}
-              className="text-[10px] font-bold uppercase tracking-[0.3em] text-on-surface-variant mb-12"
-            >
-              Cómo funciona
-            </motion.p>
-            <div>
-              {PASOS.map((paso, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, x: -20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true, margin: "-40px" }}
-                  transition={{ duration: 0.5, ease: E, delay: i * 0.1 }}
-                  className="flex items-start gap-8 sm:gap-14 py-10 border-t border-outline-variant/20 group"
-                >
-                  <span className="text-5xl sm:text-6xl font-bold text-outline-variant/25 leading-none select-none tabular-nums w-16 sm:w-20 shrink-0 pt-1">
-                    {paso.n}
-                  </span>
-                  <div className="flex-1 min-w-0">
-                    <h3 className="text-lg sm:text-xl font-bold text-primary mb-2">{paso.titulo}</h3>
-                    <p className="text-sm text-on-surface-variant leading-relaxed">{paso.desc}</p>
-                  </div>
-                  <ArrowRight
-                    size={16}
-                    className="text-outline-variant/30 mt-2 shrink-0 transition-all group-hover:text-primary group-hover:translate-x-1"
-                  />
-                </motion.div>
-              ))}
-              <div className="border-t border-outline-variant/20" />
-            </div>
-          </div>
-        </section>
-
-        {/* ── Por qué confiar ─────────────────────────────────────────── */}
-        <section className="py-24 bg-surface border-b border-outline-variant/20">
-          <div className="max-w-7xl mx-auto px-6">
-            <motion.p
-              initial={{ opacity: 0, y: 8 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.4, ease: E }}
-              className="text-[10px] font-bold uppercase tracking-[0.3em] text-on-surface-variant mb-12"
-            >
-              Por qué confiar
-            </motion.p>
-            <div className="grid md:grid-cols-3 gap-px bg-outline-variant/15">
-              {PILARES.map((p, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, y: 14 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-40px" }}
-                  transition={{ duration: 0.45, ease: E, delay: i * 0.08 }}
-                  className="bg-surface p-8 flex flex-col gap-5"
-                >
-                  <p.Icon size={18} className="text-secondary" />
-                  <div>
-                    <h3 className="text-sm font-bold text-primary mb-2">{p.titulo}</h3>
-                    <p className="text-sm text-on-surface-variant leading-relaxed">{p.desc}</p>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* ── Para empresas ───────────────────────────────────────────── */}
-        <section className="border-b border-outline-variant/20">
-          <motion.a
-            href="/empresas"
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.4, ease: E }}
-            className="flex items-center justify-between gap-6 max-w-7xl mx-auto px-6 py-10 group"
+          {/* Logo */}
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: E }}
           >
-            <div className="flex items-center gap-5">
-              <Building2 size={20} className="text-secondary shrink-0" />
-              <div>
-                <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-on-surface-variant mb-0.5">
-                  Para empresas
-                </p>
-                <p className="text-base font-semibold text-primary">
-                  Diagnóstico de cumplimiento laboral y benchmark B2B sectorial
-                </p>
-              </div>
-            </div>
-            <ArrowRight
-              size={16}
-              className="text-outline-variant shrink-0 transition-all group-hover:text-primary group-hover:translate-x-1"
+            <Image
+              src="/logo-white.png"
+              alt="RemuneraLab"
+              width={280}
+              height={72}
+              priority
+              className="select-none"
+              style={{ filter: "drop-shadow(0 0 24px rgba(133,104,243,0.35))" }}
             />
-          </motion.a>
-        </section>
+          </motion.div>
 
-        {/* ── CTA ─────────────────────────────────────────────────────── */}
-        <section className="bg-primary py-24 sm:py-32">
-          <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-start md:items-end justify-between gap-12">
-            <motion.div
-              initial={{ opacity: 0, y: 16 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, ease: E }}
-            >
-              <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-on-primary-container mb-8">
-                Transparencia salarial · Chile
-              </p>
-              <h2 className="text-4xl sm:text-5xl font-bold text-white leading-tight tracking-tight max-w-lg">
-                Cada dato que compartes<br />hace el mercado más justo.
-              </h2>
-            </motion.div>
-            <motion.a
+          {/* Label */}
+          <motion.p
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, ease: E, delay: 0.1 }}
+            style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.6rem", letterSpacing: "0.35em", color: "rgba(133,104,243,0.65)" }}
+            className="uppercase"
+          >
+            Benchmark salarial · Chile 2026
+          </motion.p>
+
+          {/* Línea separadora */}
+          <motion.div
+            initial={{ scaleX: 0, opacity: 0 }}
+            animate={{ scaleX: 1, opacity: 1 }}
+            transition={{ duration: 0.7, ease: E, delay: 0.2 }}
+            className="origin-center h-px w-24"
+            style={{ background: "linear-gradient(to right, transparent, #8568f3, transparent)" }}
+          />
+
+          {/* Headline */}
+          <motion.h1
+            initial={{ opacity: 0, y: 14 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.65, ease: E, delay: 0.24 }}
+            className="font-semibold leading-tight text-white"
+            style={{ fontSize: "clamp(1.5rem, 3.8vw, 2.6rem)", fontFamily: "var(--font-dm-sans)" }}
+          >
+            Descubre en qué percentil del mercado<br />
+            laboral chileno estás —{" "}
+            <span style={{ color: "#e7e4fd" }}>en 2 minutos.</span>
+          </motion.h1>
+
+          {/* Sub-headline */}
+          <motion.p
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: E, delay: 0.32 }}
+            className="font-light leading-relaxed max-w-md"
+            style={{ fontSize: "1.05rem", fontFamily: "var(--font-dm-sans)", color: "rgba(255,255,255,0.45)" }}
+          >
+            Ingresa tu cargo, industria y experiencia.
+            Sin registro ni email — completamente anónimo.
+          </motion.p>
+
+          {/* CTA */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.55, ease: E, delay: 0.40 }}
+          >
+            <Link
               href="/formulario"
-              initial={{ opacity: 0, y: 12 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.4, ease: E, delay: 0.1 }}
-              className="inline-flex items-center gap-2 bg-white text-primary text-sm font-semibold px-6 py-3 rounded hover:bg-surface transition-colors shrink-0"
+              className="inline-flex items-center gap-2 font-semibold px-9 py-4 rounded-lg hover:opacity-90 transition-opacity"
+              style={{
+                fontFamily: "var(--font-dm-sans)",
+                fontSize: "0.95rem",
+                background: "linear-gradient(135deg, #8568f3, #a387f5)",
+                color: "#ffffff",
+                boxShadow: "0 0 36px rgba(133,104,243,0.40), 0 2px 12px rgba(133,104,243,0.25)",
+              }}
             >
-              Empezar análisis gratuito <ArrowRight size={15} />
-            </motion.a>
+              Descubrir mi posición <ArrowRight size={16} />
+            </Link>
+          </motion.div>
+
+          {/* Trust signals */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5, ease: E, delay: 0.52 }}
+            className="flex flex-wrap justify-center items-center gap-x-5 gap-y-2"
+            style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.6rem", letterSpacing: "0.18em", color: "rgba(255,255,255,0.22)" }}
+          >
+            <span>+104.000 REGISTROS REALES</span>
+            <span style={{ color: "rgba(255,255,255,0.10)" }}>·</span>
+            <span>100% ANÓNIMO</span>
+            <span style={{ color: "rgba(255,255,255,0.10)" }}>·</span>
+            <span>SIEMPRE GRATIS</span>
+          </motion.div>
+
+        </div>
+
+        {/* Scroll hint */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.6, ease: E, delay: 0.9 }}
+          className="absolute bottom-10 flex flex-col items-center gap-2"
+        >
+          <motion.div
+            animate={{ y: [0, 6, 0] }}
+            transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
+          >
+            <ArrowRight size={14} className="rotate-90" style={{ color: "rgba(255,255,255,0.18)" }} />
+          </motion.div>
+        </motion.div>
+
+      </section>
+
+      {/* ══════════════ SECTORES ══════════════ */}
+      {sectores.length > 0 && (
+        <section
+          className="relative px-6 py-24 overflow-hidden"
+          style={{ borderTop: "1px solid rgba(133,104,243,0.12)" }}
+        >
+
+          <div className="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px]"
+            style={{ background: "radial-gradient(ellipse, rgba(133,104,243,0.10) 0%, transparent 70%)" }} />
+
+          <div className="relative max-w-5xl mx-auto flex flex-col gap-12">
+
+            {/* Header + stat grande */}
+            <div className="flex flex-col items-center text-center gap-4">
+              <p
+                className="uppercase tracking-[0.3em]"
+                style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.62rem", color: "#8568f3" }}
+              >
+                Mercado laboral · Chile
+              </p>
+              <div className="h-px w-12" style={{ background: "rgba(133,104,243,0.40)" }} />
+
+              <div className="flex flex-col items-center gap-1">
+                <span
+                  className="leading-none tabular-nums"
+                  style={{
+                    fontFamily: "var(--font-space-mono)",
+                    fontSize: "clamp(2.8rem, 7vw, 4.5rem)",
+                    color: "white",
+                    fontWeight: 700,
+                    letterSpacing: "-0.02em",
+                    textShadow: "0 0 40px rgba(133,104,243,0.25)",
+                  }}
+                >
+                  <CountUp target={totalAvisos} />
+                </span>
+                <span
+                  className="uppercase tracking-[0.3em]"
+                  style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.62rem", color: "#8568f3" }}
+                >
+                  avisos laborales disponibles
+                </span>
+              </div>
+
+              <p
+                className="font-light max-w-sm mt-2"
+                style={{ fontFamily: "var(--font-dm-sans)", fontSize: "0.875rem", color: "rgba(255,255,255,0.35)" }}
+              >
+                Selecciona un sector para ver las ofertas disponibles.
+              </p>
+            </div>
+
+            {/* Tarjetas de sectores */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {sectores.map(({ sector, count }, i) => {
+                const pct = Math.round((count / maxCount) * 100);
+                return (
+                  <motion.div
+                    key={sector}
+                    initial={{ opacity: 0, y: 14 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: "-30px" }}
+                    transition={{ duration: 0.4, ease: E, delay: i * 0.07 }}
+                  >
+                    <Link
+                      href={`/ofertas?sector=${encodeURIComponent(sector)}`}
+                      className="group flex flex-col gap-4 p-6 rounded-xl h-full transition-all"
+                      style={{
+                        border: "1px solid rgba(133,104,243,0.15)",
+                        background: "rgba(133,104,243,0.05)",
+                      }}
+                      onMouseEnter={e => {
+                        (e.currentTarget as HTMLAnchorElement).style.background = "rgba(133,104,243,0.12)";
+                        (e.currentTarget as HTMLAnchorElement).style.borderColor = "rgba(133,104,243,0.40)";
+                      }}
+                      onMouseLeave={e => {
+                        (e.currentTarget as HTMLAnchorElement).style.background = "rgba(133,104,243,0.05)";
+                        (e.currentTarget as HTMLAnchorElement).style.borderColor = "rgba(133,104,243,0.15)";
+                      }}
+                    >
+                      <span
+                        className="font-semibold text-white leading-tight transition-colors group-hover:text-[#e7e4fd]"
+                        style={{ fontFamily: "var(--font-dm-sans)", fontSize: "1.15rem" }}
+                      >
+                        {sector}
+                      </span>
+
+                      <div className="h-0.5 w-full rounded-full overflow-hidden" style={{ background: "rgba(133,104,243,0.15)" }}>
+                        <motion.div
+                          initial={{ width: 0 }}
+                          whileInView={{ width: `${pct}%` }}
+                          viewport={{ once: true }}
+                          transition={{ duration: 0.9, ease: E, delay: 0.15 + i * 0.05 }}
+                          className="h-full rounded-full"
+                          style={{ background: "rgba(133,104,243,0.60)" }}
+                        />
+                      </div>
+
+                      <div className="flex items-center justify-between">
+                        <span
+                          className="tabular-nums transition-colors"
+                          style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.75rem", letterSpacing: "0.05em", color: "rgba(255,255,255,0.45)" }}
+                        >
+                          {count} avisos
+                        </span>
+                        <span
+                          className="flex items-center gap-1 transition-colors"
+                          style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.6rem", letterSpacing: "0.12em", color: "rgba(255,255,255,0.20)" }}
+                        >
+                          VER <ArrowRight size={9} />
+                        </span>
+                      </div>
+                    </Link>
+                  </motion.div>
+                );
+              })}
+            </div>
+
+            {/* CTA general */}
+            <div className="flex justify-center">
+              <Link
+                href="/ofertas"
+                className="inline-flex items-center gap-2 px-7 py-3 rounded-lg transition-all"
+                style={{
+                  fontFamily: "var(--font-space-mono)",
+                  fontSize: "0.65rem",
+                  letterSpacing: "0.15em",
+                  border: "1px solid rgba(133,104,243,0.40)",
+                  color: "#8568f3",
+                }}
+                onMouseEnter={e => {
+                  (e.currentTarget as HTMLAnchorElement).style.background = "rgba(133,104,243,0.10)";
+                  (e.currentTarget as HTMLAnchorElement).style.color = "#e7e4fd";
+                }}
+                onMouseLeave={e => {
+                  (e.currentTarget as HTMLAnchorElement).style.background = "transparent";
+                  (e.currentTarget as HTMLAnchorElement).style.color = "#8568f3";
+                }}
+              >
+                VER TODOS LOS SECTORES <ArrowRight size={11} />
+              </Link>
+            </div>
+
           </div>
         </section>
-      </main>
+      )}
 
-      {/* ── Footer ──────────────────────────────────────────────────── */}
-      <footer className="bg-primary border-t border-white/10 py-10">
-        <div className="max-w-7xl mx-auto px-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
-          <div>
-            <p className="text-xs font-bold uppercase tracking-[0.12em] text-white mb-1">
-              RemuneraLab
-            </p>
-            <p className="text-xs text-on-primary-container">
-              Inteligencia salarial para Chile. Tus datos son anónimos y nunca se venderán.
-            </p>
-          </div>
-          <nav className="flex items-center gap-6">
-            <a href="/empresas" className="text-xs text-on-primary-container hover:text-white transition-colors">
-              Para empresas
-            </a>
-            <a href="/formulario" className="text-xs text-on-primary-container hover:text-white transition-colors">
-              Benchmark
-            </a>
-          </nav>
-        </div>
-      </footer>
     </div>
   );
 }

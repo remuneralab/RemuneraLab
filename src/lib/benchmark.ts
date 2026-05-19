@@ -40,7 +40,9 @@ function calcularK(n_esi: number): number {
   if (n_esi >= 50)  return 15;
   return 10;
 }
-const ESI_FLOOR = 100_000;
+// Solo incluye trabajadores con ingresos ≥ sueldo mínimo legal.
+// Excluye sector informal/jornada parcial que arrastraría el p50 por debajo del mínimo.
+const ESI_FLOOR = 539_000; // Ley N° 21.751, vigente 1 enero 2026
 const ESI_CEIL  = 10_000_000;
 
 const YEAR_NOW = new Date().getFullYear();
@@ -105,14 +107,19 @@ export interface BenchmarkResult {
   n_aviso: number;
   n_trab: number;
   promedio: number | null;
+  p10: number | null;
   p25: number | null;
   p50: number | null;
   p75: number | null;
+  p90: number | null;
   percentil_usuario: number | null;
   confianza: "alta" | "media" | "baja";
   expanded: boolean;
   fuentes: { remuneralab: number; esi: number; avisos: number; trabajando: number };
   fuente_descripcion: string;
+  // 1-2: cargo exacto (ciuo4), 3-4: grupo ocupacional (ciuo2), 5-7: sector (industria)
+  nivel_cascada: 1 | 2 | 3 | 4 | 5 | 6 | 7;
+  grupo_usado: string | null; // nombre legible del grupo/sector que entregó los datos
 }
 
 export async function calcularBenchmark(
@@ -155,6 +162,8 @@ export async function calcularBenchmark(
 
   let esiData: { ingreso_mensual: number; factor_expansion: number | null; ano_encuesta: number | null }[] | null = null;
   let fuente_descripcion = `${industria} · datos generales`;
+  let nivel_cascada: 1 | 2 | 3 | 4 | 5 | 6 | 7 = 7;
+  let grupo_usado: string | null = null;
 
   // Nivel 1: ciuo4 exacto + región + edad
   if (ciuo4) {
@@ -170,6 +179,8 @@ export async function calcularBenchmark(
     if (!error && (data?.length ?? 0) >= ESI_MIN) {
       esiData = data;
       fuente_descripcion = `${ciuoMatch!.grupo} · ${region}`;
+      nivel_cascada = 1;
+      grupo_usado = ciuoMatch!.grupo;
     }
   }
 
@@ -186,6 +197,8 @@ export async function calcularBenchmark(
     if (!error && (data?.length ?? 0) >= ESI_MIN) {
       esiData = data;
       fuente_descripcion = `${ciuoMatch!.grupo} · nacional`;
+      nivel_cascada = 2;
+      grupo_usado = ciuoMatch!.grupo;
     }
   }
 
@@ -204,6 +217,8 @@ export async function calcularBenchmark(
     if (!error && (data?.length ?? 0) >= ESI_MIN) {
       esiData = data;
       fuente_descripcion = `${CIUO2_NOMBRE[ciuo2] ?? `Grupo CIUO ${ciuo2}xx`} · ${region}`;
+      nivel_cascada = 3;
+      grupo_usado = CIUO2_NOMBRE[ciuo2] ?? null;
     }
   }
 
@@ -221,6 +236,8 @@ export async function calcularBenchmark(
     if (!error && (data?.length ?? 0) >= ESI_MIN) {
       esiData = data;
       fuente_descripcion = `${CIUO2_NOMBRE[ciuo2] ?? `Grupo CIUO ${ciuo2}xx`} · nacional`;
+      nivel_cascada = 4;
+      grupo_usado = CIUO2_NOMBRE[ciuo2] ?? null;
     }
   }
 
@@ -238,6 +255,8 @@ export async function calcularBenchmark(
     if (!error && (data?.length ?? 0) >= ESI_MIN) {
       esiData = data;
       fuente_descripcion = `${industria} · ${region} (por sector)`;
+      nivel_cascada = 5;
+      grupo_usado = industria;
     }
   }
 
@@ -254,6 +273,8 @@ export async function calcularBenchmark(
     if (!error && (data?.length ?? 0) >= ESI_MIN) {
       esiData = data;
       fuente_descripcion = `${industria} · nacional (por sector)`;
+      nivel_cascada = 6;
+      grupo_usado = industria;
     }
   }
 
@@ -268,6 +289,8 @@ export async function calcularBenchmark(
     if (!error) {
       esiData = data ?? [];
       fuente_descripcion = `${industria} · nacional`;
+      nivel_cascada = 7;
+      grupo_usado = industria;
     }
   }
 
@@ -361,14 +384,18 @@ export async function calcularBenchmark(
   const uP75  = n > 0     ? at(userSorted, 75)                    : null;
   const uProm = n > 0     ? Math.round(userMids.reduce((a,b) => a+b, 0) / n) : null;
 
+  const eP10  = n_esi > 0 ? weightedAt(esiSortedW, 10, esiTotalW) : null;
   const eP25  = n_esi > 0 ? weightedAt(esiSortedW, 25, esiTotalW) : null;
   const eP50  = n_esi > 0 ? weightedAt(esiSortedW, 50, esiTotalW) : null;
   const eP75  = n_esi > 0 ? weightedAt(esiSortedW, 75, esiTotalW) : null;
+  const eP90  = n_esi > 0 ? weightedAt(esiSortedW, 90, esiTotalW) : null;
   const eProm = n_esi > 0 ? weightedMean(esiWeighted)              : null;
 
+  const aP10  = n_aviso > 0 ? at(avisoSorted, 10)                  : null;
   const aP25  = n_aviso > 0 ? at(avisoSorted, 25)                  : null;
   const aP50  = n_aviso > 0 ? at(avisoSorted, 50)                  : null;
   const aP75  = n_aviso > 0 ? at(avisoSorted, 75)                  : null;
+  const aP90  = n_aviso > 0 ? at(avisoSorted, 90)                  : null;
   const aProm = n_aviso > 0 ? Math.round(avisoSorted.reduce((a,b)=>a+b,0)/n_aviso) : null;
 
   // ── 5. Prior blended (ESI + avisos + Trabajando.cl) ────────────────────
@@ -376,8 +403,10 @@ export async function calcularBenchmark(
   const n_trab_equiv  = trabPrior ? TRAB_EQUIV : 0;
 
   const tP50 = trabPrior?.p50 ?? null;
+  const tP10 = trabPrior ? Math.round(trabPrior.p50 * 0.58) : null;
   const tP25 = trabPrior ? Math.round(trabPrior.p50 * 0.78) : null;
   const tP75 = trabPrior ? Math.round(trabPrior.p50 * 1.30) : null;
+  const tP90 = trabPrior ? Math.round(trabPrior.p50 * 1.65) : null;
 
   const blendPrior = (e: number | null, a: number | null, t: number | null): number | null => {
     const parts: { v: number; w: number }[] = [];
@@ -390,9 +419,11 @@ export async function calcularBenchmark(
     return Math.round(parts.reduce((s, p) => s + p.v * p.w, 0) / wTotal);
   };
 
+  const priorP10  = blendPrior(eP10,  aP10,  tP10);
   const priorP25  = blendPrior(eP25,  aP25,  tP25);
   const priorP50  = blendPrior(eP50,  aP50,  tP50);
   const priorP75  = blendPrior(eP75,  aP75,  tP75);
+  const priorP90  = blendPrior(eP90,  aP90,  tP90);
   const priorProm = blendPrior(eProm, aProm, tP50);
 
   // ── 6. Shrinkage usuario ↔ prior ───────────────────────────────────────
@@ -406,9 +437,13 @@ export async function calcularBenchmark(
     return u ?? prior ?? null;
   };
 
+  const uP10    = n > 0 ? at(userSorted, 10) : null;
+  const uP90    = n > 0 ? at(userSorted, 90) : null;
+  const p10     = blend(uP10,  priorP10);
   const p25     = blend(uP25,  priorP25);
   const p50     = blend(uP50,  priorP50);
   const p75     = blend(uP75,  priorP75);
+  const p90     = blend(uP90,  priorP90);
   const promedio = blend(uProm, priorProm);
 
   if (n_aviso > 0) {
@@ -466,13 +501,17 @@ export async function calcularBenchmark(
     n_aviso,
     n_trab: trabPrior ? TRAB_EQUIV : 0,
     promedio,
+    p10,
     p25,
     p50,
     p75,
+    p90,
     percentil_usuario,
     confianza,
     expanded,
     fuentes: { remuneralab: n, esi: n_esi, avisos: n_aviso, trabajando: trabPrior ? TRAB_EQUIV : 0 },
     fuente_descripcion,
+    nivel_cascada,
+    grupo_usado,
   };
 }

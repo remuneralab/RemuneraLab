@@ -59,9 +59,9 @@ const RIESGOS = [
     titulo: "Responsabilidad solidaria por deudas de contratistas",
     desc: "La Ley 20.123 hace a la empresa principal responsable de todas las obligaciones laborales y previsionales de sus contratistas. Una AFP impaga de un contratista — aunque sea pequeño — puede ejecutarse directamente contra la minera o el yacimiento.",
     nivel: "Crítico",
-    color: "text-red-600",
-    bg: "bg-red-50",
-    border: "border-red-100",
+    color: "text-red-500",
+    bg: "bg-red-900/12",
+    border: "border-red-500/20",
   },
   {
     icon: HardHat,
@@ -69,8 +69,8 @@ const RIESGOS = [
     desc: "SERNAGEOMIN puede ordenar paralización inmediata de cualquier equipo pesado operado sin certificación vigente. Costo directo: $2.800.000/día por equipo paralizado + multa de 10 a 150 UTM según reincidencia.",
     nivel: "Crítico",
     color: "text-red-500",
-    bg: "bg-red-50",
-    border: "border-red-100",
+    bg: "bg-red-900/12",
+    border: "border-red-500/20",
   },
   {
     icon: ShieldAlert,
@@ -78,17 +78,17 @@ const RIESGOS = [
     desc: "La minería es el sector con mayor brecha de género en Chile: mujeres ganan un 21% menos que hombres en cargos equivalentes, controlando por experiencia. La Ley 20.348 está vigente desde 2009 y la prescripción de acciones es de 5 años.",
     nivel: "Alto",
     color: "text-red-500",
-    bg: "bg-red-50",
-    border: "border-red-100",
+    bg: "bg-red-900/12",
+    border: "border-red-500/20",
   },
   {
     icon: Users,
     titulo: "Ley de Transparencia Salarial — próxima a regir",
     desc: "La Ley de Transparencia (2025–26) obliga a publicar rangos salariales por cargo y reportar brecha de género anualmente. Las mineras con +100 trabajadores propios (no contratistas) quedan incluidas. Multa: hasta 60 UTM por cargo incumplido.",
     nivel: "Moderado",
-    color: "text-amber-600",
-    bg: "bg-amber-50",
-    border: "border-amber-100",
+    color: "text-amber-500",
+    bg: "bg-amber-900/12",
+    border: "border-amber-500/20",
   },
 ];
 
@@ -98,40 +98,40 @@ export default function CumplimientoLegalMineria() {
   const [openIdx, setOpenIdx] = useState<number | null>(null);
 
   return (
-    <section className="py-20 bg-surface">
+    <section className="py-20 border-t border-white/8">
       <div className="max-w-7xl mx-auto px-6">
 
         {/* Header */}
         <div className="flex flex-wrap items-center gap-3 mb-3">
-          <span className="text-xs font-bold text-secondary tracking-[0.2em] uppercase">
+          <span className="text-[#00B4D8] uppercase tracking-[0.3em]" style={{ fontFamily: "'Space Mono', monospace", fontSize: "0.62rem", fontWeight: 700 }}>
             Marco regulatorio
           </span>
-          <span className="inline-flex items-center gap-1.5 bg-primary text-on-primary text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full">
+          <span className="inline-flex items-center gap-1.5 bg-[#00B4D8]/10 text-[#00B4D8] text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full border border-[#00B4D8]/20">
             <Scale size={10} /> Convierte útil en necesario
           </span>
         </div>
-        <h2 className="text-2xl font-bold text-primary mb-2">
+        <h2 className="text-2xl font-bold text-white mb-2">
           Cumplimiento legal — ¿Está preparada tu operación?
         </h2>
-        <p className="text-sm text-on-surface-variant max-w-2xl mb-10">
-          La minería acumula tres capas regulatorias simultáneas: la <strong className="text-primary">Ley 20.123</strong> convierte
-          cada deuda de contratistas en deuda propia, el <strong className="text-primary">DS 132 SERNAGEOMIN</strong> puede
-          paralizar equipos sin previo aviso, y la <strong className="text-primary">Ley 20.348</strong> lleva 15 años exigiendo
+        <p className="text-sm text-white/45 max-w-2xl mb-10">
+          La minería acumula tres capas regulatorias simultáneas: la <strong className="text-white">Ley 20.123</strong> convierte
+          cada deuda de contratistas en deuda propia, el <strong className="text-white">DS 132 SERNAGEOMIN</strong> puede
+          paralizar equipos sin previo aviso, y la <strong className="text-white">Ley 20.348</strong> lleva 15 años exigiendo
           igualdad salarial. Este es el diagnóstico para una operación minera privada tipo.
         </p>
 
         <div className="grid lg:grid-cols-2 gap-8 mb-10">
 
           {/* Score + checklist */}
-          <div className="bg-white rounded-lg border border-outline-variant/30 p-6 flex flex-col gap-6">
+          <div className="rounded-xl border border-white/10 bg-white/4 p-6 flex flex-col gap-6">
             <div className="flex items-center gap-6">
               <ComplianceGauge score={SCORE} />
               <div>
-                <p className="text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-1">
+                <p className="text-[#00B4D8] uppercase tracking-[0.3em] mb-1" style={{ fontFamily: "'Space Mono', monospace", fontSize: "0.62rem", fontWeight: 700 }}>
                   Score de cumplimiento
                 </p>
                 <p className="text-3xl font-bold text-red-500">{SCORE}/100</p>
-                <p className="text-xs text-on-surface-variant mt-1 max-w-[200px]">
+                <p className="text-xs text-white/45 mt-1 max-w-[200px]">
                   Exposición alta. Tres incumplimientos críticos con riesgo de ejecución inmediata.
                 </p>
               </div>
@@ -141,10 +141,10 @@ export default function CumplimientoLegalMineria() {
               {CHECKLIST.map((c, i) => {
                 const isOpen = openIdx === i;
                 const Icon  = c.status === "ok" ? CheckCircle2 : c.status === "partial" ? AlertCircle : XCircle;
-                const color = c.status === "ok" ? "text-emerald-500" : c.status === "partial" ? "text-amber-500" : "text-red-500";
-                const bg    = c.status === "ok" ? "bg-emerald-50 border-emerald-100"
-                            : c.status === "partial" ? "bg-amber-50 border-amber-100"
-                            : "bg-red-50 border-red-100";
+                const color = c.status === "ok" ? "text-[#06D6A0]" : c.status === "partial" ? "text-amber-500" : "text-red-500";
+                const bg    = c.status === "ok" ? "bg-emerald-900/10 border-emerald-500/20"
+                            : c.status === "partial" ? "bg-amber-900/10 border-amber-500/20"
+                            : "bg-red-900/10 border-red-500/20";
                 return (
                   <motion.div
                     key={i}
@@ -157,7 +157,7 @@ export default function CumplimientoLegalMineria() {
                     <button onClick={() => setOpenIdx(isOpen ? null : i)}
                       className="w-full flex items-center gap-3 px-4 py-3 text-left">
                       <Icon size={16} className={`shrink-0 ${color}`} />
-                      <span className="text-xs font-medium text-on-surface flex-1">{c.item}</span>
+                      <span className="text-xs font-medium text-white flex-1">{c.item}</span>
                       <span className={`text-[10px] font-bold uppercase ${color} shrink-0`}>
                         {c.status === "ok" ? "Cumple" : c.status === "partial" ? "Parcial" : "No cumple"}
                       </span>
@@ -166,7 +166,7 @@ export default function CumplimientoLegalMineria() {
                         transition={{ duration: 0.15, ease: [0.2, 0, 0, 1] }}
                         className="inline-flex shrink-0"
                       >
-                        <ChevronRight size={13} className="text-on-surface-variant" />
+                        <ChevronRight size={13} className="text-white/45" />
                       </motion.span>
                     </button>
                     <AnimatePresence>
@@ -181,7 +181,7 @@ export default function CumplimientoLegalMineria() {
                           }}
                           className="px-4 pb-3"
                         >
-                          <p className="text-[11px] text-on-surface-variant leading-relaxed border-t border-black/5 pt-2">
+                          <p className="text-[11px] text-white/45 leading-relaxed border-t border-white/8 pt-2">
                             {c.detalle}
                           </p>
                         </motion.div>
@@ -197,35 +197,35 @@ export default function CumplimientoLegalMineria() {
           <div className="flex flex-col gap-4">
 
             {/* Ley 20.123 destacada */}
-            <div className="bg-white rounded-lg border border-red-200 bg-red-50/60 p-5">
+            <div className="rounded-xl border border-red-500/20 bg-red-900/10 p-5">
               <div className="flex items-start gap-3 mb-3">
                 <FileText size={18} className="text-red-500 shrink-0 mt-0.5" />
                 <div>
                   <div className="flex items-center gap-2 mb-1">
-                    <p className="text-sm font-bold text-primary">Ley 20.123 (subcontratación) — vigente desde 2007</p>
+                    <p className="text-sm font-bold text-white">Ley 20.123 (subcontratación) — vigente desde 2007</p>
                     <span className="text-[9px] font-bold uppercase bg-red-500 text-white px-2 py-0.5 rounded-full">Crítica</span>
                   </div>
-                  <p className="text-xs text-on-surface-variant leading-relaxed">
-                    La empresa principal responde <strong className="text-primary">solidaria y subsidiariamente</strong> por
+                  <p className="text-xs text-white/45 leading-relaxed">
+                    La empresa principal responde <strong className="text-white">solidaria y subsidiariamente</strong> por
                     todas las obligaciones laborales y previsionales de sus contratistas y subcontratistas.
                     En minería, donde hasta el 60% de la dotación puede ser contratista, la exposición es masiva
                     sin auditorías periódicas.
                   </p>
                 </div>
               </div>
-              <div className="grid grid-cols-3 gap-3 pt-3 border-t border-red-100">
+              <div className="grid grid-cols-3 gap-3 pt-3 border-t border-red-500/20">
                 {[
                   { label: "Vigencia",     valor: "2007" },
                   { label: "Aplica a",     valor: "Todos" },
                   { label: "Exposición",   valor: "Masiva" },
                 ].map((s) => (
                   <div key={s.label} className="text-center">
-                    <p className="text-base font-bold text-primary">{s.valor}</p>
-                    <p className="text-[10px] text-on-surface-variant">{s.label}</p>
+                    <p className="text-base font-bold text-white">{s.valor}</p>
+                    <p className="text-[10px] text-white/45">{s.label}</p>
                   </div>
                 ))}
               </div>
-              <p className="text-[10px] text-on-surface-variant mt-2">Sin auditoría activa de contratistas, cualquier deuda de AFP o sueldo impago ejecuta contra la faena.</p>
+              <p className="text-[10px] text-white/45 mt-2">Sin auditoría activa de contratistas, cualquier deuda de AFP o sueldo impago ejecuta contra la faena.</p>
             </div>
 
             {RIESGOS.map((r, i) => (
@@ -240,18 +240,19 @@ export default function CumplimientoLegalMineria() {
                 <r.icon size={18} className={`${r.color} shrink-0 mt-0.5`} />
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between gap-2 mb-1">
-                    <p className="text-xs font-bold text-on-surface">{r.titulo}</p>
+                    <p className="text-xs font-bold text-white">{r.titulo}</p>
                     <span className={`text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border ${r.border} ${r.color} shrink-0`}>
                       {r.nivel}
                     </span>
                   </div>
-                  <p className="text-[11px] text-on-surface-variant leading-relaxed">{r.desc}</p>
+                  <p className="text-[11px] text-white/45 leading-relaxed">{r.desc}</p>
                 </div>
               </motion.div>
             ))}
 
             <a href="#cta"
-              className="w-full bg-primary text-on-primary py-3 rounded-xl text-sm font-bold text-center hover:opacity-90 transition-all flex items-center justify-center gap-2">
+              className="w-full text-[#0D2240] py-3 rounded-xl text-sm font-bold text-center hover:opacity-90 transition-all flex items-center justify-center gap-2"
+              style={{ background: "linear-gradient(135deg,#06D6A0,#2EC4B6)" }}>
               Solicitar auditoría de cumplimiento <ChevronRight size={15} />
             </a>
           </div>
@@ -259,19 +260,19 @@ export default function CumplimientoLegalMineria() {
 
         {/* Info DS 132 + Ley 20.348 */}
         <div className="grid sm:grid-cols-2 gap-4">
-          <div className="flex items-start gap-3 bg-amber-50 border border-amber-100 rounded-xl p-4">
+          <div className="flex items-start gap-3 bg-amber-900/12 border border-amber-500/20 rounded-xl p-4">
             <Info size={14} className="text-amber-500 shrink-0 mt-0.5" />
-            <p className="text-[11px] text-on-surface-variant leading-relaxed">
-              <strong className="text-primary">DS 132 SERNAGEOMIN:</strong> todo operador de
+            <p className="text-[11px] text-white/45 leading-relaxed">
+              <strong className="text-white">DS 132 SERNAGEOMIN:</strong> todo operador de
               equipo pesado (camión minero, pala, cargador) debe tener su certificación operacional
               vigente. SERNAGEOMIN puede ordenar paralización inmediata de un equipo cuyo operador
               no tenga certificación. Multa desde 10 UTM hasta 150 UTM por reincidencia (~$660.000–$9.900.000).
             </p>
           </div>
-          <div className="flex items-start gap-3 bg-secondary-container/20 border border-secondary-container/40 rounded-xl p-4">
-            <Info size={14} className="text-secondary shrink-0 mt-0.5" />
-            <p className="text-[11px] text-on-surface-variant leading-relaxed">
-              <strong className="text-primary">Ley 20.348 (igualdad salarial):</strong> la minería
+          <div className="flex items-start gap-3 bg-[#00B4D8]/5 border border-[#00B4D8]/15 rounded-xl p-4">
+            <Info size={14} className="text-[#00B4D8] shrink-0 mt-0.5" />
+            <p className="text-[11px] text-white/45 leading-relaxed">
+              <strong className="text-white">Ley 20.348 (igualdad salarial):</strong> la minería
               es el sector con mayor brecha de género en Chile. Mujeres en roles técnicos equivalentes
               ganan hasta un 21% menos. Con prescripción de 5 años y alta visibilidad mediática,
               el sector minero es de fiscalización prioritaria para la DT desde 2023.

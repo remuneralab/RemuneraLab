@@ -18,9 +18,9 @@ interface Props {
 }
 
 export default function AIInterpretacion(props: Props) {
-  const [texto, setTexto] = useState("");
+  const [texto, setTexto]   = useState("");
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [error, setError]   = useState("");
 
   useEffect(() => {
     fetch("/api/interpretar", {
@@ -40,21 +40,25 @@ export default function AIInterpretacion(props: Props) {
   if (!loading && (error || !texto)) return null;
 
   return (
-    <div className="mt-6 bg-primary/5 border border-primary/20 rounded-2xl px-6 py-5">
+    <div className="mt-6 rounded-xl border border-[#00B4D8]/20 bg-[#00B4D8]/5 px-6 py-5">
       <div className="flex items-center gap-2 mb-3">
-        <Sparkles size={16} className="text-secondary" />
-        <span className="text-xs font-bold text-secondary uppercase tracking-wider">
+        <Sparkles size={14} className="text-[#00B4D8]" />
+        <span className="text-[#00B4D8] uppercase tracking-[0.2em]"
+          style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.6rem", fontWeight: 700 }}>
           Análisis IA
         </span>
       </div>
       {loading ? (
         <div className="space-y-2">
-          <div className="h-3 bg-primary/10 rounded-full w-full animate-pulse" />
-          <div className="h-3 bg-primary/10 rounded-full w-4/5 animate-pulse" />
-          <div className="h-3 bg-primary/10 rounded-full w-3/5 animate-pulse" />
+          <div className="h-2.5 bg-white/8 rounded-full w-full animate-pulse" />
+          <div className="h-2.5 bg-white/8 rounded-full w-4/5 animate-pulse" />
+          <div className="h-2.5 bg-white/8 rounded-full w-3/5 animate-pulse" />
         </div>
       ) : (
-        <p className="text-sm text-on-surface leading-relaxed">{texto}</p>
+        <p className="text-white/65 leading-relaxed"
+          style={{ fontFamily: "var(--font-dm-sans)", fontSize: "0.875rem" }}>
+          {texto}
+        </p>
       )}
     </div>
   );

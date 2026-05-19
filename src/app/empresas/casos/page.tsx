@@ -72,8 +72,8 @@ const CASES: Case[] = [
     cargo: "TENS · UCI y curaciones avanzadas",
     Icon: Heart,
     color: "text-red-500",
-    colorBg: "bg-red-50",
-    colorBorder: "border-red-400",
+    colorBg: "bg-red-900/12",
+    colorBorder: "border-red-500/20",
     colorDot: "bg-red-400",
     stats: [
       { label: "TENS perdidos",    valor: "11",  sub: "en 8 meses"      },
@@ -120,9 +120,9 @@ const CASES: Case[] = [
     empleados: 95,
     cargo: "Ejecutivo/a Comercial",
     Icon: BarChart3,
-    color: "text-emerald-600",
-    colorBg: "bg-emerald-50",
-    colorBorder: "border-emerald-500",
+    color: "text-[#06D6A0]",
+    colorBg: "bg-emerald-900/12",
+    colorBorder: "border-emerald-500/30",
     colorDot: "bg-emerald-500",
     stats: [
       { label: "Brecha de género", valor: "−18%",  sub: "no medida"       },
@@ -171,8 +171,8 @@ const CASES: Case[] = [
     cargo: "Técnico Eléctrico · certificación SERNAGEOMIN",
     Icon: HardHat,
     color: "text-amber-600",
-    colorBg: "bg-amber-50",
-    colorBorder: "border-amber-500",
+    colorBg: "bg-amber-900/12",
+    colorBorder: "border-amber-500/20",
     colorDot: "bg-amber-500",
     stats: [
       { label: "Técnicos perdidos",  valor: "6/14",  sub: "en 12 meses"      },
@@ -221,8 +221,8 @@ const CASES: Case[] = [
     cargo: "Garzón bilingüe · temporada alta",
     Icon: Globe,
     color: "text-sky-600",
-    colorBg: "bg-sky-50",
-    colorBorder: "border-sky-500",
+    colorBg: "bg-sky-900/12",
+    colorBorder: "border-sky-500/20",
     colorDot: "bg-sky-500",
     stats: [
       { label: "Rotación anual",    valor: "35%",       sub: "cargos de contacto"      },
@@ -270,7 +270,7 @@ const CaseSection = forwardRef<HTMLElement, { caso: Case }>(({ caso: c }, ref) =
     <section
       ref={ref}
       id={c.id}
-      className="scroll-mt-28 py-14 sm:py-18 border-b border-outline-variant/20 last:border-0"
+      className="scroll-mt-28 py-14 sm:py-18 border-b border-white/8 last:border-0"
     >
       {/* Header */}
       <motion.div
@@ -284,8 +284,8 @@ const CaseSection = forwardRef<HTMLElement, { caso: Case }>(({ caso: c }, ref) =
           <c.Icon size={14} />
           <span className="text-xs font-semibold uppercase tracking-widest">{c.sector}</span>
         </div>
-        <h2 className="text-2xl sm:text-3xl font-bold text-on-surface">{c.empresa}</h2>
-        <div className="flex flex-wrap gap-x-5 gap-y-1 mt-2 text-sm text-on-surface-variant">
+        <h2 className="text-2xl sm:text-3xl font-bold text-white">{c.empresa}</h2>
+        <div className="flex flex-wrap gap-x-5 gap-y-1 mt-2 text-sm text-white/45">
           <span className="flex items-center gap-1"><MapPin size={12} />{c.ciudad}</span>
           <span className="flex items-center gap-1"><Users size={12} />{c.empleados} empleados</span>
           <span className="italic">{c.cargo}</span>
@@ -298,13 +298,13 @@ const CaseSection = forwardRef<HTMLElement, { caso: Case }>(({ caso: c }, ref) =
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.45, ease: E }}
         viewport={{ once: true }}
-        className="grid grid-cols-3 divide-x divide-outline-variant/20 border border-outline-variant/20 rounded-lg overflow-hidden mb-8"
+        className="grid grid-cols-3 divide-x divide-white/8 border border-white/8 rounded-lg overflow-hidden mb-8"
       >
         {c.stats.map((s, i) => (
           <div key={i} className="p-4 sm:p-5 text-center">
             <div className={`text-xl sm:text-2xl font-bold ${c.color}`}>{s.valor}</div>
-            <div className="text-xs font-medium text-on-surface mt-0.5">{s.label}</div>
-            <div className="text-xs text-on-surface-variant">{s.sub}</div>
+            <div className="text-xs font-medium text-white mt-0.5">{s.label}</div>
+            <div className="text-xs text-white/45">{s.sub}</div>
           </div>
         ))}
       </motion.div>
@@ -315,7 +315,7 @@ const CaseSection = forwardRef<HTMLElement, { caso: Case }>(({ caso: c }, ref) =
         whileInView={{ opacity: 1 }}
         transition={{ duration: 0.5, ease: E }}
         viewport={{ once: true }}
-        className="text-on-surface-variant leading-relaxed text-[15px] mb-8 max-w-3xl"
+        className="text-white/45 leading-relaxed text-[15px] mb-8 max-w-3xl"
       >
         {c.narrative}
       </motion.p>
@@ -326,18 +326,18 @@ const CaseSection = forwardRef<HTMLElement, { caso: Case }>(({ caso: c }, ref) =
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.45, ease: E }}
         viewport={{ once: true }}
-        className="mb-6 p-5 rounded-lg border border-outline-variant/20 bg-surface-container/30"
+        className="mb-6 p-5 rounded-lg border border-white/10 bg-white/6"
       >
-        <p className="text-xs font-semibold uppercase tracking-widest text-on-surface-variant mb-5">
+        <p className="text-xs font-semibold uppercase tracking-widest text-white/45 mb-5">
           {c.gap.title}
         </p>
         <div className="space-y-4">
           <div>
             <div className="flex justify-between items-center mb-1.5">
-              <span className="text-sm text-on-surface-variant">Salario pagado</span>
+              <span className="text-sm text-white/45">Salario pagado</span>
               <span className="font-mono text-sm font-semibold text-red-500">{c.gap.pagado}</span>
             </div>
-            <div className="h-2.5 bg-surface-container rounded-full overflow-hidden">
+            <div className="h-2.5 bg-white/6 rounded-full overflow-hidden">
               <motion.div
                 className="h-full bg-red-400 rounded-full"
                 initial={{ width: 0 }}
@@ -349,10 +349,10 @@ const CaseSection = forwardRef<HTMLElement, { caso: Case }>(({ caso: c }, ref) =
           </div>
           <div>
             <div className="flex justify-between items-center mb-1.5">
-              <span className="text-sm text-on-surface-variant">Mercado real</span>
-              <span className="font-mono text-sm font-semibold text-emerald-600">{c.gap.mercado}</span>
+              <span className="text-sm text-white/45">Mercado real</span>
+              <span className="font-mono text-sm font-semibold text-[#06D6A0]">{c.gap.mercado}</span>
             </div>
-            <div className="h-2.5 bg-surface-container rounded-full overflow-hidden">
+            <div className="h-2.5 bg-white/6 rounded-full overflow-hidden">
               <motion.div
                 className="h-full bg-emerald-400 rounded-full"
                 initial={{ width: 0 }}
@@ -375,15 +375,15 @@ const CaseSection = forwardRef<HTMLElement, { caso: Case }>(({ caso: c }, ref) =
         whileInView={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.4, ease: E }}
         viewport={{ once: true }}
-        className="mb-8 p-4 rounded-lg border-l-4 border-red-400 bg-red-50"
+        className="mb-8 p-4 rounded-lg border-l-4 border-red-400 bg-red-900/12"
       >
         <div className="flex items-center gap-2 mb-1">
           <AlertTriangle size={14} className="text-red-500 shrink-0" />
-          <span className="font-semibold text-red-700 text-sm">
+          <span className="font-semibold text-red-400 text-sm">
             {c.ley.nombre} · Ley {c.ley.articulo}
           </span>
         </div>
-        <p className="text-sm text-red-700 leading-relaxed">{c.ley.riesgo}</p>
+        <p className="text-sm text-red-400 leading-relaxed">{c.ley.riesgo}</p>
       </motion.div>
 
       {/* Cost comparison */}
@@ -394,22 +394,22 @@ const CaseSection = forwardRef<HTMLElement, { caso: Case }>(({ caso: c }, ref) =
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.45, ease: E }}
           viewport={{ once: true }}
-          className="border border-red-200 rounded-lg p-5"
+          className="bg-white/4 border border-white/10 rounded-lg p-5"
         >
           <div className="flex items-center gap-2 mb-5">
             <div className="w-2 h-2 rounded-full bg-red-400" />
-            <span className="text-sm font-semibold text-on-surface">Sin RemuneraLab</span>
+            <span className="text-sm font-semibold text-white">Sin RemuneraLab</span>
           </div>
           <div className="space-y-3 mb-5">
             {c.sinRL.items.map((item) => (
               <div key={item.label} className="flex justify-between items-start gap-3">
-                <span className="text-xs text-on-surface-variant leading-relaxed">{item.label}</span>
-                <span className="text-xs font-mono font-semibold text-on-surface whitespace-nowrap">{item.monto}</span>
+                <span className="text-xs text-white/45 leading-relaxed">{item.label}</span>
+                <span className="text-xs font-mono font-semibold text-white whitespace-nowrap">{item.monto}</span>
               </div>
             ))}
           </div>
-          <div className="border-t border-outline-variant/20 pt-4 flex justify-between items-center">
-            <span className="text-xs font-semibold uppercase tracking-wide text-on-surface-variant">Total</span>
+          <div className="border-t border-white/8 pt-4 flex justify-between items-center">
+            <span className="text-xs font-semibold uppercase tracking-wide text-white/45">Total</span>
             <div className="text-2xl font-bold text-red-500">
               $<CountUp to={c.sinRL.total} />M
             </div>
@@ -422,22 +422,22 @@ const CaseSection = forwardRef<HTMLElement, { caso: Case }>(({ caso: c }, ref) =
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.45, delay: 0.1, ease: E }}
           viewport={{ once: true }}
-          className="border border-emerald-200 rounded-lg p-5 flex flex-col"
+          className="bg-white/4 border border-white/10 rounded-lg p-5 flex flex-col"
         >
           <div className="flex items-center gap-2 mb-5">
             <div className="w-2 h-2 rounded-full bg-emerald-400" />
-            <span className="text-sm font-semibold text-on-surface">Con RemuneraLab</span>
+            <span className="text-sm font-semibold text-white">Con RemuneraLab</span>
           </div>
           <div className="space-y-3 mb-5">
             {c.conRL.items.map((item) => (
               <div key={item.label} className="flex justify-between items-start gap-3">
-                <span className="text-xs text-on-surface-variant leading-relaxed">{item.label}</span>
-                <span className="text-xs font-mono font-semibold text-emerald-700 whitespace-nowrap">{item.monto}</span>
+                <span className="text-xs text-white/45 leading-relaxed">{item.label}</span>
+                <span className="text-xs font-mono font-semibold text-[#06D6A0] whitespace-nowrap">{item.monto}</span>
               </div>
             ))}
           </div>
-          <div className="mt-auto p-3 rounded-lg bg-emerald-50 border border-emerald-100">
-            <p className="text-xs text-emerald-800 leading-relaxed">{c.conRL.nota}</p>
+          <div className="mt-auto p-3 rounded-lg bg-emerald-900/12 border border-emerald-500/30">
+            <p className="text-xs text-white/45 leading-relaxed">{c.conRL.nota}</p>
           </div>
         </motion.div>
       </div>
@@ -451,10 +451,10 @@ const CaseSection = forwardRef<HTMLElement, { caso: Case }>(({ caso: c }, ref) =
         className={`${c.colorBg} border ${c.colorBorder} rounded-xl p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4`}
       >
         <div>
-          <p className="text-xs font-semibold uppercase tracking-widest text-on-surface-variant mb-1">
+          <p className="text-xs font-semibold uppercase tracking-widest text-white/45 mb-1">
             Retorno sobre la inversión
           </p>
-          <p className="text-sm text-on-surface-variant max-w-xs">
+          <p className="text-sm text-white/45 max-w-xs">
             Lo que costó prevenir comparado con lo que costó no hacerlo
           </p>
         </div>
@@ -493,17 +493,32 @@ export default function CasosPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="relative min-h-screen flex flex-col bg-[#0D2240] overflow-x-hidden">
+      {/* Fixed glows */}
+      <div
+        className="pointer-events-none fixed -top-32 -right-32 w-[700px] h-[700px] rounded-full"
+        style={{ background: "radial-gradient(circle, rgba(0,180,216,0.13) 0%, transparent 65%)" }}
+      />
+      <div
+        className="pointer-events-none fixed bottom-0 -left-24 w-[500px] h-[500px] rounded-full"
+        style={{ background: "radial-gradient(circle, rgba(46,196,182,0.09) 0%, transparent 65%)" }}
+      />
+      <div
+        className="pointer-events-none fixed inset-0"
+        style={{
+          backgroundImage:
+            "linear-gradient(rgba(0,180,216,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(0,180,216,0.04) 1px, transparent 1px)",
+          backgroundSize: "64px 64px",
+        }}
+      />
+
       {/* Main navbar */}
       <nav
-        className={`fixed top-0 w-full z-40 transition-all duration-300 ${
-          scrolled
-            ? "bg-white/95 backdrop-blur-md border-b border-outline-variant/20"
-            : "bg-transparent"
-        }`}
+        className="fixed top-0 left-0 right-0 z-50 border-b border-white/12"
+        style={{ background: "rgba(13,34,64,0.88)", backdropFilter: "blur(14px)" }}
       >
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
-          <a href="/" className="font-bold text-primary text-lg tracking-tight">
+        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+          <a href="/" className="font-serif-display italic text-white hover:text-[#00B4D8] transition-colors" style={{ fontSize: "1.4rem" }}>
             RemuneraLab
           </a>
           <TabNav active="casos" />
@@ -511,17 +526,17 @@ export default function CasosPage() {
       </nav>
 
       {/* Hero */}
-      <div className="pt-14">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-12 border-b border-outline-variant/20">
-          <div className="border-l-2 border-primary pl-6">
-            <div className="flex items-center gap-2 mb-2 text-on-surface-variant">
+      <div className="pt-16">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-12 border-b border-white/8">
+          <div className="border-l-2 border-[#00B4D8] pl-6">
+            <div className="flex items-center gap-2 mb-2 text-white/45">
               <BookOpen size={14} />
               <span className="text-xs font-semibold uppercase tracking-widest">Evidencia de mercado</span>
             </div>
-            <h1 className="text-3xl sm:text-4xl font-bold text-on-surface mb-3">
+            <h1 className="text-3xl sm:text-4xl font-bold text-white mb-3">
               Cuatro casos donde RemuneraLab<br className="hidden sm:block" /> habría marcado la diferencia
             </h1>
-            <p className="text-on-surface-variant max-w-2xl text-[15px] leading-relaxed">
+            <p className="text-white/45 max-w-2xl text-[15px] leading-relaxed">
               Construidos sobre datos verificables del mercado chileno. Las leyes, los montos y los patrones de rotación son reales. Los nombres son ficticios pero representativos del tipo exacto de organización donde estos problemas ocurren.
             </p>
           </div>
@@ -529,7 +544,7 @@ export default function CasosPage() {
       </div>
 
       {/* Sticky inner nav */}
-      <div className="sticky top-14 z-30 bg-white border-b border-outline-variant/20">
+      <div className="sticky top-16 z-30 bg-[#0D2240]/90 backdrop-blur border-b border-white/8">
         <div className="max-w-5xl mx-auto px-4 sm:px-6">
           <div className="flex gap-1 overflow-x-auto py-2 scrollbar-hide">
             {CASES.map((c, i) => (
@@ -539,7 +554,7 @@ export default function CasosPage() {
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium whitespace-nowrap transition-all duration-200 ${
                   activeCase === i
                     ? `${c.colorBg} ${c.color} font-semibold`
-                    : "text-on-surface-variant hover:text-on-surface hover:bg-surface-container"
+                    : "text-white/45 hover:text-white hover:bg-white/6"
                 }`}
               >
                 <c.Icon size={13} />
@@ -565,16 +580,16 @@ export default function CasosPage() {
       </div>
 
       {/* Closing — "Lo que tienen en común" */}
-      <div className="bg-primary py-20 sm:py-28">
+      <div className="border-t border-white/8 py-20 sm:py-28">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-10">
           <div className="max-w-xl">
-            <p className="text-xs font-semibold uppercase tracking-widest text-white/50 mb-4">
+            <p className="text-xs font-semibold uppercase tracking-widest text-white/25 mb-4">
               El patrón común
             </p>
             <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4">
               En todos el patrón es idéntico
             </h2>
-            <p className="text-white/75 leading-relaxed mb-4">
+            <p className="text-white/45 leading-relaxed mb-4">
               La empresa no tenía un número malo, tenía un número desconocido. No sabía que estaba bajo el mercado. Nadie se lo dijo hasta que ya era demasiado tarde.
             </p>
             <p className="text-white font-medium">
@@ -583,7 +598,8 @@ export default function CasosPage() {
           </div>
           <a
             href="/formulario"
-            className="inline-flex items-center gap-2 bg-white text-primary font-semibold px-6 py-3 rounded-lg hover:bg-white/90 transition-colors shrink-0"
+            className="inline-flex items-center gap-2 font-semibold px-6 py-3 rounded-lg hover:opacity-90 transition-opacity shrink-0"
+            style={{ background: "linear-gradient(135deg,#06D6A0,#2EC4B6)", color: "#0D2240", boxShadow: "0 0 28px rgba(6,214,160,0.2)" }}
           >
             Ver mi posición salarial
             <ArrowRight size={16} />
@@ -592,10 +608,10 @@ export default function CasosPage() {
       </div>
 
       {/* Footer */}
-      <footer className="bg-primary border-t border-white/10 py-8">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <span className="font-bold text-white">RemuneraLab</span>
-          <span className="text-white/40 text-sm">
+      <footer className="border-t border-white/8 py-10 px-6">
+        <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
+          <p className="font-serif-display italic text-white mb-1" style={{ fontSize: "1.2rem" }}>RemuneraLab</p>
+          <span className="text-white/30 text-sm">
             Inteligencia salarial para Chile · Tus datos son anónimos y nunca se venderán.
           </span>
         </div>

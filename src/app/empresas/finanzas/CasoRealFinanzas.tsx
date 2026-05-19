@@ -51,42 +51,12 @@ const ROLES: {
 ];
 
 const TIMELINE = [
-  {
-    mes: "Mayo 2023",
-    evento: "La ejecutiva con mayor cartera (6 años, 42 clientes corporativos) empieza a recibir contactos de headhunters. RRHH no detecta señal. Su brecha salarial de $462.000/mes vs sus pares hombres lleva más de 2 años sin ser medida.",
-    impacto: "Señal de mercado ignorada",
-    color: "bg-orange-400",
-  },
-  {
-    mes: "Julio 2023",
-    evento: "Acepta oferta de una corredora en Santiago: $2.850.000 mensuales (35% sobre su actual). El contrato no tenía cláusula de no competencia efectiva. El aviso de salida llega sin explicación de causa.",
-    impacto: "Renuncia confirmada · brecha fue el detonante",
-    color: "bg-red-400",
-  },
-  {
-    mes: "Agosto 2023",
-    evento: "Los primeros 8 clientes corporativos de la ejecutiva redirigen renovaciones de pólizas a su nueva empleadora. La corredora no logra retenerlos. Ingreso anual no renovado estimado: $8M.",
-    impacto: "$8.000.000 en cartera perdida · no recuperable",
-    color: "bg-red-500",
-  },
-  {
-    mes: "Octubre 2023",
-    evento: "Una segunda ejecutiva (misma antigüedad, mismos resultados) descubre la diferencia salarial al conversar con un colega hombre. Consulta a abogado laboral sobre sus derechos bajo la Ley 20.348.",
-    impacto: "Riesgo legal activado · aún no declarado",
-    color: "bg-red-600",
-  },
-  {
-    mes: "Diciembre 2023",
-    evento: "La segunda ejecutiva presenta denuncia ante la Dirección del Trabajo invocando Ley 20.348 (igual remuneración). La empresa no tiene documentación de criterios objetivos de diferenciación salarial. La exposición retroactiva es de 5 años.",
-    impacto: "Proceso legal iniciado · riesgo $27.720.000 retroactivo",
-    color: "bg-red-700",
-  },
-  {
-    mes: "Marzo 2024",
-    evento: "Para evitar juicio público y daño reputacional, la empresa negocia un acuerdo extrajudicial de $14M + honorarios legales. Adicionalmente debe cubrir la reposición de la ejecutiva saliente: 7 meses de salario equivalente.",
-    impacto: "$23.800.000 en costos legales y reposición",
-    color: "bg-red-800",
-  },
+  { mes: "Mayo 2023",    evento: "La ejecutiva con mayor cartera (6 años, 42 clientes corporativos) empieza a recibir contactos de headhunters. RRHH no detecta señal. Su brecha salarial de $462.000/mes vs sus pares hombres lleva más de 2 años sin ser medida.", impacto: "Señal de mercado ignorada",                               color: "bg-orange-400" },
+  { mes: "Julio 2023",   evento: "Acepta oferta de una corredora en Santiago: $2.850.000 mensuales (35% sobre su actual). El contrato no tenía cláusula de no competencia efectiva. El aviso de salida llega sin explicación de causa.", impacto: "Renuncia confirmada · brecha fue el detonante",               color: "bg-red-400"    },
+  { mes: "Agosto 2023",  evento: "Los primeros 8 clientes corporativos de la ejecutiva redirigen renovaciones de pólizas a su nueva empleadora. La corredora no logra retenerlos. Ingreso anual no renovado estimado: $8M.", impacto: "$8.000.000 en cartera perdida · no recuperable",              color: "bg-red-500"    },
+  { mes: "Octubre 2023", evento: "Una segunda ejecutiva (misma antigüedad, mismos resultados) descubre la diferencia salarial al conversar con un colega hombre. Consulta a abogado laboral sobre sus derechos bajo la Ley 20.348.", impacto: "Riesgo legal activado · aún no declarado",                   color: "bg-red-600"    },
+  { mes: "Dic. 2023",    evento: "La segunda ejecutiva presenta denuncia ante la Dirección del Trabajo invocando Ley 20.348 (igual remuneración). La empresa no tiene documentación de criterios objetivos de diferenciación salarial. La exposición retroactiva es de 5 años.", impacto: "Proceso legal iniciado · riesgo $27.720.000 retroactivo", color: "bg-red-700"    },
+  { mes: "Marzo 2024",   evento: "Para evitar juicio público y daño reputacional, la empresa negocia un acuerdo extrajudicial de $14M + honorarios legales. Adicionalmente debe cubrir la reposición de la ejecutiva saliente: 7 meses de salario equivalente.", impacto: "$23.800.000 en costos legales y reposición",               color: "bg-red-800"    },
 ];
 
 const SIN_RL = [
@@ -101,48 +71,13 @@ const CON_RL = [
 ];
 
 const FUENTES = [
-  {
-    nombre: "Ley N° 20.348 — Resguarda la igualdad en las remuneraciones",
-    uso: "Marco legal central del caso: obligación del empleador de mantener compensación sin discriminación de género y prescripción retroactiva de 5 años.",
-    url: "https://www.bcn.cl/leychile/navegar?idNorma=1003032",
-    organismo: "Biblioteca del Congreso Nacional de Chile",
-  },
-  {
-    nombre: "Dirección del Trabajo — Fiscalización e igualdad salarial",
-    uso: "Proceso de denuncia, obligaciones del empleador y criterios de fiscalización bajo la Ley de Igualdad de Remuneraciones entre hombres y mujeres.",
-    url: "https://www.dt.gob.cl",
-    organismo: "Dirección del Trabajo",
-  },
-  {
-    nombre: "Encuesta Suplementaria de Ingresos (ESI) 2023 — INE Chile",
-    uso: "Estadísticas de ingresos del trabajo por sexo y categoría ocupacional. Base para calcular brechas de género por cargo en el sector financiero y de seguros.",
-    url: "https://www.ine.gob.cl/estadisticas/sociales/encuestas-de-empleo-e-ingresos",
-    organismo: "Instituto Nacional de Estadísticas (INE)",
-  },
-  {
-    nombre: "Estudio de Remuneración 2024–2025 — Michael Page Chile",
-    uso: "Rangos salariales para Ejecutivo/a Comercial, Analista de Seguros y Supervisor/a Comercial en el sector seguros y financiero Chile.",
-    url: "https://www.michaelpage.cl/estudios-y-tendencias/estudio-de-remuneracion-2024-2025-1-MP-095",
-    organismo: "Michael Page Chile",
-  },
-  {
-    nombre: "SernamEG — Brecha salarial de género en Chile",
-    uso: "Estadísticas de brecha salarial por sector, metodología de medición y contexto comparativo. Referencia para la brecha del 18% en cargos de ventas y comercialización.",
-    url: "https://www.sernameg.gob.cl",
-    organismo: "SernamEG — Servicio Nacional de la Mujer y la Equidad de Género",
-  },
-  {
-    nombre: "Guía Laboral Chile 2025 — Hays Recruitment",
-    uso: "Benchmarks de compensación para ejecutivos comerciales en el sector seguros. Referencia para tasas de rotación y costos de reposición por cargo.",
-    url: "https://www.hays.cl/guia-laboral",
-    organismo: "Hays Chile",
-  },
-  {
-    nombre: "CMF — Regulación y supervisión del sector asegurador chileno",
-    uso: "Marco regulatorio del sector corredores de seguros, incluyendo estándares de conducta y obligaciones laborales aplicables.",
-    url: "https://www.cmfchile.cl",
-    organismo: "CMF — Comisión para el Mercado Financiero",
-  },
+  { nombre: "Ley N° 20.348 — Resguarda la igualdad en las remuneraciones", uso: "Marco legal central del caso: obligación del empleador de mantener compensación sin discriminación de género y prescripción retroactiva de 5 años.", url: "https://www.bcn.cl/leychile/navegar?idNorma=1003032", organismo: "Biblioteca del Congreso Nacional de Chile" },
+  { nombre: "Dirección del Trabajo — Fiscalización e igualdad salarial", uso: "Proceso de denuncia, obligaciones del empleador y criterios de fiscalización bajo la Ley de Igualdad de Remuneraciones entre hombres y mujeres.", url: "https://www.dt.gob.cl", organismo: "Dirección del Trabajo" },
+  { nombre: "Encuesta Suplementaria de Ingresos (ESI) 2023 — INE Chile", uso: "Estadísticas de ingresos del trabajo por sexo y categoría ocupacional. Base para calcular brechas de género por cargo en el sector financiero y de seguros.", url: "https://www.ine.gob.cl/estadisticas/sociales/encuestas-de-empleo-e-ingresos", organismo: "Instituto Nacional de Estadísticas (INE)" },
+  { nombre: "Estudio de Remuneración 2024–2025 — Michael Page Chile", uso: "Rangos salariales para Ejecutivo/a Comercial, Analista de Seguros y Supervisor/a Comercial en el sector seguros y financiero Chile.", url: "https://www.michaelpage.cl/estudios-y-tendencias/estudio-de-remuneracion-2024-2025-1-MP-095", organismo: "Michael Page Chile" },
+  { nombre: "SernamEG — Brecha salarial de género en Chile", uso: "Estadísticas de brecha salarial por sector, metodología de medición y contexto comparativo. Referencia para la brecha del 18% en cargos de ventas y comercialización.", url: "https://www.sernameg.gob.cl", organismo: "SernamEG — Servicio Nacional de la Mujer y la Equidad de Género" },
+  { nombre: "Guía Laboral Chile 2025 — Hays Recruitment", uso: "Benchmarks de compensación para ejecutivos comerciales en el sector seguros. Referencia para tasas de rotación y costos de reposición por cargo.", url: "https://www.hays.cl/guia-laboral", organismo: "Hays Chile" },
+  { nombre: "CMF — Regulación y supervisión del sector asegurador chileno", uso: "Marco regulatorio del sector corredores de seguros, incluyendo estándares de conducta y obligaciones laborales aplicables.", url: "https://www.cmfchile.cl", organismo: "CMF — Comisión para el Mercado Financiero" },
 ];
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -154,32 +89,32 @@ function fmtCLP(n: number) {
 }
 
 function gapStyle(nivel: GapLevel) {
-  if (nivel === "CRÍTICO")  return { badge: "bg-red-100 text-red-700"       };
-  if (nivel === "ALTO")     return { badge: "bg-orange-100 text-orange-700" };
-  return                          { badge: "bg-yellow-100 text-yellow-700"  };
+  if (nivel === "CRÍTICO")  return { badge: "bg-red-900/20 text-red-400"       };
+  if (nivel === "ALTO")     return { badge: "bg-orange-900/20 text-orange-400" };
+  return                          { badge: "bg-yellow-900/20 text-yellow-400"  };
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export default function CasoRealFinanzas() {
   return (
-    <div className="bg-white">
+    <div>
 
       {/* ── Perfil de empresa ─────────────────────────────────────────── */}
-      <div className="border-b border-outline-variant/20">
+      <div className="border-b border-white/8">
         <div className="max-w-7xl mx-auto px-6 py-12">
-          <div className="flex items-center gap-2 mb-2 text-on-surface-variant">
-            <Scale size={14} className="text-emerald-600" />
+          <div className="flex items-center gap-2 mb-2 text-white/45">
+            <Scale size={14} className="text-[#06D6A0]" />
             <span className="text-xs font-semibold uppercase tracking-widest">Caso real aplicado · Finanzas</span>
           </div>
-          <div className="border-l-2 border-primary pl-6 mb-10">
-            <p className="text-xs font-semibold uppercase tracking-widest text-on-surface-variant mb-2">
+          <div className="border-l-2 border-[#00B4D8] pl-6 mb-10">
+            <p className="text-xs font-semibold uppercase tracking-widest text-white/45 mb-2">
               Este es el análisis que RemuneraLab habría generado para
             </p>
-            <h2 className="text-3xl sm:text-4xl font-bold text-on-surface mb-2">
+            <h2 className="text-3xl sm:text-4xl font-bold text-white mb-2">
               {CORREDORA.nombre}
             </h2>
-            <div className="flex flex-wrap gap-x-5 gap-y-1 text-sm text-on-surface-variant">
+            <div className="flex flex-wrap gap-x-5 gap-y-1 text-sm text-white/45">
               <span className="flex items-center gap-1.5"><MapPin size={12} />{CORREDORA.ciudad}</span>
               <span className="flex items-center gap-1.5"><Users size={12} />{CORREDORA.empleados} empleados</span>
               <span className="flex items-center gap-1.5"><Scale size={12} />{CORREDORA.tipo}</span>
@@ -192,16 +127,16 @@ export default function CasoRealFinanzas() {
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, ease: E }}
-              className="border border-outline-variant/20 rounded-lg p-5"
+              className="rounded-xl border border-white/10 bg-white/4 p-5"
             >
-              <p className="text-xs font-semibold uppercase tracking-widest text-on-surface-variant mb-3">
+              <p className="text-xs font-semibold uppercase tracking-widest text-white/45 mb-3">
                 Riesgo de rotación
               </p>
               <div className="flex items-end gap-3 mb-3">
-                <span className="text-4xl font-bold text-red-500">{CORREDORA.riesgo}</span>
-                <span className="text-on-surface-variant mb-1">/ 100</span>
+                <span className="text-4xl font-bold text-red-400">{CORREDORA.riesgo}</span>
+                <span className="text-white/45 mb-1">/ 100</span>
               </div>
-              <div className="h-2 bg-surface-container rounded-full overflow-hidden">
+              <div className="h-2 bg-white/8 rounded-full overflow-hidden">
                 <motion.div
                   className="h-full bg-red-400 rounded-full"
                   initial={{ width: 0 }}
@@ -209,14 +144,14 @@ export default function CasoRealFinanzas() {
                   transition={{ duration: 1, delay: 0.3, ease: E }}
                 />
               </div>
-              <p className="text-xs text-red-600 font-semibold mt-2">ALTO · Requiere atención inmediata</p>
+              <p className="text-xs text-red-400 font-semibold mt-2">ALTO · Requiere atención inmediata</p>
             </motion.div>
 
             <motion.div
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.1, ease: E }}
-              className="sm:col-span-2 grid grid-cols-3 divide-x divide-outline-variant/20 border border-outline-variant/20 rounded-lg overflow-hidden"
+              className="sm:col-span-2 grid grid-cols-3 divide-x divide-white/8 border border-white/10 bg-white/4 rounded-xl overflow-hidden"
             >
               {[
                 { valor: "1",    label: "Ejecutiva perdida",   sub: "6 años de seniority · cartera VIP" },
@@ -224,9 +159,9 @@ export default function CasoRealFinanzas() {
                 { valor: "$32M", label: "Pérdida total",       sub: "sin RemuneraLab"                   },
               ].map((k, i) => (
                 <div key={i} className="p-4 text-center">
-                  <div className="text-xl sm:text-2xl font-bold text-red-500">{k.valor}</div>
-                  <div className="text-xs font-medium text-on-surface mt-0.5">{k.label}</div>
-                  <div className="text-xs text-on-surface-variant">{k.sub}</div>
+                  <div className="text-xl sm:text-2xl font-bold text-red-400">{k.valor}</div>
+                  <div className="text-xs font-medium text-white mt-0.5">{k.label}</div>
+                  <div className="text-xs text-white/45">{k.sub}</div>
                 </div>
               ))}
             </motion.div>
@@ -235,7 +170,7 @@ export default function CasoRealFinanzas() {
       </div>
 
       {/* ── Mapa salarial ─────────────────────────────────────────────── */}
-      <div className="border-b border-outline-variant/20">
+      <div className="border-b border-white/8">
         <div className="max-w-7xl mx-auto px-6 py-12">
           <motion.div
             initial={{ opacity: 0, y: 10 }}
@@ -244,8 +179,8 @@ export default function CasoRealFinanzas() {
             viewport={{ once: true }}
             className="mb-6"
           >
-            <h3 className="text-xl font-bold text-on-surface mb-1">Tu mapa salarial vs referencia</h3>
-            <p className="text-sm text-on-surface-variant">
+            <h3 className="text-xl font-bold text-white mb-1">Tu mapa salarial vs referencia</h3>
+            <p className="text-sm text-white/45">
               Datos cruzados con Michael Page, Hays Chile y ESI 2023. La primera fila compara ejecutivas vs sus pares hombres en el mismo cargo y antigüedad.
             </p>
           </motion.div>
@@ -253,7 +188,7 @@ export default function CasoRealFinanzas() {
           {/* Table header (desktop) */}
           <div className="hidden sm:grid grid-cols-[2fr_1fr_1fr_80px_90px] gap-x-4 px-4 mb-2">
             {["Cargo", "Salario actual", "Referencia", "Gap", "Alerta"].map((h) => (
-              <span key={h} className="text-xs font-semibold uppercase tracking-wider text-on-surface-variant">{h}</span>
+              <span key={h} className="text-xs font-semibold uppercase tracking-wider text-white/45">{h}</span>
             ))}
           </div>
 
@@ -268,22 +203,22 @@ export default function CasoRealFinanzas() {
                   whileInView={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.35, delay: i * 0.05, ease: E }}
                   viewport={{ once: true }}
-                  className={`border rounded-lg px-4 py-3 ${isCritico ? "border-red-200 bg-red-50/40" : "border-outline-variant/20"}`}
+                  className={`border rounded-xl px-4 py-3 ${isCritico ? "border-red-500/20 bg-red-900/8" : "border-white/10 bg-white/4"}`}
                 >
                   {/* Desktop */}
                   <div className="hidden sm:grid grid-cols-[2fr_1fr_1fr_80px_90px] gap-x-4 items-center">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className="text-sm font-medium text-on-surface">{r.cargo}</span>
-                      <span className="text-xs text-on-surface-variant">× {r.cantidad}</span>
+                      <span className="text-sm font-medium text-white">{r.cargo}</span>
+                      <span className="text-xs text-white/45">× {r.cantidad}</span>
                       {isCritico && (
-                        <span className="text-[10px] text-emerald-700 font-semibold bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-100">
+                        <span className="text-[10px] text-[#06D6A0] font-semibold bg-emerald-900/12 px-1.5 py-0.5 rounded border border-emerald-500/20">
                           vs {r.refLabel}
                         </span>
                       )}
                     </div>
-                    <span className="font-mono text-sm text-on-surface">{fmtCLP(r.actual)}</span>
-                    <span className="font-mono text-sm text-emerald-700">{fmtCLP(r.mercado)}</span>
-                    <span className="font-mono text-sm font-semibold text-red-500">−{r.gap}%</span>
+                    <span className="font-mono text-sm text-white">{fmtCLP(r.actual)}</span>
+                    <span className="font-mono text-sm text-[#06D6A0]">{fmtCLP(r.mercado)}</span>
+                    <span className="font-mono text-sm font-semibold text-red-400">−{r.gap}%</span>
                     <span className={`text-xs font-semibold px-2 py-0.5 rounded-full w-fit ${style.badge}`}>
                       {r.nivel}
                     </span>
@@ -291,16 +226,16 @@ export default function CasoRealFinanzas() {
                   {/* Mobile */}
                   <div className="sm:hidden">
                     <div className="flex items-start justify-between gap-2 mb-2">
-                      <span className="text-sm font-medium text-on-surface">{r.cargo} <span className="text-on-surface-variant">× {r.cantidad}</span></span>
+                      <span className="text-sm font-medium text-white">{r.cargo} <span className="text-white/45">× {r.cantidad}</span></span>
                       <span className={`text-xs font-semibold px-2 py-0.5 rounded-full shrink-0 ${style.badge}`}>{r.nivel}</span>
                     </div>
                     {isCritico && (
-                      <p className="text-[10px] text-emerald-700 mb-1">Ref: {r.refLabel}</p>
+                      <p className="text-[10px] text-[#06D6A0] mb-1">Ref: {r.refLabel}</p>
                     )}
                     <div className="flex gap-4 text-xs">
-                      <span className="text-on-surface-variant">Actual: <span className="font-mono font-semibold text-on-surface">{fmtCLP(r.actual)}</span></span>
-                      <span className="text-on-surface-variant">Ref: <span className="font-mono font-semibold text-emerald-700">{fmtCLP(r.mercado)}</span></span>
-                      <span className="font-mono font-semibold text-red-500">−{r.gap}%</span>
+                      <span className="text-white/45">Actual: <span className="font-mono font-semibold text-white">{fmtCLP(r.actual)}</span></span>
+                      <span className="text-white/45">Ref: <span className="font-mono font-semibold text-[#06D6A0]">{fmtCLP(r.mercado)}</span></span>
+                      <span className="font-mono font-semibold text-red-400">−{r.gap}%</span>
                     </div>
                   </div>
                 </motion.div>
@@ -311,7 +246,7 @@ export default function CasoRealFinanzas() {
       </div>
 
       {/* ── Alertas que nunca llegaron ────────────────────────────────── */}
-      <div className="border-b border-outline-variant/20 bg-surface-container/20">
+      <div className="border-b border-white/8 bg-white/3">
         <div className="max-w-7xl mx-auto px-6 py-12">
           <motion.div
             initial={{ opacity: 0, y: 10 }}
@@ -320,8 +255,8 @@ export default function CasoRealFinanzas() {
             viewport={{ once: true }}
             className="mb-8"
           >
-            <h3 className="text-xl font-bold text-on-surface mb-1">Las dos alertas que nunca llegaron</h3>
-            <p className="text-sm text-on-surface-variant max-w-2xl">
+            <h3 className="text-xl font-bold text-white mb-1">Las dos alertas que nunca llegaron</h3>
+            <p className="text-sm text-white/45 max-w-2xl">
               RemuneraLab habría detectado ambas señales en simultáneo: la brecha de género interna y el riesgo legal antes de que se volvieran irreversibles.
             </p>
           </motion.div>
@@ -334,7 +269,7 @@ export default function CasoRealFinanzas() {
               whileInView={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.5, ease: E }}
               viewport={{ once: true }}
-              className="border border-outline-variant/30 rounded-xl overflow-hidden shadow-sm"
+              className="border border-white/10 rounded-xl overflow-hidden"
             >
               <div className="bg-red-600 px-5 py-3 flex items-center justify-between">
                 <div className="flex items-center gap-2">
@@ -344,50 +279,50 @@ export default function CasoRealFinanzas() {
                 <span className="text-xs text-white/70">Lunes, 15 may 2023 · 09:14</span>
               </div>
 
-              <div className="bg-white p-5">
+              <div className="bg-white/5 border-t border-white/8 p-5">
                 <div className="flex items-center gap-2 mb-4">
                   <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
-                  <span className="text-xs font-semibold uppercase tracking-widest text-red-600">
+                  <span className="text-xs font-semibold uppercase tracking-widest text-red-400">
                     Brecha de género no medida detectada
                   </span>
                 </div>
 
-                <p className="text-base font-bold text-on-surface">Ejecutiva Comercial · mujeres (8 personas)</p>
-                <p className="text-sm text-on-surface-variant mb-5">{CORREDORA.nombre} · Valparaíso</p>
+                <p className="text-base font-bold text-white">Ejecutiva Comercial · mujeres (8 personas)</p>
+                <p className="text-sm text-white/45 mb-5">{CORREDORA.nombre} · Valparaíso</p>
 
-                <div className="mb-5 p-4 bg-surface-container/40 rounded-lg">
-                  <p className="text-xs font-semibold uppercase tracking-widest text-on-surface-variant mb-4">
+                <div className="mb-5 p-4 bg-white/6 rounded-lg">
+                  <p className="text-xs font-semibold uppercase tracking-widest text-white/45 mb-4">
                     Posición vs pares hombres (mismo cargo · misma antigüedad)
                   </p>
                   <div className="space-y-3">
                     <div>
-                      <div className="flex justify-between text-xs text-on-surface-variant mb-1">
+                      <div className="flex justify-between text-xs text-white/45 mb-1">
                         <span>Ene 2021 (incorporación promedio)</span>
-                        <span className="font-semibold text-emerald-600">Percentil 52</span>
+                        <span className="font-semibold text-[#06D6A0]">top 48%</span>
                       </div>
-                      <div className="h-2 bg-surface-container rounded-full overflow-hidden">
+                      <div className="h-2 bg-white/8 rounded-full overflow-hidden">
                         <div className="h-full bg-emerald-400 rounded-full" style={{ width: "52%" }} />
                       </div>
                     </div>
                     <div>
-                      <div className="flex justify-between text-xs text-on-surface-variant mb-1">
+                      <div className="flex justify-between text-xs text-white/45 mb-1">
                         <span>Mayo 2023 — hoy</span>
-                        <span className="font-semibold text-red-600">Percentil 31</span>
+                        <span className="font-semibold text-red-400">bottom 31%</span>
                       </div>
-                      <div className="h-2 bg-surface-container rounded-full overflow-hidden">
+                      <div className="h-2 bg-white/8 rounded-full overflow-hidden">
                         <div className="h-full bg-red-400 rounded-full" style={{ width: "31%" }} />
                       </div>
                     </div>
                   </div>
-                  <p className="text-xs text-on-surface-variant mt-3 flex items-center gap-1.5">
-                    <TrendingDown size={12} className="text-red-500" />
+                  <p className="text-xs text-white/45 mt-3 flex items-center gap-1.5">
+                    <TrendingDown size={12} className="text-red-400" />
                     El mercado subió bandas un 18% entre 2021 y 2023. Las mujeres recibieron ajustes del 4%; los hombres, del 14%.
                   </p>
                 </div>
 
-                <p className="text-sm text-on-surface-variant mb-4 leading-relaxed">
-                  Las <strong className="text-on-surface">8 ejecutivas comerciales</strong> perciben en promedio{" "}
-                  <strong className="text-on-surface">$462.000 menos por mes</strong> que sus pares hombres
+                <p className="text-sm text-white/45 mb-4 leading-relaxed">
+                  Las <strong className="text-white">8 ejecutivas comerciales</strong> perciben en promedio{" "}
+                  <strong className="text-white">$462.000 menos por mes</strong> que sus pares hombres
                   con el mismo nivel de seniority y los mismos resultados. La diferencia no está documentada ni justificada.
                 </p>
 
@@ -395,7 +330,7 @@ export default function CasoRealFinanzas() {
                   <button className="flex items-center gap-1.5 bg-red-600 text-white text-xs font-semibold px-4 py-2 rounded-lg">
                     Ver análisis completo <ChevronRight size={12} />
                   </button>
-                  <button className="text-xs text-on-surface-variant">Recordar en 30 días</button>
+                  <button className="text-xs text-white/45">Recordar en 30 días</button>
                 </div>
               </div>
             </motion.div>
@@ -406,7 +341,7 @@ export default function CasoRealFinanzas() {
               whileInView={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.5, delay: 0.1, ease: E }}
               viewport={{ once: true }}
-              className="border border-outline-variant/30 rounded-xl overflow-hidden shadow-sm"
+              className="border border-white/10 rounded-xl overflow-hidden"
             >
               <div className="bg-amber-600 px-5 py-3 flex items-center justify-between">
                 <div className="flex items-center gap-2">
@@ -416,60 +351,45 @@ export default function CasoRealFinanzas() {
                 <span className="text-xs text-white/70">Jueves, 5 oct 2023 · 11:33</span>
               </div>
 
-              <div className="bg-white p-5">
+              <div className="bg-white/5 border-t border-white/8 p-5">
                 <div className="flex items-center gap-2 mb-4">
                   <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
-                  <span className="text-xs font-semibold uppercase tracking-widest text-amber-700">
+                  <span className="text-xs font-semibold uppercase tracking-widest text-amber-400">
                     Riesgo de demanda laboral detectado
                   </span>
                 </div>
 
-                <p className="text-base font-bold text-on-surface">Ley 20.348 — Igualdad en las remuneraciones</p>
-                <p className="text-sm text-on-surface-variant mb-5">
-                  Diferencia documentada entre cargos equivalentes · <strong>retroactividad 5 años</strong>
+                <p className="text-base font-bold text-white">Ley 20.348 — Igualdad en las remuneraciones</p>
+                <p className="text-sm text-white/45 mb-5">
+                  Diferencia documentada entre cargos equivalentes · <strong className="text-white">retroactividad 5 años</strong>
                 </p>
 
-                <div className="mb-5 p-4 bg-amber-50 border border-amber-100 rounded-lg space-y-3">
+                <div className="mb-5 p-4 bg-amber-900/12 border border-amber-500/20 rounded-lg space-y-3">
                   {[
-                    {
-                      label: "Diferencia mensual documentada",
-                      valor: "$462.000/mes · mismo cargo",
-                      colorVal: "text-red-600",
-                      icon: <AlertTriangle size={13} className="text-red-500 shrink-0" />,
-                    },
-                    {
-                      label: "Ejecutivas en situación de riesgo",
-                      valor: "8 ejecutivas comerciales",
-                      colorVal: "text-amber-700",
-                      icon: <Users size={13} className="text-amber-600 shrink-0" />,
-                    },
-                    {
-                      label: "Exposición estimada (1 demanda · 5 años)",
-                      valor: "~$27.720.000 + intereses",
-                      colorVal: "text-red-600",
-                      icon: <Scale size={13} className="text-red-500 shrink-0" />,
-                    },
+                    { label: "Diferencia mensual documentada", valor: "$462.000/mes · mismo cargo",       colorVal: "text-red-400",   icon: <AlertTriangle size={13} className="text-red-400 shrink-0" /> },
+                    { label: "Ejecutivas en situación de riesgo", valor: "8 ejecutivas comerciales",       colorVal: "text-amber-400", icon: <Users size={13} className="text-amber-400 shrink-0" /> },
+                    { label: "Exposición estimada (1 demanda · 5 años)", valor: "~$27.720.000 + intereses", colorVal: "text-red-400",   icon: <Scale size={13} className="text-red-400 shrink-0" /> },
                   ].map((row) => (
                     <div key={row.label} className="flex items-center justify-between gap-3">
                       <div className="flex items-center gap-2">
                         {row.icon}
-                        <span className="text-xs text-on-surface-variant">{row.label}</span>
+                        <span className="text-xs text-white/45">{row.label}</span>
                       </div>
                       <span className={`text-xs font-semibold ${row.colorVal}`}>{row.valor}</span>
                     </div>
                   ))}
                 </div>
 
-                <p className="text-sm text-on-surface-variant mb-4 leading-relaxed">
-                  Con <strong className="text-on-surface">diferencias salariales documentadas</strong> entre ejecutivos hombres y mujeres del mismo nivel y sin criterios objetivos registrados,{" "}
-                  cualquier denuncia activa <strong className="text-on-surface">retroactividad de 5 años</strong> bajo la Ley 20.348.
+                <p className="text-sm text-white/45 mb-4 leading-relaxed">
+                  Con <strong className="text-white">diferencias salariales documentadas</strong> entre ejecutivos hombres y mujeres del mismo nivel y sin criterios objetivos registrados,{" "}
+                  cualquier denuncia activa <strong className="text-white">retroactividad de 5 años</strong> bajo la Ley 20.348.
                 </p>
 
                 <div className="flex items-center gap-3">
                   <button className="flex items-center gap-1.5 bg-amber-600 text-white text-xs font-semibold px-4 py-2 rounded-lg">
                     Generar criterios objetivos <ChevronRight size={12} />
                   </button>
-                  <button className="text-xs text-on-surface-variant">Ver guía legal</button>
+                  <button className="text-xs text-white/45">Ver guía legal</button>
                 </div>
               </div>
             </motion.div>
@@ -479,7 +399,7 @@ export default function CasoRealFinanzas() {
       </div>
 
       {/* ── Timeline sin RemuneraLab ──────────────────────────────────── */}
-      <div className="border-b border-outline-variant/20">
+      <div className="border-b border-white/8">
         <div className="max-w-7xl mx-auto px-6 py-12">
           <motion.div
             initial={{ opacity: 0, y: 10 }}
@@ -488,14 +408,14 @@ export default function CasoRealFinanzas() {
             viewport={{ once: true }}
             className="mb-8"
           >
-            <h3 className="text-xl font-bold text-on-surface mb-1">Lo que ocurrió sin RemuneraLab</h3>
-            <p className="text-sm text-on-surface-variant">
+            <h3 className="text-xl font-bold text-white mb-1">Lo que ocurrió sin RemuneraLab</h3>
+            <p className="text-sm text-white/45">
               10 meses entre la primera señal y el acuerdo extrajudicial — todo originado en una brecha que nunca fue medida.
             </p>
           </motion.div>
 
           <div className="relative">
-            <div className="absolute left-[7px] sm:left-[11px] top-2 bottom-2 w-px bg-outline-variant/30" />
+            <div className="absolute left-[7px] sm:left-[11px] top-2 bottom-2 w-px bg-white/10" />
             <div className="space-y-6">
               {TIMELINE.map((item, i) => (
                 <motion.div
@@ -507,15 +427,15 @@ export default function CasoRealFinanzas() {
                   className="flex gap-4 sm:gap-6"
                 >
                   <div className="shrink-0 pt-1">
-                    <div className={`w-3.5 h-3.5 sm:w-5 sm:h-5 rounded-full ${item.color} ring-2 ring-white`} />
+                    <div className={`w-3.5 h-3.5 sm:w-5 sm:h-5 rounded-full ${item.color} ring-2 ring-[#0D2240]`} />
                   </div>
                   <div className="pb-2">
                     <div className="flex items-center gap-2 mb-1">
-                      <Clock size={11} className="text-on-surface-variant" />
-                      <span className="text-xs font-semibold text-on-surface-variant uppercase tracking-wide">{item.mes}</span>
+                      <Clock size={11} className="text-white/45" />
+                      <span className="text-xs font-semibold text-white/45 uppercase tracking-wide">{item.mes}</span>
                     </div>
-                    <p className="text-sm text-on-surface leading-relaxed mb-1.5">{item.evento}</p>
-                    <span className="inline-flex items-center gap-1 text-xs font-medium text-red-600 bg-red-50 px-2 py-0.5 rounded">
+                    <p className="text-sm text-white leading-relaxed mb-1.5">{item.evento}</p>
+                    <span className="inline-flex items-center gap-1 text-xs font-medium text-red-400 bg-red-900/12 px-2 py-0.5 rounded">
                       <AlertTriangle size={10} />
                       {item.impacto}
                     </span>
@@ -528,7 +448,7 @@ export default function CasoRealFinanzas() {
       </div>
 
       {/* ── Comparativa de costos ─────────────────────────────────────── */}
-      <div className="border-b border-outline-variant/20">
+      <div className="border-b border-white/8">
         <div className="max-w-7xl mx-auto px-6 py-12">
           <motion.div
             initial={{ opacity: 0, y: 10 }}
@@ -537,8 +457,8 @@ export default function CasoRealFinanzas() {
             viewport={{ once: true }}
             className="mb-8"
           >
-            <h3 className="text-xl font-bold text-on-surface mb-1">El costo de saber vs no saber</h3>
-            <p className="text-sm text-on-surface-variant">Actuar en mayo de 2023 vs reaccionar en marzo de 2024.</p>
+            <h3 className="text-xl font-bold text-white mb-1">El costo de saber vs no saber</h3>
+            <p className="text-sm text-white/45">Actuar en mayo de 2023 vs reaccionar en marzo de 2024.</p>
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
@@ -548,23 +468,23 @@ export default function CasoRealFinanzas() {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.45, ease: E }}
               viewport={{ once: true }}
-              className="border border-red-200 rounded-lg p-5"
+              className="rounded-xl border border-red-500/20 bg-white/4 p-5"
             >
               <div className="flex items-center gap-2 mb-5">
                 <div className="w-2 h-2 rounded-full bg-red-400" />
-                <span className="text-sm font-semibold text-on-surface">Sin RemuneraLab</span>
+                <span className="text-sm font-semibold text-white">Sin RemuneraLab</span>
               </div>
               <div className="space-y-3 mb-5">
                 {SIN_RL.map((item) => (
                   <div key={item.label} className="flex justify-between items-start gap-3">
-                    <span className="text-xs text-on-surface-variant leading-relaxed">{item.label}</span>
-                    <span className="text-xs font-mono font-semibold text-on-surface whitespace-nowrap">{item.monto}</span>
+                    <span className="text-xs text-white/45 leading-relaxed">{item.label}</span>
+                    <span className="text-xs font-mono font-semibold text-white whitespace-nowrap">{item.monto}</span>
                   </div>
                 ))}
               </div>
-              <div className="border-t border-outline-variant/20 pt-4 flex justify-between items-center">
-                <span className="text-xs font-semibold uppercase tracking-wide text-on-surface-variant">Total</span>
-                <div className="text-2xl font-bold text-red-500">
+              <div className="border-t border-white/8 pt-4 flex justify-between items-center">
+                <span className="text-xs font-semibold uppercase tracking-wide text-white/45">Total</span>
+                <div className="text-2xl font-bold text-red-400">
                   $<CountUp to={32} />M
                 </div>
               </div>
@@ -576,17 +496,17 @@ export default function CasoRealFinanzas() {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.45, delay: 0.1, ease: E }}
               viewport={{ once: true }}
-              className="border border-emerald-100 bg-emerald-50/30 rounded-lg p-5 flex flex-col"
+              className="rounded-xl border border-emerald-500/20 bg-emerald-900/12 p-5 flex flex-col"
             >
               <div className="flex items-center gap-2 mb-5">
                 <div className="w-2 h-2 rounded-full bg-emerald-500" />
-                <span className="text-sm font-semibold text-on-surface">Con RemuneraLab</span>
+                <span className="text-sm font-semibold text-white">Con RemuneraLab</span>
               </div>
               <div className="space-y-3 mb-5">
                 {CON_RL.map((item) => (
                   <div key={item.label} className="flex justify-between items-start gap-3">
-                    <span className="text-xs text-on-surface-variant leading-relaxed">{item.label}</span>
-                    <span className="text-xs font-mono font-semibold text-emerald-700 whitespace-nowrap">{item.monto}</span>
+                    <span className="text-xs text-white/45 leading-relaxed">{item.label}</span>
+                    <span className="text-xs font-mono font-semibold text-[#06D6A0] whitespace-nowrap">{item.monto}</span>
                   </div>
                 ))}
               </div>
@@ -597,8 +517,8 @@ export default function CasoRealFinanzas() {
                   "Cero denuncias activas. Cero acuerdos extrajudiciales. La cartera, protegida.",
                 ].map((txt, i) => (
                   <div key={i} className="flex items-start gap-2">
-                    <CheckCircle2 size={13} className="text-emerald-500 shrink-0 mt-0.5" />
-                    <span className="text-xs text-on-surface-variant">{txt}</span>
+                    <CheckCircle2 size={13} className="text-[#06D6A0] shrink-0 mt-0.5" />
+                    <span className="text-xs text-white/45">{txt}</span>
                   </div>
                 ))}
               </div>
@@ -611,18 +531,18 @@ export default function CasoRealFinanzas() {
             whileInView={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5, ease: E }}
             viewport={{ once: true }}
-            className="bg-emerald-50 border border-emerald-300 rounded-xl p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
+            className="bg-emerald-900/12 border border-emerald-500/25 rounded-xl p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
           >
             <div>
-              <p className="text-xs font-semibold uppercase tracking-widest text-on-surface-variant mb-1">
+              <p className="text-xs font-semibold uppercase tracking-widest text-white/45 mb-1">
                 Retorno sobre la inversión
               </p>
-              <p className="text-sm text-on-surface-variant max-w-sm">
+              <p className="text-sm text-white/45 max-w-sm">
                 $32M en daños evitables vs $6.5M en corrección de brecha + suscripción.
                 Una brecha no medida destruyó en 10 meses lo que tardó 6 años en construirse.
               </p>
             </div>
-            <div className="text-6xl font-bold text-emerald-600 shrink-0">
+            <div className="text-6xl font-bold text-[#06D6A0] shrink-0">
               <CountUp to={7} duration={900} />x
             </div>
           </motion.div>
@@ -630,7 +550,7 @@ export default function CasoRealFinanzas() {
       </div>
 
       {/* ── Fuentes ──────────────────────────────────────────────────── */}
-      <div className="bg-surface-container/10">
+      <div>
         <div className="max-w-7xl mx-auto px-6 py-12">
           <motion.div
             initial={{ opacity: 0, y: 10 }}
@@ -639,8 +559,8 @@ export default function CasoRealFinanzas() {
             viewport={{ once: true }}
             className="mb-6"
           >
-            <h3 className="text-lg font-bold text-on-surface mb-1">Metodología y fuentes</h3>
-            <p className="text-sm text-on-surface-variant">
+            <h3 className="text-lg font-bold text-white mb-1">Metodología y fuentes</h3>
+            <p className="text-sm text-white/45">
               La empresa es ficticia pero representativa de corredoras de seguros de 80–120 empleados en la Región de Valparaíso.
               Los montos, leyes, estadísticas y benchmarks son reales y verificables.
             </p>
@@ -654,25 +574,25 @@ export default function CasoRealFinanzas() {
                 whileInView={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.3, delay: i * 0.04, ease: E }}
                 viewport={{ once: true }}
-                className="border border-outline-variant/20 rounded-lg p-4 bg-white"
+                className="rounded-xl border border-white/10 bg-white/4 p-4"
               >
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <p className="text-sm font-semibold text-on-surface mb-0.5">{f.nombre}</p>
-                    <p className="text-xs text-on-surface-variant leading-relaxed">{f.uso}</p>
-                    <p className="text-xs text-on-surface-variant/50 mt-0.5">{f.organismo}</p>
+                    <p className="text-sm font-semibold text-white mb-0.5">{f.nombre}</p>
+                    <p className="text-xs text-white/45 leading-relaxed">{f.uso}</p>
+                    <p className="text-xs text-white/25 mt-0.5">{f.organismo}</p>
                   </div>
                   <a
                     href={f.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="shrink-0 text-emerald-600 hover:text-emerald-800 transition-colors mt-0.5"
+                    className="shrink-0 text-[#06D6A0] hover:opacity-70 transition-opacity mt-0.5"
                     aria-label="Ver fuente"
                   >
                     <ExternalLink size={14} />
                   </a>
                 </div>
-                <p className="text-xs font-mono text-on-surface-variant/40 mt-1.5 truncate">{f.url}</p>
+                <p className="text-xs font-mono text-white/25 mt-1.5 truncate">{f.url}</p>
               </motion.div>
             ))}
           </div>
