@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useState, useCallback, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { motion } from "motion/react";
-import { ArrowRight, ExternalLink, MapPin } from "lucide-react";
+import { ArrowRight, ExternalLink, MapPin, Loader2 } from "lucide-react";
 
 const E = [0.16, 1, 0.3, 1] as const;
 
@@ -49,14 +49,14 @@ function fmtFecha(d: Date): string {
   return d.toLocaleDateString("es-CL", { day: "numeric", month: "short" });
 }
 
-type FiltroItem = { nombre: string; count: number };
-
 function fmtCLP(n: number) {
   if (n >= 1_000_000) return `$${(n / 1_000_000).toFixed(1)}M`;
   return `$${(n / 1000).toFixed(0)}k`;
 }
 
-function FiltroBtn({
+type FiltroItem = { nombre: string; count: number };
+
+function FiltroRow({
   label, count, active, onClick,
 }: {
   label: string; count: number; active: boolean; onClick: () => void;
@@ -64,16 +64,28 @@ function FiltroBtn({
   return (
     <button
       onClick={onClick}
-      className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded border transition-all ${
-        active
-          ? "bg-[#00B4D8]/15 text-[#00B4D8] border-[#00B4D8]/50"
-          : "border-white/12 text-white/45 hover:border-[#00B4D8]/40 hover:text-white/80"
-      }`}
-      style={{ fontFamily: "var(--font-dm-sans)", fontSize: "0.78rem" }}
+      className="w-full flex items-center justify-between py-2 px-3 rounded-lg transition-all text-left"
+      style={{
+        background: active ? "rgba(133,104,243,0.12)" : "transparent",
+        border: active ? "1px solid rgba(133,104,243,0.20)" : "1px solid transparent",
+      }}
     >
-      {label}
-      <span className={`tabular-nums text-[10px] ${active ? "opacity-80" : "opacity-40"}`}
-        style={{ fontFamily: "var(--font-space-mono)" }}>
+      <div className="flex items-center gap-2.5 min-w-0">
+        <div className="w-1.5 h-1.5 rounded-full shrink-0"
+          style={{ background: active ? "#8568f3" : "rgba(255,255,255,0.18)" }} />
+        <span className="truncate" style={{
+          fontFamily: "var(--font-dm-sans)", fontSize: "0.82rem",
+          color: active ? "rgba(255,255,255,0.82)" : "rgba(255,255,255,0.42)",
+          fontWeight: active ? 500 : 400,
+        }}>
+          {label}
+        </span>
+      </div>
+      <span style={{
+        fontFamily: "var(--font-space-mono)", fontSize: "0.58rem", letterSpacing: "0.04em",
+        color: active ? "rgba(133,104,243,0.80)" : "rgba(255,255,255,0.20)",
+        flexShrink: 0, marginLeft: "8px",
+      }}>
         {count.toLocaleString("es-CL")}
       </span>
     </button>
@@ -82,7 +94,11 @@ function FiltroBtn({
 
 export default function Ofertas() {
   return (
-    <Suspense>
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center" style={{ background: "#180b3b" }}>
+        <Loader2 size={24} className="animate-spin" style={{ color: "#8568f3" }} />
+      </div>
+    }>
       <OfertasInner />
     </Suspense>
   );
@@ -93,6 +109,7 @@ function OfertasInner() {
   const [sector, setSector]          = useState(() => searchParams.get("sector") ?? "Todos");
   const [region, setRegion]          = useState("Todas");
   const [soloConRegion, setSoloCR]   = useState(false);
+  const [cargo, setCargo]            = useState("");
   const [ofertas, setOfertas]        = useState<Oferta[]>([]);
   const [total, setTotal]            = useState(0);
   const [page, setPage]              = useState(0);
@@ -109,17 +126,16 @@ function OfertasInner() {
       .then((d) => {
         setSectores(d.sectores ?? []);
         setRegiones(d.regiones ?? []);
-        const total = (d.sectores ?? []).reduce((acc: number, s: FiltroItem) => acc + s.count, 0);
-        setTotalGral(total);
+        const t = (d.sectores ?? []).reduce((acc: number, s: FiltroItem) => acc + s.count, 0);
+        setTotalGral(t);
       })
       .catch(() => {});
   }, []);
 
-  const fetchOfertas = useCallback(async (s: string, r: string, cr: boolean, p: number) => {
+  const fetchOfertas = useCallback(async (s: string, r: string, cr: boolean, p: number, c: string) => {
     setLoading(true);
-    const params = new URLSearchParams({
-      sector: s, region: r, conRegion: cr ? "1" : "0", page: String(p),
-    });
+    const params = new URLSearchParams({ sector: s, region: r, conRegion: cr ? "1" : "0", page: String(p) });
+    if (c) params.set("cargo", c);
     const res  = await fetch(`/api/ofertas?${params}`);
     const json = await res.json();
     setOfertas(p === 0 ? json.ofertas : (prev: Oferta[]) => [...prev, ...json.ofertas]);
@@ -130,13 +146,13 @@ function OfertasInner() {
   useEffect(() => {
     setPage(0);
     setOfertas([]);
-    fetchOfertas(sector, region, soloConRegion, 0);
-  }, [sector, region, soloConRegion, fetchOfertas]);
+    fetchOfertas(sector, region, soloConRegion, 0, cargo);
+  }, [sector, region, soloConRegion, cargo, fetchOfertas]);
 
   function loadMore() {
     const next = page + 1;
     setPage(next);
-    fetchOfertas(sector, region, soloConRegion, next);
+    fetchOfertas(sector, region, soloConRegion, next, cargo);
   }
 
   function handleRegion(r: string) {
@@ -146,255 +162,273 @@ function OfertasInner() {
 
   const hayMas = ofertas.length < total;
 
-  const totalSector =
-    sector === "Todos"
-      ? totalGeneral
-      : (sectores.find((s) => s.nombre === sector)?.count ?? 0);
-
   return (
-    <div className="relative min-h-screen flex flex-col bg-[#0D2240] overflow-x-hidden">
+    <div className="relative min-h-screen flex flex-col" style={{ background: "#180b3b" }}>
 
       {/* Glows */}
-      <div className="pointer-events-none fixed -top-32 -right-32 w-[600px] h-[600px] rounded-full"
-        style={{ background: "radial-gradient(circle, rgba(0,180,216,0.12) 0%, transparent 65%)" }} />
-      <div className="pointer-events-none fixed bottom-0 -left-24 w-[450px] h-[450px] rounded-full"
-        style={{ background: "radial-gradient(circle, rgba(46,196,182,0.08) 0%, transparent 65%)" }} />
+      <div className="pointer-events-none fixed -top-32 -right-32 w-[700px] h-[700px] rounded-full"
+        style={{ background: "radial-gradient(circle, rgba(133,104,243,0.16) 0%, transparent 65%)" }} />
+      <div className="pointer-events-none fixed -bottom-24 -left-24 w-[500px] h-[500px] rounded-full"
+        style={{ background: "radial-gradient(circle, rgba(133,104,243,0.09) 0%, transparent 65%)" }} />
       <div className="pointer-events-none fixed inset-0"
         style={{
           backgroundImage:
-            "linear-gradient(rgba(0,180,216,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(0,180,216,0.04) 1px, transparent 1px)",
+            "linear-gradient(rgba(133,104,243,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(133,104,243,0.04) 1px, transparent 1px)",
           backgroundSize: "64px 64px",
         }} />
 
       {/* Navbar */}
-      <header className="fixed top-0 left-0 right-0 z-50 border-b border-white/8"
-        style={{ background: "rgba(13,34,64,0.85)", backdropFilter: "blur(12px)" }}>
-        <div className="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
-          <Link
-            href="/"
-            className="font-serif-display italic text-white hover:text-[#00B4D8] transition-colors"
-            style={{ fontSize: "1.4rem" }}
-          >
-            RemuneraLab
+      <header className="fixed top-0 left-0 right-0 z-50"
+        style={{ background: "rgba(24,11,59,0.88)", backdropFilter: "blur(12px)", borderBottom: "1px solid rgba(133,104,243,0.12)" }}>
+        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+          <Link href="/">
+            <img src="/logo-white.png" alt="RemuneraLab"
+              style={{ height: "30px", width: "auto", filter: "drop-shadow(0 0 10px rgba(133,104,243,0.30))" }} />
           </Link>
-          <Link
-            href="/formulario"
-            className="inline-flex items-center gap-1.5 font-semibold border border-[#00B4D8]/40 text-[#00B4D8] px-4 py-1.5 rounded hover:bg-[#00B4D8]/10 transition-colors"
-            style={{ fontFamily: "var(--font-dm-sans)", fontSize: "0.8rem" }}
-          >
-            Revisar mi sueldo <ArrowRight size={11} />
-          </Link>
+          <nav className="flex items-center gap-5">
+
+            <Link href="/formulario"
+              className="inline-flex items-center gap-1.5 font-semibold px-4 py-1.5 rounded transition-colors hover:bg-[#8568f3]/10"
+              style={{ fontFamily: "var(--font-dm-sans)", fontSize: "0.8rem", border: "1px solid rgba(133,104,243,0.40)", color: "#8568f3" }}>
+              Revisar mi sueldo <ArrowRight size={11} />
+            </Link>
+          </nav>
         </div>
       </header>
 
-      <main className="relative flex-grow max-w-5xl mx-auto px-6 w-full pt-28 pb-24">
+      <div className="relative flex-grow max-w-7xl mx-auto px-6 w-full pt-28 pb-24">
 
-        {/* Título */}
+        {/* Page header */}
         <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, ease: E }}
-          className="mb-10"
+          className="mb-8"
         >
-          <p className="text-[#00B4D8] uppercase tracking-[0.3em] mb-3"
-            style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.62rem" }}>
+          <p className="uppercase tracking-[0.3em] mb-2"
+            style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.58rem", color: "#8568f3" }}>
             Mercado laboral · Chile
           </p>
-          <h1 className="text-3xl sm:text-4xl font-bold text-white tracking-tight"
-            style={{ fontFamily: "var(--font-dm-sans)" }}>
+          <h1 className="font-bold text-white" style={{ fontFamily: "var(--font-dm-sans)", fontSize: "clamp(1.6rem, 3vw, 2.2rem)" }}>
             Ofertas laborales
           </h1>
-          <p className="text-white/25 mt-3"
-            style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.6rem", letterSpacing: "0.1em" }}>
-            Última actualización: 12 de mayo 2026 · Verificar vigencia al postular
-          </p>
           {!loading && (
-            <p className="text-white/45 mt-2"
-              style={{ fontFamily: "var(--font-dm-sans)", fontSize: "0.875rem" }}>
+            <p className="mt-2" style={{ fontFamily: "var(--font-dm-sans)", fontSize: "0.85rem", color: "rgba(255,255,255,0.38)" }}>
               {total.toLocaleString("es-CL")} avisos
-              {sector !== "Todos" ? ` · ${sector}` : ""}
-              {region !== "Todas" ? ` · ${region}` : ""}
-              {soloConRegion && region === "Todas" ? " · con región" : ""}
-              {totalSector > 0 && total < totalSector && region !== "Todas" && (
-                <span className="text-white/25">
-                  {" "}(de {totalSector.toLocaleString("es-CL")} en este sector)
-                </span>
-              )}
+              {cargo && ` · "${cargo}"`}
+              {sector !== "Todos" && ` · ${sector}`}
+              {region !== "Todas" && ` · ${region}`}
             </p>
           )}
         </motion.div>
 
-        {/* Filtros */}
-        <motion.div
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, ease: E, delay: 0.1 }}
-          className="flex flex-col gap-6 mb-10 p-5 rounded-xl border border-white/8 bg-white/3"
-        >
-          {/* Sector */}
-          <div className="flex flex-col gap-2.5">
-            <p className="text-white/35 uppercase tracking-[0.25em]"
-              style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.6rem", fontWeight: 700 }}>
-              Sector
-            </p>
-            <div className="flex flex-wrap gap-2">
-              <FiltroBtn label="Todos" count={totalGeneral} active={sector === "Todos"} onClick={() => setSector("Todos")} />
-              {sectores.map((s) => (
-                <FiltroBtn key={s.nombre} label={s.nombre} count={s.count} active={sector === s.nombre} onClick={() => setSector(s.nombre)} />
-              ))}
-            </div>
-          </div>
+        {/* Two-column layout */}
+        <div className="flex flex-col lg:flex-row gap-8 items-start">
 
-          {/* Región */}
-          <div className="flex flex-col gap-2.5">
-            <div className="flex items-center justify-between gap-4">
-              <p className="text-white/35 uppercase tracking-[0.25em]"
-                style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.6rem", fontWeight: 700 }}>
-                Región
-              </p>
-              <button
-                onClick={() => { setSoloCR((v) => !v); setRegion("Todas"); }}
-                className={`inline-flex items-center gap-2 uppercase tracking-[0.2em] transition-colors ${
-                  soloConRegion ? "text-[#00B4D8]" : "text-white/30 hover:text-white/55"
-                }`}
-                style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.6rem", fontWeight: 700 }}
-              >
-                <span className={`w-7 h-3.5 rounded-full transition-colors relative ${soloConRegion ? "bg-[#00B4D8]" : "bg-white/15"}`}>
-                  <span className={`absolute top-0.5 w-2.5 h-2.5 rounded-full bg-white shadow transition-all ${soloConRegion ? "left-[calc(100%-0.75rem)]" : "left-0.5"}`} />
-                </span>
-                Solo con región
-              </button>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              <FiltroBtn label="Todas" count={totalGeneral} active={region === "Todas"} onClick={() => handleRegion("Todas")} />
-              {regiones.map((r) => (
-                <FiltroBtn key={r.nombre} label={r.nombre} count={r.count} active={region === r.nombre} onClick={() => handleRegion(r.nombre)} />
-              ))}
-            </div>
-          </div>
-        </motion.div>
+          {/* ── Sidebar filtros ── */}
+          <motion.aside
+            initial={{ opacity: 0, x: -12 }} animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.45, ease: E, delay: 0.08 }}
+            className="w-full lg:w-60 shrink-0 lg:sticky lg:top-24"
+          >
+            <div className="rounded-xl p-4 flex flex-col gap-5"
+              style={{ border: "1px solid rgba(133,104,243,0.14)", background: "rgba(133,104,243,0.04)" }}>
 
-        {/* Lista de ofertas */}
-        {loading && ofertas.length === 0 ? (
-          <div className="flex flex-col divide-y divide-white/6">
-            {Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} className="py-5 animate-pulse flex gap-4">
-                <div className="flex-1 space-y-2">
-                  <div className="h-4 bg-white/6 rounded w-2/5" />
-                  <div className="h-3 bg-white/6 rounded w-1/4" />
-                </div>
-                <div className="h-4 bg-white/6 rounded w-16" />
+              {/* Cargo — búsqueda libre */}
+              <div>
+                <p className="px-3 mb-2 uppercase tracking-[0.22em]"
+                  style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.50rem", color: "rgba(133,104,243,0.55)", fontWeight: 700 }}>
+                  Cargo
+                </p>
+                <input
+                  type="text"
+                  placeholder="ej. diseñador, contador..."
+                  value={cargo}
+                  onChange={(e) => setCargo(e.target.value)}
+                  className="w-full px-3 py-2 rounded-lg text-sm text-white placeholder:text-white/20 focus:outline-none transition-all"
+                  style={{
+                    background: "rgba(255,255,255,0.04)",
+                    border: "1px solid rgba(133,104,243,0.18)",
+                    fontFamily: "var(--font-dm-sans)",
+                    fontSize: "0.82rem",
+                  }}
+                  onFocus={e => (e.currentTarget.style.borderColor = "rgba(133,104,243,0.45)")}
+                  onBlur={e => (e.currentTarget.style.borderColor = "rgba(133,104,243,0.18)")}
+                />
               </div>
-            ))}
-          </div>
-        ) : ofertas.length === 0 ? (
-          <p className="text-white/35 py-12 text-center"
-            style={{ fontFamily: "var(--font-dm-sans)", fontSize: "0.875rem" }}>
-            No hay avisos para esta combinación de filtros.
-          </p>
-        ) : (
-          <div className="flex flex-col divide-y divide-white/6">
-            {ofertas.map((o, i) => (
-              <motion.div
-                key={o.id}
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, ease: E, delay: Math.min(i * 0.03, 0.3) }}
-                onClick={() => o.url_aviso && window.open(o.url_aviso, "_blank", "noopener,noreferrer")}
-                className={`py-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 group transition-colors -mx-2 px-2 rounded-lg ${
-                  o.url_aviso ? "cursor-pointer hover:bg-white/4" : ""
-                }`}
-              >
-                <div className="flex flex-col gap-1 min-w-0">
-                  <p className="text-sm font-semibold text-white/85 leading-snug group-hover:text-[#00B4D8] transition-colors"
-                    style={{ fontFamily: "var(--font-dm-sans)" }}>
-                    {o.cargo_original}
+
+              <div style={{ height: "1px", background: "rgba(133,104,243,0.10)" }} />
+
+              {/* Sector */}
+              <div>
+                <p className="px-3 mb-2 uppercase tracking-[0.22em]"
+                  style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.50rem", color: "rgba(133,104,243,0.55)", fontWeight: 700 }}>
+                  Sector
+                </p>
+                <div className="flex flex-col gap-0.5">
+                  <FiltroRow label="Todos" count={totalGeneral} active={sector === "Todos"} onClick={() => setSector("Todos")} />
+                  {sectores.map((s) => (
+                    <FiltroRow key={s.nombre} label={s.nombre} count={s.count} active={sector === s.nombre} onClick={() => setSector(s.nombre)} />
+                  ))}
+                </div>
+              </div>
+
+              <div style={{ height: "1px", background: "rgba(133,104,243,0.10)" }} />
+
+              {/* Región */}
+              <div>
+                <div className="px-3 mb-2 flex items-center justify-between gap-2">
+                  <p className="uppercase tracking-[0.22em]"
+                    style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.50rem", color: "rgba(133,104,243,0.55)", fontWeight: 700 }}>
+                    Región
                   </p>
-                  <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5">
-                    {o.industria && (
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-white/30"
-                        style={{ fontFamily: "var(--font-space-mono)" }}>
-                        {o.industria}
-                      </span>
-                    )}
-                    {o.region && (
-                      <span className="flex items-center gap-1 text-white/35"
-                        style={{ fontFamily: "var(--font-dm-sans)", fontSize: "0.75rem" }}>
-                        <MapPin size={10} />
-                        {o.region}
-                      </span>
-                    )}
-                    {o.modalidad && (
-                      <span className="text-white/30"
-                        style={{ fontFamily: "var(--font-dm-sans)", fontSize: "0.75rem" }}>
-                        {o.modalidad}
-                      </span>
-                    )}
+                  <button
+                    onClick={() => { setSoloCR((v) => !v); setRegion("Todas"); }}
+                    className="flex items-center gap-1.5 transition-colors"
+                    style={{ color: soloConRegion ? "#8568f3" : "rgba(255,255,255,0.28)", fontFamily: "var(--font-space-mono)", fontSize: "0.48rem", letterSpacing: "0.1em" }}
+                  >
+                    <span className="relative w-6 h-3 rounded-full transition-colors"
+                      style={{ background: soloConRegion ? "#8568f3" : "rgba(255,255,255,0.15)" }}>
+                      <span className="absolute top-0.5 w-2 h-2 rounded-full bg-white shadow transition-all"
+                        style={{ left: soloConRegion ? "calc(100% - 0.625rem)" : "2px" }} />
+                    </span>
+                    <span>Con región</span>
+                  </button>
+                </div>
+                <div className="flex flex-col gap-0.5">
+                  <FiltroRow label="Todas" count={totalGeneral} active={region === "Todas"} onClick={() => handleRegion("Todas")} />
+                  {regiones.map((r) => (
+                    <FiltroRow key={r.nombre} label={r.nombre} count={r.count} active={region === r.nombre} onClick={() => handleRegion(r.nombre)} />
+                  ))}
+                </div>
+              </div>
+
+            </div>
+          </motion.aside>
+
+          {/* ── Lista de ofertas ── */}
+          <motion.div
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+            transition={{ duration: 0.4, ease: E, delay: 0.12 }}
+            className="flex-1 min-w-0"
+          >
+            {loading && ofertas.length === 0 ? (
+              <div className="flex flex-col divide-y" style={{ borderColor: "rgba(133,104,243,0.08)" }}>
+                {Array.from({ length: 10 }).map((_, i) => (
+                  <div key={i} className="py-5 animate-pulse flex gap-4">
+                    <div className="flex-1 space-y-2">
+                      <div className="h-4 rounded w-2/5" style={{ background: "rgba(133,104,243,0.10)" }} />
+                      <div className="h-3 rounded w-1/4" style={{ background: "rgba(133,104,243,0.06)" }} />
+                    </div>
+                    <div className="h-4 rounded w-16" style={{ background: "rgba(133,104,243,0.08)" }} />
                   </div>
-                </div>
+                ))}
+              </div>
+            ) : ofertas.length === 0 ? (
+              <p className="py-12 text-center" style={{ fontFamily: "var(--font-dm-sans)", fontSize: "0.875rem", color: "rgba(255,255,255,0.28)" }}>
+                No hay avisos para esta combinación de filtros.
+              </p>
+            ) : (
+              <div className="flex flex-col" style={{ borderTop: "1px solid rgba(133,104,243,0.08)" }}>
+                {ofertas.map((o, i) => {
+                  const fecha = resolverFecha(o.fecha_publicacion_texto, o.created_at);
+                  const dias  = Math.floor((Date.now() - fecha.getTime()) / 86_400_000);
+                  return (
+                    <motion.div
+                      key={o.id}
+                      initial={{ opacity: 0, y: 6 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.28, ease: E, delay: Math.min(i * 0.025, 0.25) }}
+                      onClick={() => o.url_aviso && window.open(o.url_aviso, "_blank", "noopener,noreferrer")}
+                      className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 py-4 -mx-2 px-2 rounded-lg transition-all group"
+                      style={{
+                        borderBottom: "1px solid rgba(133,104,243,0.07)",
+                        cursor: o.url_aviso ? "pointer" : "default",
+                      }}
+                      onMouseEnter={e => { if (o.url_aviso) (e.currentTarget as HTMLDivElement).style.background = "rgba(133,104,243,0.05)"; }}
+                      onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.background = "transparent"; }}
+                    >
+                      <div className="flex flex-col gap-1 min-w-0">
+                        <p className="font-semibold leading-snug transition-colors"
+                          style={{ fontFamily: "var(--font-dm-sans)", fontSize: "0.9rem", color: "rgba(255,255,255,0.82)" }}>
+                          {o.cargo_original}
+                        </p>
+                        <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5">
+                          {o.industria && (
+                            <span className="uppercase tracking-wider"
+                              style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.58rem", color: "rgba(133,104,243,0.55)" }}>
+                              {o.industria}
+                            </span>
+                          )}
+                          {o.region && (
+                            <span className="flex items-center gap-1"
+                              style={{ fontFamily: "var(--font-dm-sans)", fontSize: "0.75rem", color: "rgba(255,255,255,0.32)" }}>
+                              <MapPin size={10} />{o.region}
+                            </span>
+                          )}
+                          {o.modalidad && (
+                            <span style={{ fontFamily: "var(--font-dm-sans)", fontSize: "0.75rem", color: "rgba(255,255,255,0.28)" }}>
+                              {o.modalidad}
+                            </span>
+                          )}
+                        </div>
+                      </div>
 
-                <div className="flex items-center gap-4 shrink-0">
-                  {(() => {
-                    const fecha = resolverFecha(o.fecha_publicacion_texto, o.created_at);
-                    const dias  = Math.floor((Date.now() - fecha.getTime()) / 86_400_000);
-                    return (
-                      <span className={`tabular-nums ${dias > 45 ? "text-amber-500" : "text-white/30"}`}
-                        style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.7rem" }}>
-                        {dias > 45 ? "⚠ " : ""}{fmtFecha(fecha)}
-                      </span>
-                    );
-                  })()}
-                  {o.salario_mid ? (
-                    <span className="font-bold text-[#06D6A0] tabular-nums"
-                      style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.85rem" }}>
-                      {fmtCLP(o.salario_mid)}
-                    </span>
-                  ) : (
-                    <span className="text-white/20"
-                      style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.7rem" }}>
-                      Sin salario
-                    </span>
-                  )}
-                  {o.url_aviso ? (
-                    <span className="inline-flex items-center gap-1 text-white/25 group-hover:text-[#00B4D8] transition-colors"
-                      style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.65rem" }}>
-                      Ver <ExternalLink size={10} />
-                    </span>
-                  ) : (
-                    <span className="text-white/15"
-                      style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.65rem" }}>
-                      Sin enlace
-                    </span>
-                  )}
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        )}
+                      <div className="flex items-center gap-5 shrink-0">
+                        <span className={`tabular-nums`}
+                          style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.68rem", color: dias > 45 ? "#F7C948" : "rgba(255,255,255,0.28)" }}>
+                          {dias > 45 ? "⚠ " : ""}{fmtFecha(fecha)}
+                        </span>
+                        {o.salario_mid ? (
+                          <span className="font-bold tabular-nums"
+                            style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.85rem", color: "#a387f5" }}>
+                            {fmtCLP(o.salario_mid)}
+                          </span>
+                        ) : (
+                          <span style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.68rem", color: "rgba(255,255,255,0.18)" }}>
+                            Sin salario
+                          </span>
+                        )}
+                        {o.url_aviso ? (
+                          <span className="inline-flex items-center gap-1 transition-colors"
+                            style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.62rem", color: "rgba(133,104,243,0.45)" }}>
+                            Ver <ExternalLink size={10} />
+                          </span>
+                        ) : (
+                          <span style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.62rem", color: "rgba(255,255,255,0.14)" }}>
+                            Sin enlace
+                          </span>
+                        )}
+                      </div>
+                    </motion.div>
+                  );
+                })}
+              </div>
+            )}
 
-        {/* Cargar más */}
-        {hayMas && !loading && (
-          <div className="mt-10 flex justify-center">
-            <button
-              onClick={loadMore}
-              className="border border-[#00B4D8]/35 text-[#00B4D8] px-6 py-2.5 rounded hover:bg-[#00B4D8]/10 transition-colors"
-              style={{ fontFamily: "var(--font-dm-sans)", fontSize: "0.875rem" }}
-            >
-              Cargar más
-            </button>
-          </div>
-        )}
+            {hayMas && !loading && (
+              <div className="mt-10 flex justify-center">
+                <button onClick={loadMore}
+                  className="px-6 py-2.5 rounded-lg transition-all hover:opacity-90"
+                  style={{ border: "1px solid rgba(133,104,243,0.35)", color: "#8568f3", fontFamily: "var(--font-dm-sans)", fontSize: "0.875rem" }}>
+                  Cargar más
+                </button>
+              </div>
+            )}
 
-        {loading && ofertas.length > 0 && (
-          <div className="mt-10 flex justify-center">
-            <span className="text-white/30"
-              style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.65rem", letterSpacing: "0.1em" }}>
-              Cargando...
-            </span>
-          </div>
-        )}
+            {loading && ofertas.length > 0 && (
+              <div className="mt-10 flex justify-center">
+                <Loader2 size={18} className="animate-spin" style={{ color: "#8568f3" }} />
+              </div>
+            )}
+          </motion.div>
+        </div>
+      </div>
 
-      </main>
+      <footer className="relative py-6 px-6" style={{ borderTop: "1px solid rgba(133,104,243,0.10)" }}>
+        <p className="text-center" style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.55rem", letterSpacing: "0.15em", color: "rgba(255,255,255,0.18)" }}>
+          REMUNERALAB — DATOS ACTUALIZADOS PERIÓDICAMENTE · VERIFICAR VIGENCIA AL POSTULAR
+        </p>
+      </footer>
     </div>
   );
 }

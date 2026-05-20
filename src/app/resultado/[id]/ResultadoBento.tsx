@@ -7,49 +7,10 @@ import ChartResult from "./ChartResult";
 import AIInterpretacion from "./AIInterpretacion";
 import OfertasPerfil from "./OfertasPerfil";
 import LoginPerfil from "@/components/LoginPerfil";
-import { getTendenciaSector, getTendenciaTamano, getTendenciaCIUO, getTendenciaSexo, EMRCL_PERIODO } from "@/lib/emrcl";
 import { getBrechaCiuo, getBrechaRama, BRECHA_PERIODO } from "@/lib/brecha-genero";
-import { getTasaRegion, TASA_NACIONAL, ENE_PERIODO } from "@/lib/ene";
-import { getCostoLaboral, ICL_PERIODO } from "@/lib/icl";
 import type { MercadoResult } from "@/lib/mercado";
 
 const E = [0.16, 1, 0.3, 1] as const;
-
-function calcularTension(
-  nEfectivo: number,
-  isLocal: boolean,
-  tasaRegion: number,
-  tasaNacional: number,
-): { label: string; color: string; descripcion: string } {
-  const scoreVacantes = isLocal
-    ? (nEfectivo >= 10 ? 2 : nEfectivo >= 4 ? 1 : 0)
-    : (nEfectivo >= 20 ? 2 : nEfectivo >= 8 ? 1 : 0);
-  // Desocupación baja = mercado de talento ajustado = más tensión para el empleador
-  const scoreEne =
-    tasaRegion <= tasaNacional - 1.5 ? 2 :
-    tasaRegion >= tasaNacional + 1.5 ? 0 : 1;
-  const total = scoreVacantes + scoreEne;
-  if (total >= 3) return {
-    label: "Alta tensión laboral",
-    color: "#F7C948",
-    descripcion: "Muchas vacantes activas y baja desocupación regional — fuerte competencia por talento, buen momento para negociar.",
-  };
-  if (total === 2) return {
-    label: "Tensión moderada",
-    color: "#8568f3",
-    descripcion: "Demanda activa de empleadores con disponibilidad de candidatos moderada — mercado en movimiento.",
-  };
-  if (total === 1) return {
-    label: "Mercado equilibrado",
-    color: "rgba(255,255,255,0.55)",
-    descripcion: "Balance entre oferta de candidatos y demanda de empleadores en tu región.",
-  };
-  return {
-    label: "Mercado holgado",
-    color: "rgba(255,255,255,0.3)",
-    descripcion: "Pocas vacantes activas y alta desocupación regional — hay más candidatos que empleos disponibles.",
-  };
-}
 
 function formatCLP(n: number) {
   return new Intl.NumberFormat("es-CL", {
@@ -124,15 +85,8 @@ export default function ResultadoBento({
   cargo, industria, region, salario_mid, brechaP75, competitividad, anios_experiencia,
   fuente_descripcion, nivel_cascada, grupo_usado, ciuo_codigo, tamano_empresa, sexo, mercado,
 }: Props) {
-  const tendenciaSector = getTendenciaSector(industria);
-  const tendenciaTamano = tamano_empresa ? getTendenciaTamano(tamano_empresa) : null;
-  const tendenciaCIUO   = getTendenciaCIUO(ciuo_codigo);
-
   const brechaCiuo = getBrechaCiuo(ciuo_codigo);
   const brechaRama = getBrechaRama(industria);
-  const tasaRegion = getTasaRegion(region);
-  const tendenciaSexo = (sexo === "M" || sexo === "F") ? getTendenciaSexo(sexo) : null;
-  const costoLaboral = getCostoLaboral(industria);
 
   const bajoMinimo    = salario_mid < SALARIO_MINIMO_CLP;
   const bajoMovilidad = ciuo_codigo
@@ -270,6 +224,52 @@ export default function ResultadoBento({
               Aún no hay suficientes datos para mostrar la distribución.
             </div>
           )}
+
+          {/* Brecha de género — integrada en el gráfico de benchmark */}
+          {(brechaCiuo !== null || brechaRama !== null) && (() => {
+            const brecha = brechaCiuo ?? brechaRama!;
+            const neg    = brecha < 0;
+            const abs    = Math.abs(brecha).toFixed(1).replace(".", ",");
+            const fuenteLabel = brechaCiuo !== null
+              ? (() => {
+                  const map: Record<string, string> = {
+                    "1": "directivos y gerentes", "2": "profesionales universitarios",
+                    "3": "técnicos", "4": "administrativos", "5": "servicios",
+                    "7": "artesanos y oficios", "8": "operadores", "9": "apoyo",
+                  };
+                  return ciuo_codigo ? (map[ciuo_codigo[0]] ?? "tu ocupación") : "tu ocupación";
+                })()
+              : industria;
+            return (
+              <div className="mt-5 pt-4 border-t border-white/8 flex items-center gap-4 flex-wrap">
+                <div className="rounded-lg px-3 py-1.5 shrink-0"
+                  style={{
+                    background: neg ? "rgba(247,201,72,0.08)" : "rgba(133,104,243,0.10)",
+                    border: `1px solid ${neg ? "rgba(247,201,72,0.28)" : "rgba(133,104,243,0.28)"}`,
+                  }}>
+                  <span className="font-bold tabular-nums"
+                    style={{ fontFamily: "var(--font-dm-sans)", fontSize: "0.95rem", color: neg ? "#F7C948" : "#8568f3" }}>
+                    {neg ? "−" : "+"}{abs}%
+                  </span>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.50rem", color: "rgba(133,104,243,0.55)", letterSpacing: "0.15em", marginBottom: "2px" }}>
+                    BRECHA DE GÉNERO · INE ESI · {BRECHA_PERIODO}
+                  </p>
+                  <p style={{ fontFamily: "var(--font-dm-sans)", fontSize: "0.80rem", color: "rgba(255,255,255,0.45)", lineHeight: 1.4 }}>
+                    {neg
+                      ? sexo === "F"
+                        ? <>Las mujeres en <span style={{ color: "rgba(255,255,255,0.70)" }}>{fuenteLabel}</span> ganan {abs}% menos que los hombres en ingreso mediano</>
+                        : sexo === "M"
+                        ? <>Las mujeres en <span style={{ color: "rgba(255,255,255,0.70)" }}>{fuenteLabel}</span> ganan {abs}% menos que tú en ingreso mediano</>
+                        : <>Las mujeres en <span style={{ color: "rgba(255,255,255,0.70)" }}>{fuenteLabel}</span> ganan {abs}% menos que los hombres en ingreso mediano</>
+                      : <>Las mujeres en <span style={{ color: "rgba(255,255,255,0.70)" }}>{fuenteLabel}</span> ganan {abs}% más que los hombres en ingreso mediano</>
+                    }
+                  </p>
+                </div>
+              </div>
+            );
+          })()}
         </motion.div>
 
         {/* Columna derecha */}
@@ -433,475 +433,44 @@ export default function ResultadoBento({
         ))}
       </div>
 
-      {/* Presión de mercado y drift salarial — avisos de empleo */}
-      {(mercado.presion !== null || mercado.drift !== null) && (
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-40px" }}
-          transition={{ duration: 0.45, ease: E }}
-          className="mt-5"
-        >
-          <div className="flex items-center justify-between mb-3">
-            <p className="text-white/30 uppercase tracking-[0.2em]"
-              style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.6rem", fontWeight: 700 }}>
-              Demanda y tendencia del mercado
-            </p>
-            <span className="text-white/20 shrink-0"
-              style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.55rem" }}>
-              Avisos de empleo · últimos 90 días
-            </span>
-          </div>
-          {(() => {
-            const showTension = mercado.presion !== null && tasaRegion !== null;
-            const count = [mercado.presion, mercado.drift].filter(Boolean).length;
-            const cols  = count === 1 ? "grid-cols-1 max-w-sm" : "grid-cols-1 sm:grid-cols-2";
-            return (
-              <>
-                {/* Card de tensión laboral — combina avisos (presión) con ENE (desocupación) */}
-                {showTension && (() => {
-                  const p = mercado.presion!;
-                  const nEfectivo = p.n_region > 0 ? p.n_region : p.n_nacional;
-                  const isLocal   = p.n_region > 0;
-                  const tension   = calcularTension(nEfectivo, isLocal, tasaRegion!, TASA_NACIONAL);
-                  return (
-                    <div className="rounded-xl border border-white/8 bg-white/3 px-6 py-5 mb-4">
-                      <p className="text-white/35 uppercase tracking-widest mb-3"
-                        style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.55rem" }}>
-                        Índice de tensión laboral · {isLocal ? region : "nacional"}
-                      </p>
-                      <p className="text-2xl font-bold mb-2"
-                        style={{ fontFamily: "var(--font-dm-sans)", color: tension.color }}>
-                        {tension.label}
-                      </p>
-                      <p className="text-white/50 leading-relaxed mb-3"
-                        style={{ fontFamily: "var(--font-dm-sans)", fontSize: "0.82rem" }}>
-                        {tension.descripcion}
-                      </p>
-                      <div className="flex gap-3 flex-wrap"
-                        style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.6rem" }}>
-                        <span className="text-white/30">
-                          {nEfectivo} vacante{nEfectivo !== 1 ? "s" : ""} · últimos 90d
-                        </span>
-                        <span className="text-white/20">·</span>
-                        <span className="text-white/30">
-                          {tasaRegion!.toFixed(1).replace(".", ",")}% desocupación {isLocal ? region : ""}
-                          {" "}vs {TASA_NACIONAL.toFixed(1).replace(".", ",")}% nacional
-                        </span>
-                      </div>
-                    </div>
-                  );
-                })()}
-                <div className={`grid gap-4 ${cols}`}>
-                {mercado.presion !== null && (
-                  <div className="rounded-xl border border-white/8 bg-white/3 px-6 py-5">
-                    <p className="text-white/35 text-xs mb-3 uppercase tracking-widest"
-                      style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.55rem" }}>
-                      Vacantes activas · {mercado.presion.n_region > 0 ? region : "a nivel nacional"}
-                    </p>
-                    <p className="text-3xl font-bold mb-2"
-                      style={{ fontFamily: "var(--font-dm-sans)", color: "#8568f3" }}>
-                      {mercado.presion.n_region > 0 ? mercado.presion.n_region : mercado.presion.n_nacional}
-                    </p>
-                    <p className="text-white/50 leading-relaxed mb-3"
-                      style={{ fontFamily: "var(--font-dm-sans)", fontSize: "0.82rem" }}>
-                      {mercado.presion.n_region > 0 ? (
-                        <>Avisos publicados en <span className="text-white/70 font-medium">{region}</span> · {mercado.presion.n_nacional} a nivel nacional</>
-                      ) : (
-                        <>Avisos publicados a nivel nacional · sin registros en {region} aún</>
-                      )}
-                    </p>
-                    {mercado.presion.fuentes.length > 0 && (
-                      <div className="flex gap-2 flex-wrap">
-                        {mercado.presion.fuentes.map(f => (
-                          <span key={f}
-                            className="rounded-full border border-white/10 px-2 py-0.5 text-white/35"
-                            style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.55rem" }}>
-                            {f === "BNE" ? "BNE · Gobierno" : f}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                )}
-                {mercado.drift !== null && (() => {
-                  const { pct_cambio, mediana_reciente, mediana_anterior } = mercado.drift!;
-                  const subiendo = pct_cambio >= 0;
-                  return (
-                    <div className="rounded-xl border border-white/8 bg-white/3 px-6 py-5">
-                      <p className="text-white/35 text-xs mb-3 uppercase tracking-widest"
-                        style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.55rem" }}>
-                        Drift salarial · vs 90 días anteriores
-                      </p>
-                      <p className="text-3xl font-bold mb-2"
-                        style={{ fontFamily: "var(--font-dm-sans)", color: subiendo ? "#8568f3" : "#F7C948" }}>
-                        {subiendo ? "+" : ""}{pct_cambio.toFixed(1).replace(".", ",")}%
-                      </p>
-                      <p className="text-white/50 leading-relaxed"
-                        style={{ fontFamily: "var(--font-dm-sans)", fontSize: "0.82rem" }}>
-                        Los avisos muestran sueldos{" "}
-                        <span className="text-white/70 font-medium">{subiendo ? "subiendo" : "bajando"}</span>{" "}
-                        — mediana actual {formatCLP(Math.round(mediana_reciente))} vs{" "}
-                        {formatCLP(Math.round(mediana_anterior))} hace 90 días
-                      </p>
-                    </div>
-                  );
-                })()}
-              </div>
-            </>
-          );
-          })()}
-        </motion.div>
-      )}
-
-      {/* Tendencias de mercado — datos INE EMRCL */}
-      {(tendenciaSector !== null || tendenciaTamano !== null || tendenciaCIUO !== null || tendenciaSexo !== null) && (
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-40px" }}
-          transition={{ duration: 0.45, ease: E }}
-          className="mt-5"
-        >
-          <div className="flex items-center justify-between mb-3">
-            <p className="text-white/30 uppercase tracking-[0.2em]"
-              style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.6rem", fontWeight: 700 }}>
-              Cómo se están moviendo los sueldos en Chile
-            </p>
-            <span className="text-white/20 shrink-0"
-              style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.55rem" }}>
-              INE · EMRCL · {EMRCL_PERIODO}
-            </span>
-          </div>
-
-          {(() => {
-            const cardValues = [tendenciaSector, tendenciaTamano, tendenciaCIUO, tendenciaSexo];
-            const count = cardValues.filter((v) => v !== null).length;
-            const cols =
-              count === 1 ? "grid-cols-1" :
-              count === 2 ? "grid-cols-1 sm:grid-cols-2" :
-              count === 3 ? "grid-cols-1 sm:grid-cols-3" :
-                            "grid-cols-1 sm:grid-cols-2 lg:grid-cols-4";
-            const ciuoGrupoLabel: Record<string, string> = {
-              "1": "directivos y gerentes",
-              "2": "profesionales universitarios",
-              "3": "técnicos de nivel medio",
-              "4": "trabajadores administrativos",
-              "5": "trabajadores de servicios",
-              "7": "artesanos y trabajadores de oficio",
-              "8": "operadores de máquinas y conductores",
-              "9": "trabajadores de apoyo",
-            };
-            const ciuoLabel = ciuo_codigo ? (ciuoGrupoLabel[ciuo_codigo[0]] ?? "tu tipo de trabajo") : "tu tipo de trabajo";
-            const sexoLabel = sexo === "F" ? "mujeres" : "hombres";
-            return (
-              <div className={`grid gap-4 ${cols}`}>
-                {tendenciaSector !== null && (
-                  <div className="rounded-xl border border-white/8 bg-white/3 px-6 py-5">
-                    <p className="text-white/35 text-xs mb-3 uppercase tracking-widest"
-                      style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.55rem" }}>
-                      En tu rubro
-                    </p>
-                    <p className="text-3xl font-bold mb-2"
-                      style={{ fontFamily: "var(--font-dm-sans)", color: "#8568f3" }}>
-                      +{tendenciaSector.toFixed(1).replace(".", ",")}%
-                    </p>
-                    <p className="text-white/50 leading-relaxed"
-                      style={{ fontFamily: "var(--font-dm-sans)", fontSize: "0.82rem" }}>
-                      Los sueldos en{" "}
-                      <span className="text-white/70 font-medium">{industria}</span>{" "}
-                      subieron el último año
-                    </p>
-                  </div>
-                )}
-                {tendenciaTamano !== null && (
-                  <div className="rounded-xl border border-white/8 bg-white/3 px-6 py-5">
-                    <p className="text-white/35 text-xs mb-3 uppercase tracking-widest"
-                      style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.55rem" }}>
-                      En tu tipo de empresa
-                    </p>
-                    <p className="text-3xl font-bold mb-2"
-                      style={{ fontFamily: "var(--font-dm-sans)", color: "#8568f3" }}>
-                      +{tendenciaTamano.var12.toFixed(1).replace(".", ",")}%
-                    </p>
-                    <p className="text-white/50 leading-relaxed"
-                      style={{ fontFamily: "var(--font-dm-sans)", fontSize: "0.82rem" }}>
-                      Los sueldos en{" "}
-                      <span className="text-white/70 font-medium">{tendenciaTamano.label}</span>{" "}
-                      subieron el último año
-                    </p>
-                  </div>
-                )}
-                {tendenciaCIUO !== null && (
-                  <div className="rounded-xl border border-white/8 bg-white/3 px-6 py-5">
-                    <p className="text-white/35 text-xs mb-3 uppercase tracking-widest"
-                      style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.55rem" }}>
-                      En tu tipo de trabajo
-                    </p>
-                    <p className="text-3xl font-bold mb-2"
-                      style={{ fontFamily: "var(--font-dm-sans)", color: "#8568f3" }}>
-                      +{tendenciaCIUO.toFixed(1).replace(".", ",")}%
-                    </p>
-                    <p className="text-white/50 leading-relaxed"
-                      style={{ fontFamily: "var(--font-dm-sans)", fontSize: "0.82rem" }}>
-                      Los sueldos entre{" "}
-                      <span className="text-white/70 font-medium">{ciuoLabel}</span>{" "}
-                      subieron el último año
-                    </p>
-                  </div>
-                )}
-                {tendenciaSexo !== null && (
-                  <div className="rounded-xl border border-white/8 bg-white/3 px-6 py-5">
-                    <p className="text-white/35 text-xs mb-3 uppercase tracking-widest"
-                      style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.55rem" }}>
-                      En tu grupo
-                    </p>
-                    <p className="text-3xl font-bold mb-2"
-                      style={{ fontFamily: "var(--font-dm-sans)", color: "#8568f3" }}>
-                      +{tendenciaSexo.toFixed(1).replace(".", ",")}%
-                    </p>
-                    <p className="text-white/50 leading-relaxed"
-                      style={{ fontFamily: "var(--font-dm-sans)", fontSize: "0.82rem" }}>
-                      Los sueldos de las{" "}
-                      <span className="text-white/70 font-medium">{sexoLabel}</span>{" "}
-                      subieron el último año a nivel nacional
-                    </p>
-                  </div>
-                )}
-              </div>
-            );
-          })()}
-        </motion.div>
-      )}
-
-      {/* Costo laboral — datos INE EMRCL ICL */}
-      {costoLaboral !== null && (
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-40px" }}
-          transition={{ duration: 0.45, ease: E }}
-          className="mt-5"
-        >
-          <div className="flex items-center justify-between mb-3">
-            <p className="text-white/30 uppercase tracking-[0.2em]"
-              style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.6rem", fontWeight: 700 }}>
-              Costo laboral en tu sector
-            </p>
-            <span className="text-white/20 shrink-0"
-              style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.55rem" }}>
-              INE · EMRCL · {ICL_PERIODO}
-            </span>
-          </div>
-          <div className={`grid gap-4 ${tendenciaSector !== null ? "grid-cols-1 sm:grid-cols-2" : "grid-cols-1 sm:grid-cols-1 max-w-sm"}`}>
+      {/* Drift salarial — tendencia de avisos de empleo */}
+      {mercado.drift !== null && (() => {
+        const { pct_cambio, mediana_reciente, mediana_anterior } = mercado.drift;
+        const subiendo = pct_cambio >= 0;
+        return (
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-40px" }}
+            transition={{ duration: 0.45, ease: E }}
+            className="mt-5 max-w-sm"
+          >
             <div className="rounded-xl border border-white/8 bg-white/3 px-6 py-5">
-              <p className="text-white/35 text-xs mb-3 uppercase tracking-widest"
-                style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.55rem" }}>
-                Índice de costo laboral · tu rubro
-              </p>
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-white/35 uppercase tracking-widest"
+                  style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.55rem" }}>
+                  Tendencia salarial · vs 90 días anteriores
+                </p>
+                <span className="text-white/20 shrink-0 ml-3"
+                  style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.50rem" }}>
+                  Avisos
+                </span>
+              </div>
               <p className="text-3xl font-bold mb-2"
-                style={{ fontFamily: "var(--font-dm-sans)", color: "#06D6A0" }}>
-                +{costoLaboral.toFixed(1).replace(".", ",")}%
+                style={{ fontFamily: "var(--font-dm-sans)", color: subiendo ? "#8568f3" : "#F7C948" }}>
+                {subiendo ? "+" : ""}{pct_cambio.toFixed(1).replace(".", ",")}%
               </p>
               <p className="text-white/50 leading-relaxed"
                 style={{ fontFamily: "var(--font-dm-sans)", fontSize: "0.82rem" }}>
-                Contratar en{" "}
-                <span className="text-white/70 font-medium">{industria}</span>{" "}
-                costó ese porcentaje más el último año — incluye sueldos, cotizaciones y beneficios
+                Los avisos muestran sueldos{" "}
+                <span className="text-white/70 font-medium">{subiendo ? "subiendo" : "bajando"}</span>{" "}
+                — mediana actual {formatCLP(Math.round(mediana_reciente))} vs{" "}
+                {formatCLP(Math.round(mediana_anterior))} hace 90 días
               </p>
             </div>
-            {tendenciaSector !== null && (() => {
-              const diff = costoLaboral - tendenciaSector;
-              return (
-                <div className="rounded-xl border border-white/8 bg-white/3 px-6 py-5">
-                  <p className="text-white/35 text-xs mb-3 uppercase tracking-widest"
-                    style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.55rem" }}>
-                    Sueldos vs. costo total
-                  </p>
-                  <div className="flex items-end gap-3 mb-2">
-                    <p className="text-3xl font-bold"
-                      style={{ fontFamily: "var(--font-dm-sans)", color: "#a387f5" }}>
-                      +{tendenciaSector.toFixed(1).replace(".", ",")}%
-                    </p>
-                    <p className="text-white/30 text-xs mb-1.5"
-                      style={{ fontFamily: "var(--font-space-mono)" }}>
-                      IR vs +{costoLaboral.toFixed(1).replace(".", ",")}% ICL
-                    </p>
-                  </div>
-                  <p className="text-white/50 leading-relaxed"
-                    style={{ fontFamily: "var(--font-dm-sans)", fontSize: "0.82rem" }}>
-                    {diff > 0.5
-                      ? <>Los costos no salariales (cotizaciones, beneficios) están subiendo más rápido que los sueldos en <span className="text-white/70 font-medium">{industria}</span></>
-                      : diff < -0.5
-                      ? <>Los sueldos en <span className="text-white/70 font-medium">{industria}</span> están liderando el alza — los costos no salariales crecen a menor ritmo</>
-                      : <>El alza del costo en <span className="text-white/70 font-medium">{industria}</span> está siendo impulsada principalmente por aumento de sueldos</>
-                    }
-                  </p>
-                </div>
-              );
-            })()}
-          </div>
-        </motion.div>
-      )}
-
-      {/* Desocupación regional — datos INE ENE */}
-      {tasaRegion !== null && (
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-40px" }}
-          transition={{ duration: 0.45, ease: E }}
-          className="mt-5"
-        >
-          <div className="flex items-center justify-between mb-3">
-            <p className="text-white/30 uppercase tracking-[0.2em]"
-              style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.6rem", fontWeight: 700 }}>
-              Mercado laboral en tu región
-            </p>
-            <span className="text-white/20 shrink-0"
-              style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.55rem" }}>
-              INE · ENE · {ENE_PERIODO}
-            </span>
-          </div>
-          <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
-            <div className="rounded-xl border border-white/8 bg-white/3 px-6 py-5">
-              <p className="text-white/35 text-xs mb-3 uppercase tracking-widest"
-                style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.55rem" }}>
-                Tasa de desocupación · {region}
-              </p>
-              <p className="text-3xl font-bold mb-2"
-                style={{
-                  fontFamily: "var(--font-dm-sans)",
-                  color: tasaRegion > TASA_NACIONAL ? "#F7C948" : "#8568f3",
-                }}>
-                {tasaRegion.toFixed(1).replace(".", ",")}%
-              </p>
-              <p className="text-white/50 leading-relaxed"
-                style={{ fontFamily: "var(--font-dm-sans)", fontSize: "0.82rem" }}>
-                {tasaRegion > TASA_NACIONAL
-                  ? <>Mayor que el promedio nacional{" "}
-                      <span className="text-white/40">({TASA_NACIONAL.toFixed(1).replace(".", ",")}%)</span>
-                      {" "}— más personas buscan trabajo en tu región</>
-                  : tasaRegion < TASA_NACIONAL
-                  ? <>Menor que el promedio nacional{" "}
-                      <span className="text-white/40">({TASA_NACIONAL.toFixed(1).replace(".", ",")}%)</span>
-                      {" "}— mercado laboral más ajustado en tu región</>
-                  : <>Igual al promedio nacional ({TASA_NACIONAL.toFixed(1).replace(".", ",")}%)</>
-                }
-              </p>
-            </div>
-            <div className="rounded-xl border border-white/8 bg-white/3 px-6 py-5">
-              <p className="text-white/35 text-xs mb-3 uppercase tracking-widest"
-                style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.55rem" }}>
-                Qué significa para tu sueldo
-              </p>
-              <p className="text-white/70 leading-relaxed"
-                style={{ fontFamily: "var(--font-dm-sans)", fontSize: "0.88rem", lineHeight: "1.65" }}>
-                {tasaRegion <= TASA_NACIONAL - 1
-                  ? "Con baja desocupación en tu región, hay más demanda que oferta de trabajo — tienes más poder de negociación salarial."
-                  : tasaRegion >= TASA_NACIONAL + 1
-                  ? "La alta desocupación regional implica más competencia por cada vacante — el mercado presiona los sueldos a la baja."
-                  : "La desocupación en tu región está en línea con el promedio nacional, sin presión extrema en ningún sentido."
-                }
-              </p>
-            </div>
-          </div>
-        </motion.div>
-      )}
-
-      {/* Brecha de género — datos INE ESI */}
-      {(brechaCiuo !== null || brechaRama !== null) && (
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-40px" }}
-          transition={{ duration: 0.45, ease: E }}
-          className="mt-5"
-        >
-          <div className="flex items-center justify-between mb-3">
-            <p className="text-white/30 uppercase tracking-[0.2em]"
-              style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.6rem", fontWeight: 700 }}>
-              Brecha de género en el mercado
-            </p>
-            <span className="text-white/20 shrink-0"
-              style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.55rem" }}>
-              INE · ESI · {BRECHA_PERIODO}
-            </span>
-          </div>
-          {(() => {
-            const cards = [brechaCiuo, brechaRama].filter((v) => v !== null).length;
-            const cols = cards === 1 ? "grid-cols-1" : "grid-cols-1 sm:grid-cols-2";
-            const ciuoGrupoLabel: Record<string, string> = {
-              "1": "directivos y gerentes",
-              "2": "profesionales universitarios",
-              "3": "técnicos de nivel medio",
-              "4": "trabajadores administrativos",
-              "5": "trabajadores de servicios",
-              "6": "trabajadores agropecuarios",
-              "7": "artesanos y trabajadores de oficio",
-              "8": "operadores de maquinaria y conductores",
-              "9": "trabajadores de apoyo",
-            };
-            const ciuoLabel = ciuo_codigo ? (ciuoGrupoLabel[ciuo_codigo[0]] ?? "tu tipo de trabajo") : "tu tipo de trabajo";
-            const fmtBrecha = (v: number) => {
-              const abs = Math.abs(v).toFixed(1).replace(".", ",");
-              return v < 0 ? `-${abs}%` : `+${abs}%`;
-            };
-            return (
-              <div className={`grid gap-4 ${cols}`}>
-                {brechaCiuo !== null && (
-                  <div className="rounded-xl border border-white/8 bg-white/3 px-6 py-5">
-                    <p className="text-white/35 text-xs mb-3 uppercase tracking-widest"
-                      style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.55rem" }}>
-                      En tu tipo de trabajo
-                    </p>
-                    <p className="text-3xl font-bold mb-2"
-                      style={{ fontFamily: "var(--font-dm-sans)", color: brechaCiuo < 0 ? "#F7C948" : "#8568f3" }}>
-                      {fmtBrecha(brechaCiuo)}
-                    </p>
-                    <p className="text-white/50 leading-relaxed"
-                      style={{ fontFamily: "var(--font-dm-sans)", fontSize: "0.82rem" }}>
-                      {brechaCiuo < 0 ? (
-                        sexo === "F"
-                          ? <>Podrías estar en la parte afectada: las mujeres ganan un <span className="text-white/70 font-medium">{Math.abs(brechaCiuo).toFixed(1).replace(".", ",")}% menos</span> entre {ciuoLabel}</>
-                          : sexo === "M"
-                          ? <>Las mujeres en tu misma ocupación ganan un <span className="text-white/70 font-medium">{Math.abs(brechaCiuo).toFixed(1).replace(".", ",")}% menos</span> en ingreso mediano</>
-                          : <>En ingreso mediano, la brecha entre mujeres y hombres es de <span className="text-white/70 font-medium">{Math.abs(brechaCiuo).toFixed(1).replace(".", ",")}%</span> entre {ciuoLabel}</>
-                      ) : (
-                        <>Las mujeres ganan un <span className="text-white/70 font-medium">{brechaCiuo.toFixed(1).replace(".", ",")}% más</span> en ingreso mediano entre {ciuoLabel}</>
-                      )}
-                    </p>
-                  </div>
-                )}
-                {brechaRama !== null && (
-                  <div className="rounded-xl border border-white/8 bg-white/3 px-6 py-5">
-                    <p className="text-white/35 text-xs mb-3 uppercase tracking-widest"
-                      style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.55rem" }}>
-                      En tu rubro
-                    </p>
-                    <p className="text-3xl font-bold mb-2"
-                      style={{ fontFamily: "var(--font-dm-sans)", color: brechaRama < 0 ? "#F7C948" : "#8568f3" }}>
-                      {fmtBrecha(brechaRama)}
-                    </p>
-                    <p className="text-white/50 leading-relaxed"
-                      style={{ fontFamily: "var(--font-dm-sans)", fontSize: "0.82rem" }}>
-                      {brechaRama < 0 ? (
-                        sexo === "F"
-                          ? <>En <span className="text-white/70 font-medium">{industria}</span>, las mujeres ganan un {Math.abs(brechaRama).toFixed(1).replace(".", ",")}% menos en ingreso mediano</>
-                          : sexo === "M"
-                          ? <>Las mujeres en <span className="text-white/70 font-medium">{industria}</span> ganan un {Math.abs(brechaRama).toFixed(1).replace(".", ",")}% menos que los hombres en ingreso mediano</>
-                          : <>La brecha de género en <span className="text-white/70 font-medium">{industria}</span> es de {Math.abs(brechaRama).toFixed(1).replace(".", ",")}% en ingreso mediano</>
-                      ) : (
-                        <>Las mujeres en <span className="text-white/70 font-medium">{industria}</span> ganan un {brechaRama.toFixed(1).replace(".", ",")}% más en ingreso mediano</>
-                      )}
-                    </p>
-                  </div>
-                )}
-              </div>
-            );
-          })()}
-        </motion.div>
-      )}
+          </motion.div>
+        );
+      })()}
 
       <AIInterpretacion
         cargo={cargo}

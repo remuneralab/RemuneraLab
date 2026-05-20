@@ -66,7 +66,7 @@ function edadInicio(ciuo2: number | null): number {
 // El rango se centra en (edad_inicio + anios_experiencia) con buffer de ±4 años.
 function edadProxy(anios: number, ciuo2: number | null): { min: number; max: number } {
   const inicio = edadInicio(ciuo2);
-  const buffer = 4;
+  const buffer = 2;
   return {
     min: Math.max(18, inicio + anios - buffer),
     max: Math.min(65, inicio + anios + buffer),

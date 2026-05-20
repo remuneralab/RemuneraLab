@@ -15,6 +15,7 @@ export async function GET(req: NextRequest) {
 
   const region     = searchParams.get("region");
   const conRegion  = searchParams.get("conRegion") === "1";
+  const cargo      = searchParams.get("cargo")?.trim();
 
   let query = supabase
     .from("registros_avisos")
@@ -29,6 +30,9 @@ export async function GET(req: NextRequest) {
     query = query.eq("region", region);
   } else if (conRegion) {
     query = query.not("region", "is", null);
+  }
+  if (cargo) {
+    query = query.ilike("cargo_original", `%${cargo}%`);
   }
 
   const { data, error, count } = await query;

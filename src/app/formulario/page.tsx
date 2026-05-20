@@ -1,10 +1,11 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "motion/react";
 import { Lock, ShieldCheck, ArrowRight } from "lucide-react";
 import Link from "next/link";
+import { sendGAEvent } from "@next/third-parties/google";
 import { clasificarCargo, type CiuoMatch } from "@/lib/ciuo08";
 
 const CIUO_INDUSTRIA_ESPERADA: Record<string, { industrias: string[]; sector: string }> = {
@@ -109,6 +110,10 @@ export default function Formulario() {
   const [ciuo, setCiuo]             = useState<CiuoMatch | null>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
+  useEffect(() => {
+    sendGAEvent("event", "formulario_inicio");
+  }, []);
+
   function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   }
@@ -144,9 +149,17 @@ export default function Formulario() {
     if (res.status === 429) { setRateLimited(true); setLoading(false); return; }
     if (!res.ok || !data.id) {
       setError(data.error ?? "No se pudo guardar la información. Intenta nuevamente.");
+      sendGAEvent("event", "benchmark_error", { cargo: form.cargo, industria: form.industria });
       setLoading(false);
       return;
     }
+    sendGAEvent("event", "benchmark_calculado", {
+      cargo: form.cargo,
+      industria: INDUSTRIAS.find(i => i.label === form.industria)?.value ?? form.industria,
+      region: form.region,
+      anios_experiencia: parseInt(form.anios_experiencia),
+      rango_salarial: form.salario_exacto < 800_000 ? "bajo" : form.salario_exacto < 2_000_000 ? "medio" : "alto",
+    });
     router.push(`/resultado/${data.id}`);
   }
 
@@ -173,13 +186,6 @@ export default function Formulario() {
               alt="RemuneraLab"
               style={{ height: "32px", width: "auto", filter: "drop-shadow(0 0 10px rgba(133,104,243,0.30))" }}
             />
-          </Link>
-          <Link
-            href="/empresas"
-            className="hover:text-white/70 transition-colors"
-            style={{ fontFamily: "var(--font-dm-sans)", fontSize: "0.8rem", color: "rgba(255,255,255,0.40)" }}
-          >
-            Para empresas
           </Link>
         </div>
       </header>

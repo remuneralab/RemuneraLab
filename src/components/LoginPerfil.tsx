@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { ArrowRight, Loader2, Mail, CheckCircle } from "lucide-react";
+import { ArrowRight, Loader2, Mail, CheckCircle, ShieldCheck } from "lucide-react";
+import { sendGAEvent } from "@next/third-parties/google";
 import { supabase } from "@/lib/supabase";
 
 const E = [0.16, 1, 0.3, 1] as const;
@@ -32,11 +33,19 @@ export default function LoginPerfil({ registroId }: Props) {
     });
   }, []);
 
+  function callbackOrigin() {
+    if (typeof window === "undefined") return "";
+    return window.location.hostname === "localhost"
+      ? "https://remuneralab.vercel.app"
+      : window.location.origin;
+  }
+
   async function handleGoogle() {
+    sendGAEvent("event", "login_intento", { method: "google" });
     localStorage.setItem("rl_vincular_registro", registroId);
     await supabase.auth.signInWithOAuth({
       provider: "google",
-      options: { redirectTo: `${window.location.origin}/auth/callback` },
+      options: { redirectTo: `${callbackOrigin()}/auth/callback` },
     });
   }
 
@@ -45,12 +54,16 @@ export default function LoginPerfil({ registroId }: Props) {
     if (!email) return;
     setLoading(true);
     localStorage.setItem("rl_vincular_registro", registroId);
+    sendGAEvent("event", "login_intento", { method: "email" });
     const { error } = await supabase.auth.signInWithOtp({
       email,
-      options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
+      options: { emailRedirectTo: `${callbackOrigin()}/auth/callback` },
     });
     setLoading(false);
-    if (!error) setMagicSent(true);
+    if (!error) {
+      sendGAEvent("event", "login_email_enviado");
+      setMagicSent(true);
+    }
   }
 
   async function handleVincular() {
@@ -65,6 +78,7 @@ export default function LoginPerfil({ registroId }: Props) {
       },
       body: JSON.stringify({ registroId }),
     });
+    sendGAEvent("event", "analisis_guardado");
     setVinculado(true);
     setLoading(false);
   }
@@ -126,16 +140,30 @@ export default function LoginPerfil({ registroId }: Props) {
         <div className="flex flex-col lg:flex-row gap-8">
           <div className="flex-1">
             <p className="uppercase tracking-[0.2em] mb-2" style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.6rem", color: "#8568f3" }}>
-              Perfil de carrera · gratis
+              Perfil de carrera
             </p>
             <h3 className="text-white font-semibold text-xl mb-3" style={{ fontFamily: "var(--font-dm-sans)" }}>
-              Guarda tu benchmark y sigue tu evolución
+              Haz seguimiento de tu carrera y accede a información personalizada
             </h3>
-            <ul className="space-y-2" style={{ fontFamily: "var(--font-dm-sans)", fontSize: "0.85rem", color: "rgba(255,255,255,0.45)" }}>
+            <ul className="space-y-2 mb-4" style={{ fontFamily: "var(--font-dm-sans)", fontSize: "0.85rem", color: "rgba(255,255,255,0.45)" }}>
               <li>· Historial de tus análisis a lo largo del tiempo</li>
               <li>· Alertas cuando el mercado de tu cargo cambie</li>
-              <li>· Mejora la calidad del dato para todos</li>
+              <li>· Acceso a datos personalizados según tu perfil</li>
             </ul>
+            <div className="flex flex-col gap-1.5">
+              <div className="flex items-center gap-2">
+                <ShieldCheck size={12} style={{ color: "rgba(133,104,243,0.60)", flexShrink: 0 }} />
+                <span style={{ fontFamily: "var(--font-dm-sans)", fontSize: "0.78rem", color: "rgba(255,255,255,0.35)" }}>
+                  Todo esto es <span style={{ color: "rgba(255,255,255,0.65)", fontWeight: 500 }}>gratis</span>, siempre. Las consultas salariales también.
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <ShieldCheck size={12} style={{ color: "rgba(133,104,243,0.60)", flexShrink: 0 }} />
+                <span style={{ fontFamily: "var(--font-dm-sans)", fontSize: "0.78rem", color: "rgba(255,255,255,0.35)" }}>
+                  Sin suscripciones — ni ahora, ni nunca.
+                </span>
+              </div>
+            </div>
           </div>
 
           <div className="flex-1 max-w-sm">
@@ -204,7 +232,7 @@ export default function LoginPerfil({ registroId }: Props) {
                     </button>
                   </form>
                   <p style={{ fontFamily: "var(--font-dm-sans)", fontSize: "0.72rem", color: "rgba(255,255,255,0.25)", textAlign: "center" }}>
-                    Te enviamos un link — sin contraseña
+                    Te enviamos un link · sin contraseña · siempre gratis
                   </p>
                 </motion.div>
               )}

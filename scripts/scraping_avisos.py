@@ -2,37 +2,49 @@
 Scraper de avisos laborales — Computrabajo Chile.
 Extrae cargo, región, salario (cuando disponible) y sube a tabla registros_avisos.
 
+Estrategia de dedup:
+  - Upsert por url_aviso: inserta nuevos, actualiza last_seen_at en existentes.
+  - hash_semantico: dedup en memoria dentro de un run (mismo cargo+ciuo+salario+región+mes).
+  - mercado.ts filtra last_seen_at >= now()-3d para mostrar solo avisos activos.
+
 Uso:
   python scripts/scraping_avisos.py               # corre completo
   python scripts/scraping_avisos.py --dry-run      # sin insertar en DB
   python scripts/scraping_avisos.py --max-pages 2  # limita páginas por búsqueda
-  python scripts/scraping_avisos.py --create-table # imprime SQL para crear la tabla
+  python scripts/scraping_avisos.py --create-table # imprime SQL para crear/migrar la tabla
 
-SQL para crear la tabla en Supabase (copiar al SQL Editor):
+SQL para Supabase (copiar al SQL Editor):
   CREATE TABLE IF NOT EXISTS registros_avisos (
-    id                    uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-    fuente                text NOT NULL DEFAULT 'Computrabajo',
-    cargo_original        text NOT NULL,
-    ciuo4                 smallint,
-    industria             text,
-    region                text,
-    salario_min           integer,
-    salario_max           integer,
-    salario_mid           integer,
-    modalidad             text,
-    url_aviso             text UNIQUE,
+    id                      uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    fuente                  text NOT NULL DEFAULT 'Computrabajo',
+    cargo_original          text NOT NULL,
+    ciuo4                   smallint,
+    industria               text,
+    region                  text,
+    salario_min             integer,
+    salario_max             integer,
+    salario_mid             integer,
+    modalidad               text,
+    url_aviso               text UNIQUE,
     fecha_publicacion_texto text,
-    hash_semantico        text UNIQUE,
-    vacantes_count        smallint DEFAULT 1,
-    ano_scraping          smallint DEFAULT EXTRACT(YEAR FROM NOW())::smallint,
-    created_at            timestamptz DEFAULT now()
+    hash_semantico          text,
+    vacantes_count          smallint DEFAULT 1,
+    ano_scraping            smallint DEFAULT EXTRACT(YEAR FROM NOW())::smallint,
+    created_at              timestamptz DEFAULT now(),
+    last_seen_at            timestamptz DEFAULT now()
   );
 
   -- Migraciones si la tabla ya existe:
   ALTER TABLE registros_avisos ADD COLUMN IF NOT EXISTS hash_semantico text;
   ALTER TABLE registros_avisos ADD COLUMN IF NOT EXISTS vacantes_count smallint DEFAULT 1;
-  CREATE UNIQUE INDEX IF NOT EXISTS idx_hash_semantico ON registros_avisos(hash_semantico)
-    WHERE hash_semantico IS NOT NULL;
+  ALTER TABLE registros_avisos ADD COLUMN IF NOT EXISTS last_seen_at timestamptz DEFAULT now();
+  UPDATE registros_avisos SET last_seen_at = created_at WHERE last_seen_at IS NULL;
+
+  -- hash_semantico: índice regular (no unique) — dedup se hace en memoria
+  DROP INDEX IF EXISTS uq_hash_semantico;
+  DROP INDEX IF EXISTS idx_hash_semantico;
+  CREATE INDEX IF NOT EXISTS idx_hash_semantico ON registros_avisos(hash_semantico);
+  CREATE INDEX IF NOT EXISTS idx_last_seen_at   ON registros_avisos(last_seen_at);
 """
 
 import sys, time, re, warnings, unicodedata, hashlib
@@ -248,14 +260,15 @@ def main():
     })
 
     sb = None if DRY_RUN else create_client(SUPABASE_URL, SUPABASE_KEY)
+    now_iso = datetime.now().isoformat()
 
-    total_insertados = 0
+    total_upserted   = 0
     total_con_salario = 0
-    total_dedup = 0
+    total_dedup      = 0
     batch: list[dict] = []
-    # hash_semantico → registro; permite acumular vacantes_count en la misma corrida
+    # Dedup en memoria dentro del run: hash_semantico → registro
     hashes_vistos: dict[str, dict] = {}
-    # URLs vistas: guardia secundaria para el mismo aviso en distintas búsquedas
+    # URLs vistas en este run para evitar doble inserción entre búsquedas
     urls_vistos: set[str] = set()
 
     for slug, ciuo4, industria in BUSQUEDAS:
@@ -271,22 +284,21 @@ def main():
                 if r["sal_min"] and r["sal_min"] < 50_000:
                     continue  # valor irreal (probablemente por hora o semanal)
 
-                sal_mid = round((r["sal_min"] + r["sal_max"]) / 2) if r["sal_min"] else None
+                sal_mid  = round((r["sal_min"] + r["sal_max"]) / 2) if r["sal_min"] else None
                 hash_sem = calcular_hash_semantico(r["cargo"], ciuo4, sal_mid, r["region"])
 
                 if hash_sem in hashes_vistos:
-                    # Mismo puesto ya visto en esta corrida → sumar vacante
+                    # Mismo aviso semántico en este run → sumar vacante, no reinsertar
                     hashes_vistos[hash_sem]["vacantes_count"] += 1
                     total_dedup += 1
                     continue
 
                 if r["url_aviso"] in urls_vistos:
-                    # Misma URL en búsqueda distinta (distinto ciuo4 asignado) → saltar
+                    # Misma URL en búsqueda distinta → saltar
                     total_dedup += 1
                     continue
 
                 urls_vistos.add(r["url_aviso"])
-
                 if r["sal_min"]:
                     total_con_salario += 1
 
@@ -304,38 +316,40 @@ def main():
                     "fecha_publicacion_texto":  r["fecha_texto"],
                     "hash_semantico":           hash_sem,
                     "vacantes_count":           1,
+                    "last_seen_at":             now_iso,
                 }
                 hashes_vistos[hash_sem] = registro
                 batch.append(registro)
                 avisos_busqueda += 1
 
                 if not DRY_RUN and len(batch) >= BATCH_SIZE:
+                    # Upsert: inserta nuevos (created_at = DB default) y actualiza
+                    # last_seen_at + datos de existentes — created_at nunca se toca
                     sb.table("registros_avisos").upsert(batch, on_conflict="url_aviso").execute()
-                    total_insertados += len(batch)
-                    print(f"  ✓ Batch de {len(batch)} registros insertado")
+                    total_upserted += len(batch)
+                    print(f"  ✓ Batch de {len(batch)} registros upserted")
                     batch.clear()
 
             time.sleep(DELAY_SEG)
 
-        print(f"  {avisos_busqueda} avisos únicos scrapeados\n")
+        print(f"  {avisos_busqueda} avisos procesados\n")
 
-    # Flush batch final (con vacantes_count ya acumulado)
     if not DRY_RUN and batch:
         sb.table("registros_avisos").upsert(batch, on_conflict="url_aviso").execute()
-        total_insertados += len(batch)
-        print(f"  ✓ Batch final de {len(batch)} registros insertado")
+        total_upserted += len(batch)
+        print(f"  ✓ Batch final de {len(batch)} registros upserted")
 
     total_scrapeados = len(hashes_vistos)
     print(f"\n{'='*50}")
     print(f"Avisos scrapeados (bruto):  {total_scrapeados + total_dedup}")
-    print(f"Duplicados fusionados:      {total_dedup}")
-    print(f"Avisos únicos (por hash):   {total_scrapeados}")
+    print(f"Dedup en memoria:           {total_dedup}")
+    print(f"Avisos únicos procesados:   {total_scrapeados}")
     print(f"Con salario explícito:      {total_con_salario} ({100*total_con_salario//max(total_scrapeados,1)}%)")
     multi = sum(1 for r in hashes_vistos.values() if r["vacantes_count"] > 1)
     if multi:
         print(f"Con múltiples vacantes:     {multi} avisos")
     if not DRY_RUN:
-        print(f"Registros en DB:            {total_insertados}")
+        print(f"Upserts enviados a DB:      {total_upserted}")
     print(f"{'[DRY RUN — nada insertado]' if DRY_RUN else 'Scraping completado.'}")
 
 if __name__ == "__main__":

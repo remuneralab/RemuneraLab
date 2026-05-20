@@ -71,13 +71,7 @@ export default async function ResultadoPage({ params }: Props) {
             />
           </Link>
           <nav className="flex items-center gap-5">
-            <Link
-              href="/empresas"
-              className="hover:text-white/70 transition-colors"
-              style={{ fontFamily: "var(--font-dm-sans)", fontSize: "0.8rem", color: "rgba(255,255,255,0.40)" }}
-            >
-              Para empresas
-            </Link>
+
             <Link
               href="/formulario"
               className="inline-flex items-center gap-1.5 font-semibold px-4 py-1.5 rounded transition-colors hover:bg-[#8568f3]/10"

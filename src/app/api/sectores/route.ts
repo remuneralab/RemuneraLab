@@ -6,22 +6,39 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!
 );
 
+const INDUSTRIAS = [
+  "Tecnología",
+  "Salud",
+  "Finanzas y Seguros",
+  "Construcción",
+  "Minería",
+  "Educación",
+  "Retail / Comercio",
+  "Manufactura / Industria",
+  "Transporte y Logística",
+  "Servicios",
+  "Agricultura",
+  "Gastronomía / Restaurantes",
+];
+
 export async function GET() {
-  const { data, error } = await supabase
-    .from("registros_avisos")
-    .select("industria");
+  // Count per industry using head queries (no row data transferred)
+  const results = await Promise.all(
+    INDUSTRIAS.map(async (industria) => {
+      const { count } = await supabase
+        .from("registros_avisos")
+        .select("*", { count: "exact", head: true })
+        .eq("industria", industria);
+      return { sector: industria, count: count ?? 0 };
+    })
+  );
 
-  if (error || !data) return NextResponse.json([]);
+  const top = results
+    .filter((r) => r.count > 0)
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 6);
 
-  const counts: Record<string, number> = {};
-  for (const row of data) {
-    if (row.industria) counts[row.industria] = (counts[row.industria] || 0) + 1;
-  }
+  const total = results.reduce((s, r) => s + r.count, 0);
 
-  const top = Object.entries(counts)
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 6)
-    .map(([sector, count]) => ({ sector, count }));
-
-  return NextResponse.json(top);
+  return NextResponse.json({ sectores: top, total });
 }

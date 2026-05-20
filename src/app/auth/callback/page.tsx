@@ -4,6 +4,7 @@ import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Loader2, AlertCircle } from "lucide-react";
 import { supabase } from "@/lib/supabase";
+import type { Session } from "@supabase/supabase-js";
 
 function CallbackInner() {
   const router = useRouter();
@@ -11,17 +12,18 @@ function CallbackInner() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    async function handle() {
-      const code = searchParams.get("code");
+    // If OAuth returned an error (e.g. user cancelled), show it immediately
+    const oauthError = searchParams.get("error");
+    if (oauthError) {
+      setError("No se completó el acceso con Google. Puedes intentarlo de nuevo.");
+      return;
+    }
 
-      if (code) {
-        const { error: exchErr } = await supabase.auth.exchangeCodeForSession(code);
-        if (exchErr) {
-          setError("El enlace es inválido o ya expiró. Intenta de nuevo.");
-          return;
-        }
-      }
+    let redirected = false;
 
+    function redirect(session: Session | null) {
+      if (redirected || !session) return;
+      redirected = true;
       const vincular = localStorage.getItem("rl_vincular_registro");
       if (vincular) {
         localStorage.removeItem("rl_vincular_registro");
@@ -31,7 +33,29 @@ function CallbackInner() {
       }
     }
 
-    handle();
+    // Supabase automatically exchanges ?code= via detectSessionInUrl.
+    // We just wait for onAuthStateChange to fire — no manual exchangeCodeForSession.
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "SIGNED_IN" || event === "INITIAL_SESSION") {
+        redirect(session);
+      }
+    });
+
+    // Also check immediately in case the session was set before the listener registered
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      redirect(session);
+    });
+
+    // Timeout: if nothing happens in 12s, show error
+    const timeout = setTimeout(() => {
+      if (!redirected) setError("Tiempo de espera agotado. Intenta de nuevo.");
+    }, 12000);
+
+    return () => {
+      subscription.unsubscribe();
+      clearTimeout(timeout);
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   if (error) {
@@ -43,15 +67,15 @@ function CallbackInner() {
             <AlertCircle size={28} style={{ color: "#8568f3" }} />
           </div>
           <h2 className="text-xl font-bold text-white mb-3" style={{ fontFamily: "var(--font-dm-sans)" }}>
-            Enlace inválido
+            No se pudo acceder
           </h2>
           <p className="mb-6" style={{ fontFamily: "var(--font-dm-sans)", fontSize: "0.88rem", color: "rgba(255,255,255,0.4)" }}>
             {error}
           </p>
-          <a href="/"
+          <a href="/perfil"
             className="inline-flex items-center gap-2 font-semibold px-5 py-2.5 rounded-lg text-sm hover:opacity-90 transition-opacity"
             style={{ background: "rgba(133,104,243,0.12)", color: "#8568f3", border: "1px solid rgba(133,104,243,0.25)", fontFamily: "var(--font-dm-sans)" }}>
-            Volver al inicio
+            Volver e intentar de nuevo
           </a>
         </div>
       </div>

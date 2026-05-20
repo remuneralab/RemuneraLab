@@ -33,8 +33,8 @@ function CountUp({ target }: { target: number }) {
 export default function Home() {
   const router = useRouter();
   const [sectores, setSectores]     = useState<Sector[]>([]);
+  const [totalAvisos, setTotalAvisos] = useState(0);
   const [authChecked, setAuthChecked] = useState(false);
-  const totalAvisos = sectores.reduce((a, s) => a + s.count, 0);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -49,7 +49,10 @@ export default function Home() {
   useEffect(() => {
     fetch("/api/sectores")
       .then((r) => r.json())
-      .then(setSectores)
+      .then((d) => {
+        setSectores(d.sectores ?? []);
+        setTotalAvisos(d.total ?? 0);
+      })
       .catch(() => {});
   }, []);
 
@@ -104,7 +107,7 @@ export default function Home() {
             style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.6rem", letterSpacing: "0.35em", color: "rgba(133,104,243,0.65)" }}
             className="uppercase"
           >
-            Benchmark salarial · Chile 2026
+            Comparador de sueldos · Chile 2026
           </motion.p>
 
           {/* Línea separadora */}
@@ -124,8 +127,8 @@ export default function Home() {
             className="font-semibold leading-tight text-white"
             style={{ fontSize: "clamp(1.5rem, 3.8vw, 2.6rem)", fontFamily: "var(--font-dm-sans)" }}
           >
-            Descubre en qué percentil del mercado<br />
-            laboral chileno estás —{" "}
+            Descubre cómo está tu sueldo<br />
+            comparado con el resto de Chile —{" "}
             <span style={{ color: "#e7e4fd" }}>en 2 minutos.</span>
           </motion.h1>
 
@@ -167,14 +170,21 @@ export default function Home() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5, ease: E, delay: 0.52 }}
-            className="flex flex-wrap justify-center items-center gap-x-5 gap-y-2"
-            style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.6rem", letterSpacing: "0.18em", color: "rgba(255,255,255,0.22)" }}
+            className="flex flex-col items-center gap-2"
           >
-            <span>+104.000 REGISTROS REALES</span>
-            <span style={{ color: "rgba(255,255,255,0.10)" }}>·</span>
-            <span>100% ANÓNIMO</span>
-            <span style={{ color: "rgba(255,255,255,0.10)" }}>·</span>
-            <span>SIEMPRE GRATIS</span>
+            <div
+              className="flex flex-wrap justify-center items-center gap-x-5 gap-y-2"
+              style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.6rem", letterSpacing: "0.18em", color: "rgba(255,255,255,0.22)" }}
+            >
+              <span>+104.000 REGISTROS REALES</span>
+              <span style={{ color: "rgba(255,255,255,0.10)" }}>·</span>
+              <span>100% ANÓNIMO</span>
+              <span style={{ color: "rgba(255,255,255,0.10)" }}>·</span>
+              <span>SIEMPRE GRATIS</span>
+            </div>
+            <p style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.55rem", letterSpacing: "0.15em", color: "rgba(255,255,255,0.14)" }}>
+              FUENTE: INE · ENCUESTA ESI · BOLSA NACIONAL DE EMPLEO · COMPUTRABAJO
+            </p>
           </motion.div>
 
         </div>
@@ -245,6 +255,12 @@ export default function Home() {
                 style={{ fontFamily: "var(--font-dm-sans)", fontSize: "0.875rem", color: "rgba(255,255,255,0.35)" }}
               >
                 Selecciona un sector para ver las ofertas disponibles.
+              </p>
+              <p
+                className="max-w-lg mt-1"
+                style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.55rem", letterSpacing: "0.12em", color: "rgba(255,255,255,0.18)", textAlign: "center" }}
+              >
+                Avisos extraídos de Computrabajo, Trabajando.cl y Bolsa Nacional de Empleo (BNE) · Actualizado regularmente
               </p>
             </div>
 

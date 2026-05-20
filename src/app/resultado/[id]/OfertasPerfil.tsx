@@ -58,10 +58,13 @@ interface Props {
   region: string;
 }
 
+const PREVIEW = 3;
+
 export default function OfertasPerfil({ cargo, industria, region }: Props) {
   const [ofertas, setOfertas] = useState<Oferta[]>([]);
   const [total, setTotal]     = useState<number | null>(null);
-  const [abierto, setAbierto] = useState(false);
+  const [abierto, setAbierto] = useState(true);
+  const [expanded, setExpanded] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -97,12 +100,18 @@ export default function OfertasPerfil({ cargo, industria, region }: Props) {
         disabled={loading}
         className="w-full flex items-center justify-between gap-4 px-6 py-5 text-left hover:bg-white/4 transition-colors disabled:cursor-default"
       >
-        <div className="flex items-center gap-3">
-          <BriefcaseBusiness size={16} className="text-[#00B4D8] shrink-0" />
-          <span className="font-semibold text-white"
-            style={{ fontFamily: "var(--font-dm-sans)", fontSize: "0.95rem" }}>
-            {labelBtn}
-          </span>
+        <div className="flex items-start gap-3">
+          <BriefcaseBusiness size={16} className="text-[#00B4D8] shrink-0 mt-0.5" />
+          <div>
+            <p className="uppercase tracking-[0.18em] mb-0.5"
+              style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.50rem", color: "#00B4D8" }}>
+              Ofertas laborales activas
+            </p>
+            <span className="font-semibold text-white"
+              style={{ fontFamily: "var(--font-dm-sans)", fontSize: "0.95rem" }}>
+              {labelBtn}
+            </span>
+          </div>
         </div>
         <motion.div
           animate={{ rotate: abierto ? 180 : 0 }}
@@ -125,7 +134,7 @@ export default function OfertasPerfil({ cargo, industria, region }: Props) {
             style={{ overflow: "hidden" }}
           >
             <div className="border-t border-white/8 divide-y divide-white/6">
-              {ofertas.map((o) => {
+              {(expanded ? ofertas : ofertas.slice(0, PREVIEW)).map((o) => {
                 const fecha = resolverFecha(o.fecha_publicacion_texto, o.created_at);
                 const dias  = Math.floor((Date.now() - fecha.getTime()) / 86_400_000);
                 return (
@@ -188,9 +197,20 @@ export default function OfertasPerfil({ cargo, industria, region }: Props) {
               })}
             </div>
 
+            {/* Ver más */}
+            {!expanded && ofertas.length > PREVIEW && (
+              <button
+                onClick={() => setExpanded(true)}
+                className="w-full py-3 border-t border-white/8 text-center hover:bg-white/4 transition-colors"
+                style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.65rem", letterSpacing: "0.12em", color: "#00B4D8" }}
+              >
+                VER {ofertas.length - PREVIEW} OFERTAS MÁS ↓
+              </button>
+            )}
+
             {/* Footer */}
             <div className="px-6 py-4 border-t border-white/8 flex items-center justify-between gap-4">
-              {(total ?? 0) > ofertas.length ? (
+              {expanded && (total ?? 0) > ofertas.length ? (
                 <p className="text-white/30" style={{ fontFamily: "var(--font-dm-sans)", fontSize: "0.8rem" }}>
                   Mostrando {ofertas.length} de {total} ofertas encontradas
                 </p>
