@@ -269,8 +269,8 @@ export default function BenchmarkView({
     const bMid    = Math.round((b.cargo.salario_min_clp + b.cargo.salario_max_clp) / 2);
     const aHoras  = a.cargo.horas_semana ?? 44;
     const bHoras  = b.cargo.horas_semana ?? 44;
-    const aMidFTE = aHoras < 44 ? Math.round(aMid * (44 / aHoras)) : aMid;
-    const bMidFTE = bHoras < 44 ? Math.round(bMid * (44 / bHoras)) : bMid;
+    const aMidFTE = aHoras < 42 ? Math.round(aMid * (42 / aHoras)) : aMid;
+    const bMidFTE = bHoras < 42 ? Math.round(bMid * (42 / bHoras)) : bMid;
     let cmp = 0;
     if (sortKey === "cargo")   cmp = a.cargo.cargo.localeCompare(b.cargo.cargo, "es");
     if (sortKey === "nivel")   cmp = inferAnios(b.cargo.cargo) - inferAnios(a.cargo.cargo);
@@ -292,7 +292,7 @@ export default function BenchmarkView({
     if (r.status !== "done") continue;
     const mid = Math.round((r.cargo.salario_min_clp + r.cargo.salario_max_clp) / 2);
     const horas = r.cargo.horas_semana ?? 44;
-    const midFTE = horas < 44 ? Math.round(mid * (44 / horas)) : mid;
+    const midFTE = horas < 42 ? Math.round(mid * (42 / horas)) : mid;
     const pos = getPos(midFTE, r.p25, r.p50, r.p75);
     if (pos !== "Sin datos") counts[pos as keyof typeof counts]++;
   }
@@ -486,7 +486,7 @@ export default function BenchmarkView({
             {sorted.map((r, i) => {
               const mid      = Math.round((r.cargo.salario_min_clp + r.cargo.salario_max_clp) / 2);
               const horas    = r.cargo.horas_semana ?? 44;
-              const isPartTime = horas < 44;
+              const isPartTime = horas < 42;
               const midFTE   = isPartTime ? Math.round(mid * (44 / horas)) : mid;
               const pos      = r.status === "done" ? getPos(midFTE, r.p25, r.p50, r.p75) : null;
               const nivel    = getNivel(r.cargo.cargo);
