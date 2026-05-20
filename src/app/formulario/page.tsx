@@ -104,10 +104,12 @@ export default function Formulario() {
     cargo: "", industria: "", anios_experiencia: "",
     region: "", tamano_empresa: "", salario_exacto: 700_000, sexo: "",
   });
-  const [loading, setLoading]       = useState(false);
-  const [error, setError]           = useState("");
+  const [loading, setLoading]         = useState(false);
+  const [error, setError]             = useState("");
   const [rateLimited, setRateLimited] = useState(false);
-  const [ciuo, setCiuo]             = useState<CiuoMatch | null>(null);
+  const [ciuo, setCiuo]               = useState<CiuoMatch | null>(null);
+  const [esJornadaParcial, setEsJornadaParcial] = useState(false);
+  const [horasSemana, setHorasSemana] = useState(20);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   useEffect(() => {
@@ -160,7 +162,7 @@ export default function Formulario() {
       anios_experiencia: parseInt(form.anios_experiencia),
       rango_salarial: form.salario_exacto < 800_000 ? "bajo" : form.salario_exacto < 2_000_000 ? "medio" : "alto",
     });
-    router.push(`/resultado/${data.id}`);
+    router.push(`/resultado/${data.id}${esJornadaParcial && horasSemana < 42 ? `?horas=${horasSemana}` : ""}`);
   }
 
   return (
@@ -432,6 +434,37 @@ export default function Formulario() {
                     <p className="text-amber-400/70 text-xs" style={{ fontFamily: "var(--font-dm-sans)" }}>
                       ⚠ Este monto está por debajo del sueldo mínimo legal ($539.000)
                     </p>
+                  )}
+                </div>
+
+                {/* Jornada parcial */}
+                <div className="md:col-span-2 flex flex-col gap-3 pt-1">
+                  <label className="flex items-center gap-3 cursor-pointer select-none">
+                    <input
+                      type="checkbox"
+                      checked={esJornadaParcial}
+                      onChange={(e) => setEsJornadaParcial(e.target.checked)}
+                      className="w-4 h-4 rounded accent-[#8568f3]"
+                    />
+                    <span className="uppercase tracking-[0.18em] text-white/40"
+                      style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.6rem" }}>
+                      Trabajo a tiempo parcial
+                    </span>
+                  </label>
+                  {esJornadaParcial && (
+                    <div className="flex items-center gap-3 pl-7">
+                      <input
+                        type="number"
+                        min={1}
+                        max={41}
+                        value={horasSemana}
+                        onChange={(e) => setHorasSemana(Math.min(41, Math.max(1, parseInt(e.target.value) || 1)))}
+                        className={`${fieldClass} w-28`}
+                      />
+                      <span className="text-white/40 text-sm" style={{ fontFamily: "var(--font-dm-sans)" }}>
+                        horas / semana
+                      </span>
+                    </div>
                   )}
                 </div>
               </div>

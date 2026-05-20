@@ -6,12 +6,17 @@ import { calcularMercado } from "@/lib/mercado";
 import PercentilHero from "./PercentilHero";
 import ResultadoBento from "./ResultadoBento";
 
+const JORNADA_COMPLETA = 42;
+const SALARIO_MINIMO   = 539_000;
+
 interface Props {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ horas?: string }>;
 }
 
-export default async function ResultadoPage({ params }: Props) {
-  const { id } = await params;
+export default async function ResultadoPage({ params, searchParams }: Props) {
+  const { id }    = await params;
+  const { horas } = await searchParams;
 
   const { data: registro, error } = await supabase
     .from("registros_salariales")
@@ -23,13 +28,26 @@ export default async function ResultadoPage({ params }: Props) {
 
   const salario_mid = Math.round((registro.salario_min + registro.salario_max) / 2);
 
+  const horasSemana = horas ? Math.min(42, Math.max(1, parseInt(horas, 10))) : null;
+  const salarioFTE  = horasSemana && horasSemana < JORNADA_COMPLETA
+    ? Math.round(salario_mid * (JORNADA_COMPLETA / horasSemana))
+    : undefined;
+  const minLegalProporcional = horasSemana && horasSemana < JORNADA_COMPLETA
+    ? Math.round(SALARIO_MINIMO * (horasSemana / JORNADA_COMPLETA))
+    : undefined;
+  const pctSobreMinimo = minLegalProporcional !== undefined
+    ? Math.round(((salario_mid - minLegalProporcional) / minLegalProporcional) * 1000) / 10
+    : undefined;
+
+  const salarioParaBench = salarioFTE ?? salario_mid;
+
   const [bench, mercado] = await Promise.all([
     calcularBenchmark(
       registro.cargo,
       registro.industria,
       registro.anios_experiencia,
       registro.region,
-      salario_mid,
+      salarioParaBench,
     ),
     calcularMercado(
       registro.ciuo_codigo ?? null,
@@ -38,9 +56,16 @@ export default async function ResultadoPage({ params }: Props) {
     ),
   ]);
 
-  const percentil      = bench.percentil_usuario ?? 50;
-  const hasData        = !!(bench.p25 && bench.p50 && bench.p75);
-  const brechaP75      = hasData ? Math.max(0, bench.p75! - salario_mid) : null;
+  const percentil = bench.percentil_usuario ?? 50;
+  const hasData   = !!(bench.p25 && bench.p50 && bench.p75);
+
+  // brechaP75: gap al P75 proporcional (part-time) o FTE (full-time)
+  const brechaP75 = hasData
+    ? (() => {
+        if (horasSemana && bench.p75) return Math.max(0, bench.p75 * horasSemana / JORNADA_COMPLETA - salario_mid);
+        return Math.max(0, bench.p75! - salario_mid);
+      })()
+    : null;
   const competitividad = percentil >= 75 ? "Alta" : percentil >= 50 ? "Media" : "En desarrollo";
 
   return (
@@ -117,6 +142,10 @@ export default async function ResultadoPage({ params }: Props) {
           tamano_empresa={registro.tamano_empresa ?? null}
           sexo={registro.sexo ?? null}
           mercado={mercado}
+          horasSemana={horasSemana ?? undefined}
+          salarioFTE={salarioFTE}
+          minLegalProporcional={minLegalProporcional}
+          pctSobreMinimo={pctSobreMinimo}
         />
       </main>
 

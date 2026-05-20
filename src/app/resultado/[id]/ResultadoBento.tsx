@@ -72,6 +72,10 @@ interface Props {
   tamano_empresa: string | null;
   sexo: string | null;
   mercado: MercadoResult;
+  horasSemana?: number;
+  salarioFTE?: number;
+  minLegalProporcional?: number;
+  pctSobreMinimo?: number;
 }
 
 const cardClass = "rounded-xl border border-white/10 bg-white/4 p-8";
@@ -84,11 +88,15 @@ export default function ResultadoBento({
   registroId, percentil, hasData, p25, p50, p75, n, n_esi, n_aviso, n_trab, confianza,
   cargo, industria, region, salario_mid, brechaP75, competitividad, anios_experiencia,
   fuente_descripcion, nivel_cascada, grupo_usado, ciuo_codigo, tamano_empresa, sexo, mercado,
+  horasSemana, salarioFTE, minLegalProporcional, pctSobreMinimo,
 }: Props) {
   const brechaCiuo = getBrechaCiuo(ciuo_codigo);
   const brechaRama = getBrechaRama(industria);
 
-  const bajoMinimo    = salario_mid < SALARIO_MINIMO_CLP;
+  const minimoEfectivo = horasSemana && horasSemana < 42 && minLegalProporcional != null
+    ? minLegalProporcional
+    : SALARIO_MINIMO_CLP;
+  const bajoMinimo = salario_mid < minimoEfectivo;
   const bajoMovilidad = ciuo_codigo
     ? CIUO_BAJA_MOVILIDAD.includes(ciuo_codigo[0])
     : INDUSTRIA_BAJA_MOVILIDAD.includes(industria);
@@ -143,12 +151,15 @@ export default function ResultadoBento({
           <div className="px-7 py-6">
             <p className="text-white font-bold text-lg mb-3 leading-snug"
               style={{ fontFamily: "var(--font-dm-sans)" }}>
-              El sueldo declarado está por debajo del ingreso mínimo mensual ($539.000)
+              {horasSemana && horasSemana < 42
+                ? `El sueldo declarado está por debajo del mínimo proporcional para ${horasSemana} horas (${formatCLP(minimoEfectivo)})`
+                : "El sueldo declarado está por debajo del ingreso mínimo mensual ($539.000)"}
             </p>
             <p className="text-white/55 mb-5 leading-relaxed"
               style={{ fontFamily: "var(--font-dm-sans)", fontSize: "0.9rem" }}>
-              Si trabajas 42 horas o más, podría constituir una infracción laboral.
-              La Dirección del Trabajo permite presentar denuncias anónimas y gratuitas.
+              {horasSemana && horasSemana < 42
+                ? "El Código del Trabajo establece que el sueldo mínimo es proporcional a las horas trabajadas (Art. 44). La Dirección del Trabajo permite presentar denuncias anónimas y gratuitas."
+                : "Si trabajas 42 horas o más, podría constituir una infracción laboral. La Dirección del Trabajo permite presentar denuncias anónimas y gratuitas."}
             </p>
             <a
               href="https://www.dt.gob.cl"
@@ -194,6 +205,58 @@ export default function ResultadoBento({
         </motion.div>
       )}
 
+      {/* Banner jornada parcial */}
+      {horasSemana && horasSemana < 42 && salarioFTE && (
+        <motion.div
+          initial={{ opacity: 0, y: -8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, ease: E }}
+          className="mb-8 rounded-xl border border-[#F7C948]/35 bg-[#F7C948]/6 px-6 py-5 flex gap-4"
+        >
+          <div className="shrink-0 mt-0.5">
+            <div className="w-7 h-7 rounded-full bg-[#F7C948]/15 border border-[#F7C948]/30 flex items-center justify-center">
+              <span style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.7rem", color: "#F7C948" }}>½</span>
+            </div>
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="font-semibold text-[#F7C948] mb-1.5 leading-snug"
+              style={{ fontFamily: "var(--font-dm-sans)", fontSize: "0.9rem" }}>
+              Jornada parcial: {horasSemana} horas semanales
+            </p>
+            <p className="text-white/50 leading-relaxed mb-3"
+              style={{ fontFamily: "var(--font-dm-sans)", fontSize: "0.82rem" }}>
+              Tu posición (P{percentil}) se calculó con tu sueldo equivalente a jornada completa de 42h —{" "}
+              <span className="text-white/70 font-semibold">{formatCLP(salarioFTE)}</span>.
+              {" "}Así se compara en igualdad de condiciones con el mercado.
+            </p>
+            {minLegalProporcional !== undefined && pctSobreMinimo !== undefined && (
+              <div className="flex flex-wrap gap-3">
+                <div className="rounded-lg px-3 py-2 border border-white/10 bg-white/5">
+                  <p className="text-white/35 uppercase tracking-widest mb-0.5"
+                    style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.5rem" }}>
+                    Mínimo proporcional ({horasSemana}h)
+                  </p>
+                  <p className="text-white/75 font-bold"
+                    style={{ fontFamily: "var(--font-dm-sans)", fontSize: "0.9rem" }}>
+                    {formatCLP(minLegalProporcional)}
+                  </p>
+                </div>
+                <div className="rounded-lg px-3 py-2 border border-white/10 bg-white/5">
+                  <p className="text-white/35 uppercase tracking-widest mb-0.5"
+                    style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.5rem" }}>
+                    Sobre el mínimo
+                  </p>
+                  <p className="font-bold"
+                    style={{ fontFamily: "var(--font-dm-sans)", fontSize: "0.9rem", color: pctSobreMinimo >= 0 ? "#8568f3" : "#f87171" }}>
+                    {pctSobreMinimo >= 0 ? "+" : ""}{pctSobreMinimo.toFixed(1).replace(".", ",")}%
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
+        </motion.div>
+      )}
+
       <div className="grid grid-cols-12 gap-5">
 
         {/* Chart */}
@@ -218,7 +281,7 @@ export default function ResultadoBento({
           </div>
 
           {hasData ? (
-            <ChartResult p25={p25!} p50={p50!} p75={p75!} percentil={percentil} n={n} n_esi={n_esi} n_aviso={n_aviso} />
+            <ChartResult p25={p25!} p50={p50!} p75={p75!} percentil={percentil} n={n} n_esi={n_esi} n_aviso={n_aviso} horasSemana={horasSemana} />
           ) : (
             <div className="h-[320px] flex items-center justify-center text-white/30 text-sm">
               Aún no hay suficientes datos para mostrar la distribución.

@@ -17,27 +17,35 @@ function formatCLP(n: number) {
   }).format(n);
 }
 
-const SALARIO_MINIMO_K = 539; // $539.000 expresado en miles (unidad del eje Y)
+const SALARIO_MINIMO_K = 539;
+
+const BREAKPOINTS = [
+  { p: 10, name: "Bajo" },
+  { p: 25, name: "Básico" },
+  { p: 40, name: "Típico" },
+  { p: 50, name: "Mediana" },
+  { p: 60, name: "Bueno" },
+  { p: 75, name: "Alto" },
+  { p: 90, name: "Top" },
+] as const;
 
 function buildChartData(p25: number, p50: number, p75: number) {
   const iqr = p75 - p25;
   return [
-    { name: "P10", val: Math.round(Math.max(SALARIO_MINIMO_K * 1000, p25 - iqr * 0.8) / 1000) },
-    { name: "P25", val: Math.round(p25 / 1000) },
-    { name: "P40", val: Math.round((p25 + iqr * 0.4) / 1000) },
-    { name: "P50", val: Math.round(p50 / 1000) },
-    { name: "P60", val: Math.round((p50 + (p75 - p50) * 0.4) / 1000) },
-    { name: "P75", val: Math.round(p75 / 1000) },
-    { name: "P90", val: Math.round((p75 + iqr * 0.6) / 1000) },
+    { name: "Bajo",    val: Math.round(Math.max(SALARIO_MINIMO_K * 1000, p25 - iqr * 0.8) / 1000) },
+    { name: "Básico",  val: Math.round(p25 / 1000) },
+    { name: "Típico",  val: Math.round((p25 + iqr * 0.4) / 1000) },
+    { name: "Mediana", val: Math.round(p50 / 1000) },
+    { name: "Bueno",   val: Math.round((p50 + (p75 - p50) * 0.4) / 1000) },
+    { name: "Alto",    val: Math.round(p75 / 1000) },
+    { name: "Top",     val: Math.round((p75 + iqr * 0.6) / 1000) },
   ];
 }
 
-function closestLabel(percentil: number) {
-  const breakpoints = [10, 25, 40, 50, 60, 75, 90];
-  const closest = breakpoints.reduce((a, b) =>
-    Math.abs(b - percentil) < Math.abs(a - percentil) ? b : a
-  );
-  return `P${closest}`;
+function closestLabel(percentil: number): string {
+  return [...BREAKPOINTS].reduce((a, b) =>
+    Math.abs(b.p - percentil) < Math.abs(a.p - percentil) ? b : a
+  ).name;
 }
 
 interface Props {
@@ -48,11 +56,13 @@ interface Props {
   n: number;
   n_esi: number;
   n_aviso: number;
+  horasSemana?: number;
 }
 
-export default function ChartResult({ p25, p50, p75, percentil, n, n_esi, n_aviso }: Props) {
-  const data = buildChartData(p25, p50, p75);
-  const refLabel = closestLabel(percentil);
+export default function ChartResult({ p25, p50, p75, percentil, n, n_esi, n_aviso, horasSemana }: Props) {
+  const isPartTime = !!horasSemana && horasSemana < 42;
+  const data       = buildChartData(p25, p50, p75);
+  const refLabel   = closestLabel(percentil);
 
   return (
     <div className="h-[320px] w-full">
@@ -91,16 +101,17 @@ export default function ChartResult({ p25, p50, p75, percentil, n, n_esi, n_avis
             tick={{ fontSize: 11, fontWeight: 600, fill: "rgba(255,255,255,0.35)" }}
             dy={10}
           />
+          {/* Marcador: FTE-equivalente para part-time, sueldo real para full-time */}
           <ReferenceLine
             x={refLabel}
-            stroke="#e7e4fd"
+            stroke={isPartTime ? "#F7C948" : "#e7e4fd"}
             strokeDasharray="4 3"
             strokeWidth={2}
             label={{
               position: "top",
-              value: `TÚ · P${percentil}`,
-              fill: "#e7e4fd",
-              fontSize: 10,
+              value: isPartTime ? `equiv. proporcional · P${percentil}` : `TÚ · P${percentil}`,
+              fill: isPartTime ? "#F7C948" : "#e7e4fd",
+              fontSize: 9,
               fontWeight: 800,
               dy: -10,
             }}
