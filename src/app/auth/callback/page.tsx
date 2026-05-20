@@ -15,7 +15,8 @@ function CallbackInner() {
     // If OAuth returned an error (e.g. user cancelled), show it immediately
     const oauthError = searchParams.get("error");
     if (oauthError) {
-      setError("No se completó el acceso con Google. Puedes intentarlo de nuevo.");
+      const msg = searchParams.get("msg");
+      setError(`Error: ${oauthError}${msg ? ` — ${msg}` : ""}`);
       return;
     }
 

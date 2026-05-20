@@ -43,10 +43,7 @@ export default function LoginPerfil({ registroId }: Props) {
   async function handleGoogle() {
     sendGAEvent("event", "login_intento", { method: "google" });
     localStorage.setItem("rl_vincular_registro", registroId);
-    await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: { redirectTo: `${callbackOrigin()}/auth/callback` },
-    });
+    window.location.href = "/api/auth/google/init";
   }
 
   async function handleMagicLink(e: React.FormEvent) {
