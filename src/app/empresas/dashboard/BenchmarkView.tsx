@@ -9,6 +9,7 @@ type CargoCSV = {
   salario_min_clp: number;
   salario_max_clp: number;
   region: string;
+  horas_semana: number;
 };
 
 type BenchRow = {
@@ -264,29 +265,35 @@ export default function BenchmarkView({
   }
 
   const sorted = [...filtered].sort((a, b) => {
-    const aMid = Math.round((a.cargo.salario_min_clp + a.cargo.salario_max_clp) / 2);
-    const bMid = Math.round((b.cargo.salario_min_clp + b.cargo.salario_max_clp) / 2);
+    const aMid    = Math.round((a.cargo.salario_min_clp + a.cargo.salario_max_clp) / 2);
+    const bMid    = Math.round((b.cargo.salario_min_clp + b.cargo.salario_max_clp) / 2);
+    const aHoras  = a.cargo.horas_semana ?? 44;
+    const bHoras  = b.cargo.horas_semana ?? 44;
+    const aMidFTE = aHoras < 44 ? Math.round(aMid * (44 / aHoras)) : aMid;
+    const bMidFTE = bHoras < 44 ? Math.round(bMid * (44 / bHoras)) : bMid;
     let cmp = 0;
     if (sortKey === "cargo")   cmp = a.cargo.cargo.localeCompare(b.cargo.cargo, "es");
     if (sortKey === "nivel")   cmp = inferAnios(b.cargo.cargo) - inferAnios(a.cargo.cargo);
-    if (sortKey === "empresa") cmp = aMid - bMid;
+    if (sortKey === "empresa") cmp = aMidFTE - bMidFTE;
     if (sortKey === "p50")     cmp = (a.p50 ?? 0) - (b.p50 ?? 0);
-    if (sortKey === "vs")      cmp = (a.p50 ? aMid - a.p50 : 0) - (b.p50 ? bMid - b.p50 : 0);
+    if (sortKey === "vs")      cmp = (a.p50 ? aMidFTE - a.p50 : 0) - (b.p50 ? bMidFTE - b.p50 : 0);
     if (sortKey === "posicion") {
       const order: Posicion[] = ["Muy bajo", "Bajo mercado", "Alineado", "Sobre mercado", "Sin datos"];
-      const pa = getPos(aMid, a.p25, a.p50, a.p75);
-      const pb = getPos(bMid, b.p25, b.p50, b.p75);
+      const pa = getPos(aMidFTE, a.p25, a.p50, a.p75);
+      const pb = getPos(bMidFTE, b.p25, b.p50, b.p75);
       cmp = order.indexOf(pa) - order.indexOf(pb);
     }
     return cmp * sortDir;
   });
 
-  // Resumen chips
+  // Resumen chips — usa mid FTE para part-time
   const counts = { "Sobre mercado": 0, "Alineado": 0, "Bajo mercado": 0, "Muy bajo": 0 };
   for (const r of rows) {
     if (r.status !== "done") continue;
     const mid = Math.round((r.cargo.salario_min_clp + r.cargo.salario_max_clp) / 2);
-    const pos = getPos(mid, r.p25, r.p50, r.p75);
+    const horas = r.cargo.horas_semana ?? 44;
+    const midFTE = horas < 44 ? Math.round(mid * (44 / horas)) : mid;
+    const pos = getPos(midFTE, r.p25, r.p50, r.p75);
     if (pos !== "Sin datos") counts[pos as keyof typeof counts]++;
   }
 
@@ -477,10 +484,13 @@ export default function BenchmarkView({
           </thead>
           <tbody>
             {sorted.map((r, i) => {
-              const mid    = Math.round((r.cargo.salario_min_clp + r.cargo.salario_max_clp) / 2);
-              const pos    = r.status === "done" ? getPos(mid, r.p25, r.p50, r.p75) : null;
-              const nivel  = getNivel(r.cargo.cargo);
-              const isLoad = r.status === "pending" || r.status === "loading";
+              const mid      = Math.round((r.cargo.salario_min_clp + r.cargo.salario_max_clp) / 2);
+              const horas    = r.cargo.horas_semana ?? 44;
+              const isPartTime = horas < 44;
+              const midFTE   = isPartTime ? Math.round(mid * (44 / horas)) : mid;
+              const pos      = r.status === "done" ? getPos(midFTE, r.p25, r.p50, r.p75) : null;
+              const nivel    = getNivel(r.cargo.cargo);
+              const isLoad   = r.status === "pending" || r.status === "loading";
 
               return (
                 <tr
@@ -514,9 +524,14 @@ export default function BenchmarkView({
                     {r.cargo.region}
                   </td>
 
-                  {/* Sueldo empresa (mid) */}
-                  <td className="py-3 pr-4 tabular-nums" style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.78rem", color: C.teal, textAlign: "right", whiteSpace: "nowrap" }}>
-                    {fmt(mid)}
+                  {/* Sueldo empresa (mid real + FTE si es part-time) */}
+                  <td className="py-3 pr-4" style={{ textAlign: "right", whiteSpace: "nowrap" }}>
+                    <span style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.78rem", color: C.teal }}>{fmt(mid)}</span>
+                    {isPartTime && (
+                      <span style={{ display: "block", fontFamily: "var(--font-space-mono)", fontSize: "0.62rem", color: "#F7C948", marginTop: "2px" }}>
+                        {horas}h → FTE {fmt(midFTE)}
+                      </span>
+                    )}
                   </td>
 
                   {isLoad ? (
@@ -551,9 +566,9 @@ export default function BenchmarkView({
                       <td className="py-3 pr-4 tabular-nums" style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.75rem", color: "rgba(255,255,255,0.32)", textAlign: "right", whiteSpace: "nowrap" }}>
                         {fmt(r.p90)}
                       </td>
-                      {/* Barra distribución */}
+                      {/* Barra distribución — usa midFTE para comparar */}
                       <td className="py-3 pr-4">
-                        <PercentileBar p10={r.p10} p25={r.p25} p50={r.p50} p75={r.p75} p90={r.p90} mid={mid} />
+                        <PercentileBar p10={r.p10} p25={r.p25} p50={r.p50} p75={r.p75} p90={r.p90} mid={midFTE} />
                       </td>
                       {/* Posición */}
                       <td className="py-3 pr-4">
@@ -573,7 +588,7 @@ export default function BenchmarkView({
                           </span>
                         )}
                       </td>
-                      {/* vs P50 */}
+                      {/* vs P50 — usa midFTE */}
                       <td className="py-3 tabular-nums" style={{
                         fontFamily: "var(--font-space-mono)",
                         fontSize:   "0.75rem",
@@ -581,10 +596,10 @@ export default function BenchmarkView({
                         textAlign:  "right",
                         whiteSpace: "nowrap",
                         color:      r.p50
-                          ? mid >= r.p50 ? "#06D6A0" : "#FF6B6B"
+                          ? midFTE >= r.p50 ? "#06D6A0" : "#FF6B6B"
                           : "rgba(255,255,255,0.25)",
                       }}>
-                        {vsP50(mid, r.p50)}
+                        {vsP50(midFTE, r.p50)}
                       </td>
                     </>
                   )}
