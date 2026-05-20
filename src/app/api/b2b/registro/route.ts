@@ -1,3 +1,5 @@
+export const runtime = 'edge';
+
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { isPublicDomain, extractDomain } from "@/lib/b2b-auth";
