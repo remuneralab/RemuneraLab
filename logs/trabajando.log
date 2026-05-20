@@ -1,0 +1,24 @@
+Iniciando scraper Trabajando.cl — máx 300 páginas
+
+Descargando sitemap...
+  12046 URLs en sitemap
+
+URLs que matchean keywords: 2481
+A fetchear (máx 300):  300
+
+  ✓ Batch de 50 upserted (51/300 procesados)
+  ✓ Batch de 50 upserted (105/300 procesados)
+  ✓ Batch de 50 upserted (155/300 procesados)
+  ✓ Batch de 50 upserted (210/300 procesados)
+  ✓ Batch de 50 upserted (263/300 procesados)
+  ✓ Batch final de 35 upserted
+
+==================================================
+URLs en sitemap:          12046
+Matchearon keywords:      300
+Errores de fetch:         1
+Avisos únicos parseados:  285
+Con salario explícito:    35 (12%)
+Sin región detectada:     0
+Upserts enviados a DB:    285
+Scraping completado.

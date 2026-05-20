@@ -1,0 +1,22 @@
+=== Ingestión Clasificador SABE CIUO-08 ===
+  Usando archivo local: C:\Users\Antres\remuneralab\scripts\data\sabe_ciuo08.xlsx
+  Filas únicas cargos incluidos: 2,779
+
+Ejemplos gastronomía:
+  'garzon' → CIUO 51310
+  'bartender' → CIUO None
+  'cocinero' → CIUO 51200
+  'chef' → CIUO 34340
+  'mozo' → CIUO 92110
+  'auxiliar de aseo' → CIUO 91110
+
+Insertando 2,779 registros…
+  Upsert 500/2779
+  Upsert 1000/2779
+  Upsert 1500/2779
+  Upsert 2000/2779
+  Upsert 2500/2779
+  Upsert 2779/2779
+  ✓ 2779 registros en sabe_ciuo_mapping
+
+Done.

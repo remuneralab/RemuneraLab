@@ -1,0 +1,56 @@
+=== Scraping BNE — Gastronomía ===
+Modo: PRODUCCIÓN
+Max páginas por keyword: 99
+
+
+  Keyword: 'garzon'
+    Pag 1: 20 avisos | salarios: 14 | acum: 20
+    Pag 2: 20 avisos | salarios: 11 | acum: 40
+    Pag 3: 5 avisos | salarios: 5 | acum: 45
+    Total declarado alcanzado (45)
+
+  Keyword: 'cocinero'
+    Pag 1: 20 avisos | salarios: 14 | acum: 20
+    Pag 2: 20 avisos | salarios: 12 | acum: 40
+    Pag 3: 12 avisos | salarios: 9 | acum: 52
+    Total declarado alcanzado (52)
+
+  Keyword: 'bartender'
+    Pag 1: 10 avisos | salarios: 4 | acum: 10
+    Total declarado alcanzado (10)
+
+  Keyword: 'chef'
+    Pag 1: 16 avisos | salarios: 8 | acum: 16
+    Total declarado alcanzado (16)
+
+  Keyword: 'ayudante cocina'
+    Pag 1: 1 avisos | salarios: 0 | acum: 1
+    Total declarado alcanzado (1)
+
+  Keyword: 'barista'
+    Pag 1: 5 avisos | salarios: 3 | acum: 5
+    Total declarado alcanzado (5)
+
+  Keyword: 'maitre'
+    Pag 1: vacía (fin)
+
+  Keyword: 'pastelero'
+    Pag 1: 5 avisos | salarios: 2 | acum: 5
+    Total declarado alcanzado (5)
+
+  Keyword: 'aseo restaurante'
+    Pag 1: vacía (fin)
+
+  Keyword: 'cajero restaurant'
+    Pag 1: vacía (fin)
+
+Total bruto acumulado: 134 avisos
+  Con CIUO mapeado: 49 (37%)
+  Con salario:      82 (61%)
+
+Unicos tras dedup: 115 (descartados: 19)
+  Upsert 100/115
+  Upsert 115/115
+  ✓ 115 avisos BNE en registros_avisos
+
+Done.
