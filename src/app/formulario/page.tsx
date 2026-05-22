@@ -2,7 +2,7 @@
 
 import { useRef, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { motion } from "motion/react";
+import { motion, AnimatePresence } from "motion/react";
 import { Lock, ShieldCheck, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { sendGAEvent } from "@next/third-parties/google";
@@ -234,9 +234,68 @@ export default function Formulario() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.65, delay: 0.08 }}
-            className="rounded-xl border border-white/10 bg-white/4 p-5 sm:p-8"
+            className="relative rounded-xl border border-white/10 bg-white/4 p-5 sm:p-8"
             style={{ backdropFilter: "blur(8px)" }}
           >
+
+            {/* ── Estado de carga ── */}
+            <AnimatePresence>
+              {loading && (
+                <motion.div
+                  key="loading"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.25 }}
+                  className="absolute inset-0 rounded-xl flex flex-col items-center justify-center gap-6 z-10"
+                  style={{ background: "rgba(24,11,59,0.97)", backdropFilter: "blur(4px)" }}
+                >
+                  {/* Spinner */}
+                  <div className="relative w-16 h-16">
+                    <motion.div
+                      className="absolute inset-0 rounded-full"
+                      style={{ border: "3px solid rgba(133,104,243,0.15)" }}
+                    />
+                    <motion.div
+                      className="absolute inset-0 rounded-full"
+                      style={{ border: "3px solid transparent", borderTopColor: "#8568f3" }}
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 0.9, repeat: Infinity, ease: "linear" }}
+                    />
+                    <motion.div
+                      className="absolute inset-2 rounded-full"
+                      style={{ border: "2px solid transparent", borderTopColor: "rgba(163,135,245,0.5)" }}
+                      animate={{ rotate: -360 }}
+                      transition={{ duration: 1.4, repeat: Infinity, ease: "linear" }}
+                    />
+                  </div>
+
+                  {/* Texto principal */}
+                  <div className="flex flex-col items-center gap-2 text-center px-6">
+                    <p className="text-white font-semibold"
+                      style={{ fontFamily: "var(--font-dm-sans)", fontSize: "1.05rem" }}>
+                      Calculando tu posición en el mercado
+                    </p>
+                    <p style={{ fontFamily: "var(--font-dm-sans)", fontSize: "0.82rem", color: "rgba(255,255,255,0.40)" }}>
+                      Comparando con registros reales de Chile...
+                    </p>
+                  </div>
+
+                  {/* Puntos animados */}
+                  <div className="flex items-center gap-2">
+                    {[0, 1, 2].map((i) => (
+                      <motion.div
+                        key={i}
+                        className="w-1.5 h-1.5 rounded-full"
+                        style={{ background: "#8568f3" }}
+                        animate={{ opacity: [0.2, 1, 0.2], scale: [0.8, 1.2, 0.8] }}
+                        transition={{ duration: 1.2, repeat: Infinity, delay: i * 0.2, ease: "easeInOut" }}
+                      />
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
 
             {/* Trust badges */}
             <div className="flex items-center flex-wrap gap-x-6 gap-y-2 mb-8 pb-7" style={{ borderBottom: "1px solid rgba(133,104,243,0.15)" }}>
@@ -543,8 +602,8 @@ export default function Formulario() {
                       boxShadow: "0 0 36px rgba(133,104,243,0.40), 0 2px 12px rgba(133,104,243,0.25)",
                     }}
                   >
-                    {loading ? "Calculando..." : "Ver mi posición en el mercado"}
-                    {!loading && <ArrowRight size={18} />}
+                    Ver mi posición en el mercado
+                    <ArrowRight size={18} />
                   </button>
                 </div>
               )}
