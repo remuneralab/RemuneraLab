@@ -171,14 +171,12 @@ export default function FeedbackWidget() {
         onClick={() => setOpen(v => !v)}
         whileHover={{ scale: 1.06 }}
         whileTap={{ scale: 0.94 }}
-        className="flex items-center gap-2 px-4 py-3 rounded-full font-semibold"
+        className="flex items-center justify-center w-12 h-12 rounded-full"
         style={{
           background: open
             ? "rgba(133,104,243,0.20)"
             : "linear-gradient(135deg, #8568f3, #a387f5)",
           color: "#fff",
-          fontFamily: "var(--font-dm-sans)",
-          fontSize: "0.85rem",
           border: open ? "1px solid rgba(133,104,243,0.40)" : "none",
           boxShadow: open ? "none" : "0 8px 32px rgba(133,104,243,0.45)",
         }}
@@ -190,7 +188,7 @@ export default function FeedbackWidget() {
               animate={{ rotate: 0, opacity: 1 }}
               exit={{ rotate: 90, opacity: 0 }}
               transition={{ duration: 0.15 }}>
-              <X size={16} />
+              <X size={18} />
             </motion.span>
           ) : (
             <motion.span key="msg"
@@ -198,11 +196,10 @@ export default function FeedbackWidget() {
               animate={{ rotate: 0, opacity: 1 }}
               exit={{ rotate: -90, opacity: 0 }}
               transition={{ duration: 0.15 }}>
-              <MessageCircle size={16} />
+              <MessageCircle size={18} />
             </motion.span>
           )}
         </AnimatePresence>
-        {open ? "Cerrar" : "Feedback"}
       </motion.button>
     </div>
   );
