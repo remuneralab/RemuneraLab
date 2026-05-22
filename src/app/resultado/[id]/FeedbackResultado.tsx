@@ -23,7 +23,7 @@ export default function FeedbackResultado({ cargo, industria, region }: Props) {
   const [dismissed, setDismissed] = useState(false);
 
   useEffect(() => {
-    const t = setTimeout(() => setVisible(true), 4000);
+    const t = setTimeout(() => setVisible(true), 5000);
     return () => clearTimeout(t);
   }, []);
 

@@ -25,13 +25,10 @@ function CallbackInner() {
     function redirect(session: Session | null) {
       if (redirected || !session) return;
       redirected = true;
-      const vincular = localStorage.getItem("rl_vincular_registro");
-      if (vincular) {
-        localStorage.removeItem("rl_vincular_registro");
-        router.replace(`/perfil?vincular=${vincular}`);
-      } else {
-        router.replace("/perfil");
-      }
+      localStorage.removeItem("rl_vincular_registro");
+      const redirectTo = localStorage.getItem("rl_redirect_after_login") ?? "/";
+      localStorage.removeItem("rl_redirect_after_login");
+      router.replace(redirectTo);
     }
 
     // Supabase automatically exchanges ?code= via detectSessionInUrl.

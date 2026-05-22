@@ -29,13 +29,10 @@ export default function GoogleSesion() {
         return;
       }
 
-      const vincular = localStorage.getItem("rl_vincular_registro");
-      if (vincular) {
-        localStorage.removeItem("rl_vincular_registro");
-        router.replace(`/perfil?vincular=${vincular}`);
-      } else {
-        router.replace("/perfil");
-      }
+      localStorage.removeItem("rl_vincular_registro");
+      const redirectTo = localStorage.getItem("rl_redirect_after_login") ?? "/";
+      localStorage.removeItem("rl_redirect_after_login");
+      router.replace(redirectTo);
     }
 
     setup();

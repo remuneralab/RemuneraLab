@@ -56,6 +56,7 @@ export default function GuardarSheet({ registroId, onDismiss }: Props) {
   async function handleGoogle() {
     sendGAEvent("event", "login_intento", { method: "google" });
     localStorage.setItem("rl_vincular_registro", registroId);
+    localStorage.setItem("rl_redirect_after_login", window.location.href);
     window.location.href = "/api/auth/google/init";
   }
 
@@ -64,6 +65,7 @@ export default function GuardarSheet({ registroId, onDismiss }: Props) {
     if (!email) return;
     setLoading(true);
     localStorage.setItem("rl_vincular_registro", registroId);
+    localStorage.setItem("rl_redirect_after_login", window.location.href);
     sendGAEvent("event", "login_intento", { method: "email" });
     const { error } = await supabase.auth.signInWithOtp({
       email,
