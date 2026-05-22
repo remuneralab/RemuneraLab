@@ -35,81 +35,17 @@ type CargoCSV = {
 
 type CSVError = { fila: number; campo: string; mensaje: string };
 
-const TEMPLATE_ROWS: CargoCSV[] = [
-  { cargo: "Técnico en Mantención Electromecánica",           salario_min_clp:  882000, salario_max_clp: 1536000, region: "La Araucanía",  horas_semana: 42 },
-  { cargo: "Técnico en Manejo de Residuos Industriales",      salario_min_clp:  920000, salario_max_clp: 1521000, region: "Biobío",        horas_semana: 42 },
-  { cargo: "Técnico en Sistemas de Control Industrial",       salario_min_clp:  845000, salario_max_clp: 1494000, region: "Los Lagos",     horas_semana: 42 },
-  { cargo: "Técnico en Operación de Planta de Celulosa",      salario_min_clp:  885000, salario_max_clp: 1552000, region: "Biobío",        horas_semana: 42 },
-  { cargo: "Técnico en Laboratorio de Calidad",               salario_min_clp:  923000, salario_max_clp: 1531000, region: "Biobío",        horas_semana: 42 },
-  { cargo: "Ingeniero de Procesos Industriales",              salario_min_clp: 1384000, salario_max_clp: 2293000, region: "Maule",         horas_semana: 42 },
-  { cargo: "Profesional de Planificación Forestal",           salario_min_clp: 1243000, salario_max_clp: 2160000, region: "Biobío",        horas_semana: 42 },
-  { cargo: "Profesional de Seguridad Industrial",             salario_min_clp: 1256000, salario_max_clp: 2159000, region: "Biobío",        horas_semana: 42 },
-  { cargo: "Ingeniero de Calidad y Laboratorio",              salario_min_clp: 1285000, salario_max_clp: 2334000, region: "Metropolitana", horas_semana: 42 },
-  { cargo: "Ingeniero de Sistemas de Información",            salario_min_clp: 1327000, salario_max_clp: 2224000, region: "La Araucanía",  horas_semana: 42 },
-  { cargo: "Ingeniero de Mantención de Equipos",              salario_min_clp: 1315000, salario_max_clp: 2212000, region: "La Araucanía",  horas_semana: 42 },
-  { cargo: "Analista de Control de Gestión",                  salario_min_clp: 1341000, salario_max_clp: 2294000, region: "Los Ríos",      horas_semana: 42 },
-  { cargo: "Analista de Gestión de Personas",                 salario_min_clp: 1214000, salario_max_clp: 2364000, region: "Biobío",        horas_semana: 42 },
-  { cargo: "Profesional de Medio Ambiente y Certificaciones", salario_min_clp: 1298000, salario_max_clp: 2209000, region: "Biobío",        horas_semana: 42 },
-  { cargo: "Analista de Operaciones Logísticas",              salario_min_clp: 1301000, salario_max_clp: 2310000, region: "Metropolitana", horas_semana: 42 },
-  { cargo: "Especialista Senior en Calidad de Madera",        salario_min_clp: 2224000, salario_max_clp: 3485000, region: "Metropolitana", horas_semana: 42 },
-  { cargo: "Operador de Línea de Producción de Tableros",     salario_min_clp:  759000, salario_max_clp: 1337000, region: "Maule",         horas_semana: 42 },
-  { cargo: "Operador de Caldera Industrial",                  salario_min_clp:  795000, salario_max_clp: 1282000, region: "Biobío",        horas_semana: 42 },
-  { cargo: "Ingeniero Senior de Automatización Industrial",   salario_min_clp: 2201000, salario_max_clp: 3442000, region: "Maule",         horas_semana: 42 },
-  { cargo: "Operador de Procesadora de Madera",               salario_min_clp:  777000, salario_max_clp: 1296000, region: "Maule",         horas_semana: 42 },
-  { cargo: "Vigilante de Predio Forestal",                    salario_min_clp:  557000, salario_max_clp: 1155000, region: "Biobío",        horas_semana: 42 },
-  { cargo: "Secretaria Ejecutiva de Gerencia",                salario_min_clp:  653000, salario_max_clp: 1070000, region: "Biobío",        horas_semana: 42 },
-  { cargo: "Conductor de Camión Forestal",                    salario_min_clp:  541000, salario_max_clp:  793000, region: "Biobío",        horas_semana: 42 },
-  { cargo: "Operario de Aplicación de Herbicidas",            salario_min_clp:  546000, salario_max_clp:  766000, region: "Los Ríos",      horas_semana: 42 },
-  { cargo: "Operador de Motosierra",                          salario_min_clp:  553000, salario_max_clp:  801000, region: "Maule",         horas_semana: 42 },
-  { cargo: "Asistente de Sistemas e Informática",             salario_min_clp:  400000, salario_max_clp:  560000, region: "Metropolitana", horas_semana: 22 },
-  { cargo: "Operador de Grúa Horquilla Industrial",           salario_min_clp:  593000, salario_max_clp: 1367000, region: "Biobío",        horas_semana: 42 },
-  { cargo: "Mecánico de Vehículos de Faena",                  salario_min_clp:  590000, salario_max_clp: 1258000, region: "Maule",         horas_semana: 42 },
-  { cargo: "Trabajador de Plantación Forestal",               salario_min_clp:  555000, salario_max_clp: 1045000, region: "Los Lagos",     horas_semana: 42 },
-  { cargo: "Auxiliar de Bodega Industrial",                   salario_min_clp:  564000, salario_max_clp:  759000, region: "Biobío",        horas_semana: 42 },
-  { cargo: "Operador de Cosechadora Forestal",                salario_min_clp:  748000, salario_max_clp: 1234000, region: "Los Lagos",     horas_semana: 42 },
-  { cargo: "Auxiliar de Servicios Generales en Planta",       salario_min_clp:  296000, salario_max_clp:  450000, region: "Maule",         horas_semana: 22 },
-  { cargo: "Conductor de Camión Maderero Certificado",        salario_min_clp:  590000, salario_max_clp: 1220000, region: "Biobío",        horas_semana: 42 },
-  { cargo: "Trabajador de Mantención de Caminos Forestales",  salario_min_clp:  567000, salario_max_clp:  768000, region: "Biobío",        horas_semana: 42 },
-  { cargo: "Auxiliar de Mantención en Faena",                 salario_min_clp:  540000, salario_max_clp:  777000, region: "Metropolitana", horas_semana: 42 },
-  { cargo: "Ingeniero Senior de Mantenimiento Industrial",    salario_min_clp: 1980000, salario_max_clp: 3292000, region: "Maule",         horas_semana: 42 },
-  { cargo: "Trabajador de Cosecha Manual",                    salario_min_clp:  549000, salario_max_clp:  777000, region: "Biobío",        horas_semana: 42 },
-  { cargo: "Ingeniero Senior de Proyectos de Capital",        salario_min_clp: 2017000, salario_max_clp: 3630000, region: "Maule",         horas_semana: 42 },
-  { cargo: "Mecánico de Equipos Pesados Forestales",          salario_min_clp:  700000, salario_max_clp: 1256000, region: "Maule",         horas_semana: 42 },
-  { cargo: "Electricista Industrial de Planta",               salario_min_clp:  649000, salario_max_clp: 1328000, region: "Metropolitana", horas_semana: 42 },
-  { cargo: "Soldador Industrial Certificado",                 salario_min_clp:  738000, salario_max_clp: 1381000, region: "Biobío",        horas_semana: 42 },
-  { cargo: "Especialista Senior en Cadena de Suministro",     salario_min_clp: 2106000, salario_max_clp: 3391000, region: "Maule",         horas_semana: 42 },
-  { cargo: "Supervisor de Seguridad en Faena",                salario_min_clp:  649000, salario_max_clp: 1505000, region: "La Araucanía",  horas_semana: 42 },
-  { cargo: "Asistente de Comunicaciones Corporativas",        salario_min_clp:  655000, salario_max_clp: 1103000, region: "Biobío",        horas_semana: 42 },
-  { cargo: "Ingeniero Senior de Planificación Forestal",      salario_min_clp: 1885000, salario_max_clp: 3225000, region: "La Araucanía",  horas_semana: 42 },
-  { cargo: "Ingeniero Senior de Medio Ambiente",              salario_min_clp: 2002000, salario_max_clp: 3220000, region: "La Araucanía",  horas_semana: 42 },
-  { cargo: "Supervisor de Cosecha Mecanizada",                salario_min_clp:  870000, salario_max_clp: 1455000, region: "Biobío",        horas_semana: 42 },
-  { cargo: "Supervisor de Plantaciones",                      salario_min_clp:  914000, salario_max_clp: 1500000, region: "Metropolitana", horas_semana: 42 },
-  { cargo: "Analista Senior de Planificación Financiera",     salario_min_clp: 2049000, salario_max_clp: 3359000, region: "Los Ríos",      horas_semana: 42 },
-  { cargo: "Ingeniero Senior de Procesos de Celulosa",        salario_min_clp: 2258000, salario_max_clp: 3445000, region: "La Araucanía",  horas_semana: 42 },
-  { cargo: "Asistente de Compras y Abastecimiento",           salario_min_clp:  651000, salario_max_clp: 1040000, region: "Maule",         horas_semana: 42 },
-  { cargo: "Especialista Senior en Silvicultura",             salario_min_clp: 2177000, salario_max_clp: 3253000, region: "Los Ríos",      horas_semana: 42 },
-  { cargo: "Asistente Contable",                              salario_min_clp:  675000, salario_max_clp: 1016000, region: "Biobío",        horas_semana: 42 },
-  { cargo: "Asistente de Operaciones Logísticas",             salario_min_clp:  676000, salario_max_clp: 1047000, region: "Biobío",        horas_semana: 42 },
-  { cargo: "Supervisor de Faena Forestal",                    salario_min_clp:  704000, salario_max_clp: 1381000, region: "Maule",         horas_semana: 42 },
-  { cargo: "Asistente de Planificación Forestal",             salario_min_clp:  691000, salario_max_clp: 1144000, region: "Biobío",        horas_semana: 42 },
-  { cargo: "Supervisor de Transporte Forestal",               salario_min_clp:  649000, salario_max_clp: 1479000, region: "Metropolitana", horas_semana: 42 },
-  { cargo: "Asistente de Recursos Humanos",                   salario_min_clp:  760000, salario_max_clp: 1011000, region: "Maule",         horas_semana: 42 },
-  { cargo: "Asistente de Administración y Finanzas",          salario_min_clp:  689000, salario_max_clp: 1005000, region: "Metropolitana", horas_semana: 42 },
-  { cargo: "Coordinador Administrativo de Faena",             salario_min_clp:  697000, salario_max_clp: 1155000, region: "Biobío",        horas_semana: 42 },
-  { cargo: "Gerente de Operaciones Forestales",               salario_min_clp: 7500000, salario_max_clp:10000000, region: "Metropolitana", horas_semana: 42 },
-];
-
 function downloadTemplate() {
-  const header = "cargo,salario_min_clp,salario_max_clp,region,horas_semana";
-  const rows = TEMPLATE_ROWS.map(r =>
-    `${r.cargo},${r.salario_min_clp},${r.salario_max_clp},${r.region},${r.horas_semana}`
-  );
-  const csv = [header, ...rows].join("\n");
+  const csv = [
+    "cargo,salario_min_clp,salario_max_clp,region,horas_semana",
+    "Ejemplo Cargo A,800000,1200000,Metropolitana,42",
+    "Ejemplo Cargo B,600000,900000,Valparaíso,42",
+  ].join("\n");
   const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "arauco_cargos_remuneralab.csv";
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement("a");
+  a.href     = url;
+  a.download = "plantilla_cargos_remuneralab.csv";
   a.click();
   URL.revokeObjectURL(url);
 }
@@ -394,8 +330,8 @@ export default function DashboardPage() {
         } catch { /* localStorage puede estar deshabilitado */ }
 
         if (!restoredFromStorage) {
-          setCargos(TEMPLATE_ROWS);
-          setCsvFile("plantilla_demo.csv");
+          setCargos([]);
+          setCsvFile("");
         }
 
         setLoading(false);

@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { motion, useInView } from "motion/react";
 import {
   Code2, AlertTriangle, TrendingDown, MapPin, Users,
-  Bell, ArrowRight, ChevronRight, CheckCircle2, ExternalLink,
+  Bell, ArrowLeft, ArrowRight, ChevronRight, CheckCircle2, ExternalLink,
   Building2, Clock,
 } from "lucide-react";
 import TabNav from "../TabNav";
@@ -219,6 +219,9 @@ export default function TecnologiaPage() {
         {/* ── Hero / Company Profile ─────────────────────────────────────── */}
         <div className="border-b border-white/8">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 py-12">
+            <a href="/empresas/resumen" className="inline-flex items-center gap-1.5 text-xs text-white/45 hover:text-white transition-colors mb-6">
+              <ArrowLeft size={13} /> Panel principal
+            </a>
             <div className="flex items-center gap-2 mb-2 text-white/45">
               <Code2 size={14} className="text-indigo-400" />
               <span className="text-xs font-semibold uppercase tracking-widest">Tecnología · Análisis de mercado</span>

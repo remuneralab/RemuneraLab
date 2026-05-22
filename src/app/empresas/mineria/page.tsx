@@ -9,7 +9,7 @@ import {
 import {
   ArrowLeft, ArrowRight, TrendingUp, AlertTriangle,
   Users, CheckCircle2, Zap, HardHat,
-  MapPin, ChevronRight, CircleDollarSign, Scale,
+  MapPin, ChevronRight, CircleDollarSign, Scale, LayoutDashboard,
 } from "lucide-react";
 import TabNav from "../TabNav";
 import CasoPracticoMineria from "./CasoPracticoMineria";
@@ -223,6 +223,7 @@ export default function AnalisisMineriaPage() {
   const scrolled = useScrolled();
   const [sectorData, setSectorData] = useState<SectorData | null>(null);
   const [b2bLoaded, setB2bLoaded] = useState(false);
+  const [showPanel, setShowPanel] = useState(true);
 
   useEffect(() => {
     fetch("/api/dashboard-b2b?sector=mineria")
@@ -255,13 +256,113 @@ export default function AnalisisMineriaPage() {
 
       <main className="flex-grow pt-16">
 
-        {/* ── 1. Hero ── */}
+        {showPanel ? (
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 py-12 pt-16">
+            <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45 }} className="mb-8">
+              <p style={{ fontFamily: "'Space Mono', monospace", fontSize: "0.6rem", color: "#00B4D8", letterSpacing: "0.25em", textTransform: "uppercase", marginBottom: "10px" }}>
+                Panel principal · Minería · ESI 2024 INE Chile
+              </p>
+              <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">Diagnóstico salarial — Sector Minería Chile</h1>
+              <p style={{ fontSize: "0.82rem", color: "rgba(255,255,255,0.4)" }}>
+                El sector mejor pagado de Chile · Resumen ejecutivo · 4 indicadores clave
+              </p>
+            </motion.div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-10">
+              {([
+                {
+                  color: "#F97316", shadow: "rgba(249,115,22,0.18)",
+                  icon: CircleDollarSign,
+                  badge: "Costo rotación",
+                  metric: "$12M",
+                  metricSub: "por reposición de operador",
+                  title: "Costo de perder un operador",
+                  desc: "Incluye reclutamiento, certificaciones SERNAGEOMIN, curva de aprendizaje y semanas de faena con dotación mínima.",
+                  bullets: ["Op. Eq. Pesado riesgo: 74/100 — Crítico", "Ahorro proyectado: $365.5M con plan", "Meta reducción: 22% → 9% rotación"],
+                },
+                {
+                  color: "#00B4D8", shadow: "rgba(0,180,216,0.18)",
+                  icon: MapPin,
+                  badge: "Bandas salariales",
+                  metric: "+42%",
+                  metricSub: "premio salarial Antofagasta",
+                  title: "Diferenciales por región y régimen",
+                  desc: "Codelco vs privada vs contratistas: brechas de hasta $1.4M por cargo. El premio territorial es el factor diferenciador más alto del mercado.",
+                  bullets: ["Salario mediano sectorial: $2.850.000", "Contratistas hasta +$400K por cargo", "6 cargos con riesgo de fuga activo"],
+                },
+                {
+                  color: "#2EC4B6", shadow: "rgba(46,196,182,0.18)",
+                  icon: AlertTriangle,
+                  badge: "Riesgo rotación",
+                  metric: "74/100",
+                  metricSub: "Operadores Eq. Pesado — Crítico",
+                  title: "Fuga activa a contratistas",
+                  desc: "El sector energías renovables y los contratistas privados compiten agresivamente por los mismos perfiles técnicos certificados.",
+                  bullets: ["Técnico Eléctrico: 68/100 — riesgo alto", "Ing. de Proceso: 61/100 activo", "Energías renovables: competencia directa"],
+                },
+                {
+                  color: "#A78BFA", shadow: "rgba(167,139,250,0.18)",
+                  icon: Scale,
+                  badge: "Cumplimiento legal",
+                  metric: "3",
+                  metricSub: "normativas críticas vigentes",
+                  title: "Responsabilidad solidaria y laboral",
+                  desc: "Ley de subcontratación, SERNAGEOMIN y Ley Karin: tres marcos legales que activan responsabilidad ante la empresa mandante.",
+                  bullets: ["Ley 20.123 subcontratación activa", "Certificación SERNAGEOMIN obligatoria", "Ley Karin vigente ago. 2024"],
+                },
+              ] as const).map((card, i) => (
+                <motion.div
+                  key={card.badge}
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.08, duration: 0.42 }}
+                  onClick={() => setShowPanel(false)}
+                  className="relative rounded-2xl p-6 cursor-pointer group overflow-hidden"
+                  style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)" }}
+                  whileHover={{ scale: 1.015, boxShadow: `0 0 32px ${card.shadow}` }}
+                >
+                  <div className="absolute top-0 left-0 right-0 h-[3px] rounded-t-2xl" style={{ background: card.color }} />
+                  <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full pointer-events-none"
+                    style={{ background: `radial-gradient(circle, ${card.shadow} 0%, transparent 65%)` }} />
+
+                  <div className="flex items-start justify-between mb-4">
+                    <span className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded-full"
+                      style={{ background: `${card.color}18`, color: card.color, border: `1px solid ${card.color}30`, fontFamily: "'Space Mono', monospace" }}>
+                      <card.icon size={11} /> {card.badge}
+                    </span>
+                    <ArrowRight size={15} style={{ color: card.color, opacity: 0.6, marginTop: "2px" }} className="group-hover:translate-x-1 transition-transform" />
+                  </div>
+
+                  <p className="text-4xl font-bold tabular-nums mb-0.5" style={{ color: card.color, fontFamily: "'Space Mono', monospace" }}>{card.metric}</p>
+                  <p style={{ fontSize: "0.68rem", color: "rgba(255,255,255,0.35)", marginBottom: "12px", fontFamily: "'Space Mono', monospace" }}>{card.metricSub}</p>
+
+                  <h3 className="text-base font-bold text-white mb-1.5">{card.title}</h3>
+                  <p style={{ fontSize: "0.78rem", color: "rgba(255,255,255,0.45)", lineHeight: 1.55, marginBottom: "16px" }}>{card.desc}</p>
+
+                  <ul className="space-y-1.5 mb-5">
+                    {card.bullets.map((b: string) => (
+                      <li key={b} className="flex items-start gap-2" style={{ fontSize: "0.72rem", color: "rgba(255,255,255,0.55)" }}>
+                        <span style={{ color: card.color, marginTop: "2px", flexShrink: 0 }}>›</span> {b}
+                      </li>
+                    ))}
+                  </ul>
+
+                  <div className="flex items-center gap-1.5" style={{ fontSize: "0.74rem", color: card.color, fontWeight: 600 }}>
+                    Ver análisis completo <ChevronRight size={13} />
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        ) : (
+
+        <>{/* ── 1. Hero ── */}
         <section className="pt-14 pb-16 border-t border-white/8">
           <div className="max-w-7xl mx-auto px-6">
             <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="mb-10">
-              <a href="/empresas" className="inline-flex items-center gap-1.5 text-xs text-white/45 hover:text-white transition-colors mb-6">
-                <ArrowLeft size={13} /> Volver a vista general
-              </a>
+              <button onClick={() => setShowPanel(true)} className="inline-flex items-center gap-1.5 text-xs text-white/45 hover:text-white transition-colors mb-6 bg-transparent border-0 p-0 cursor-pointer">
+                <LayoutDashboard size={13} /> Panel principal
+              </button>
               <motion.p
                 initial={{ opacity: 0, y: 6 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -711,6 +812,9 @@ export default function AnalisisMineriaPage() {
             </motion.a>
           </div>
         </section>
+
+        </>
+        )}
 
       </main>
 

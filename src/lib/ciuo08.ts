@@ -210,6 +210,35 @@ export interface CiuoMatch {
   confianza: number;
 }
 
+export interface CargoSugerencia {
+  titulo: string;
+  codigo: string;
+  grupo: string;
+}
+
+export function sugerirCargos(query: string, limite = 6): CargoSugerencia[] {
+  if (!query || query.trim().length < 2) return [];
+
+  const resultados: { sug: CargoSugerencia; s: number }[] = [];
+
+  for (const entry of CIUO08) {
+    let mejorScore = 0;
+    let mejorTitulo = "";
+    for (const titulo of entry.titulos) {
+      const s = score(query, titulo);
+      if (s > mejorScore) { mejorScore = s; mejorTitulo = titulo; }
+    }
+    if (mejorScore >= 0.3) {
+      resultados.push({ sug: { titulo: mejorTitulo, codigo: entry.codigo, grupo: entry.grupo }, s: mejorScore });
+    }
+  }
+
+  return resultados
+    .sort((a, b) => b.s - a.s)
+    .slice(0, limite)
+    .map((r) => r.sug);
+}
+
 export function clasificarCargo(cargo: string): CiuoMatch | null {
   if (!cargo || cargo.trim().length < 3) return null;
 

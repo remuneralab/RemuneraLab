@@ -9,7 +9,7 @@ import {
 import {
   ArrowLeft, ArrowRight, TrendingUp, TrendingDown, AlertTriangle,
   Users, CheckCircle2, Zap, Globe,
-  ChevronRight, CircleDollarSign, Scale, Award,
+  ChevronRight, CircleDollarSign, Scale, Award, LayoutDashboard,
 } from "lucide-react";
 import TabNav from "../TabNav";
 import CasoPracticoTurismo from "./CasoPracticoTurismo";
@@ -211,6 +211,7 @@ function fmtKPI(n: number) {
 export default function AnalisisTurismoPage() {
   const [sectorData, setSectorData] = useState<SectorData | null>(null);
   const [b2bLoaded, setB2bLoaded] = useState(false);
+  const [showPanel, setShowPanel] = useState(true);
 
   useEffect(() => {
     fetch("/api/dashboard-b2b?sector=turismo")
@@ -244,13 +245,114 @@ export default function AnalisisTurismoPage() {
 
       <main className="flex-grow pt-16">
 
+        {showPanel ? (
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 py-12 pt-16">
+            <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45 }} className="mb-8">
+              <p style={{ fontFamily: "'Space Mono', monospace", fontSize: "0.6rem", color: "#00B4D8", letterSpacing: "0.25em", textTransform: "uppercase", marginBottom: "10px" }}>
+                Panel principal · Turismo y Hotelería · ESI 2024 INE Chile
+              </p>
+              <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">Diagnóstico salarial — Sector Turismo y Hotelería</h1>
+              <p style={{ fontSize: "0.82rem", color: "rgba(255,255,255,0.4)" }}>
+                El sector con mayor rotación de Chile · Resumen ejecutivo · 4 indicadores clave
+              </p>
+            </motion.div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-10">
+              {([
+                {
+                  color: "#F97316", shadow: "rgba(249,115,22,0.18)",
+                  icon: CircleDollarSign,
+                  badge: "Costo rotación",
+                  metric: "$1.85M",
+                  metricSub: "por rotación de garzón",
+                  title: "Cada salida tiene un costo real",
+                  desc: "Incluye búsqueda, capacitación, propinas no generadas y pérdida de calidad en temporada alta.",
+                  bullets: ["Camarera de piso riesgo: 89/100 — Crítico", "Garzón/Bartender: 81/100 — muy alto", "Ahorro proyectado: $69.4M con plan"],
+                },
+                {
+                  color: "#00B4D8", shadow: "rgba(0,180,216,0.18)",
+                  icon: TrendingDown,
+                  badge: "Bandas salariales",
+                  metric: "$680K",
+                  metricSub: "salario mediano sectorial",
+                  title: "El sector más bajo del mercado formal",
+                  desc: "Isla de Pascua paga 65% más que el resto. Las cadenas internacionales pagan hasta el doble que los independientes.",
+                  bullets: ["Chef Ejecutivo: cadena $3.2M vs independiente $1.58M", "Premio Patagonia: +38% vs base", "Recepcionistas hacia cadenas internacionales: +40%"],
+                },
+                {
+                  color: "#2EC4B6", shadow: "rgba(46,196,182,0.18)",
+                  icon: AlertTriangle,
+                  badge: "Presión de mercado",
+                  metric: "52%",
+                  metricSub: "rotación anual del sector",
+                  title: "La rotación más alta de Chile",
+                  desc: "La liquidez laboral es extrema. Un garzón recibe oferta inmediata en grupos gastronómicos al publicar perfil.",
+                  bullets: ["Pico estacional: +65% dotación dic-mar", "ROI del plan de retención: 2.8x", "Meta: reducir 52% → 22% rotación"],
+                },
+                {
+                  color: "#A78BFA", shadow: "rgba(167,139,250,0.18)",
+                  icon: Scale,
+                  badge: "Cumplimiento legal",
+                  metric: "3",
+                  metricSub: "normativas críticas vigentes",
+                  title: "Propinas, jornada y Ley Karin",
+                  desc: "El 72% distribuye propinas informalmente. Deuda retroactiva hasta 5 años ante la Dirección del Trabajo.",
+                  bullets: ["Ley 20.803 propinas — riesgo retroactivo DT", "Ley Karin vigente ago. 2024", "Jornada 40h — implementación gradual"],
+                },
+              ] as const).map((card, i) => (
+                <motion.div
+                  key={card.badge}
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.08, duration: 0.42 }}
+                  onClick={() => setShowPanel(false)}
+                  className="relative rounded-2xl p-6 cursor-pointer group overflow-hidden"
+                  style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)" }}
+                  whileHover={{ scale: 1.015, boxShadow: `0 0 32px ${card.shadow}` }}
+                >
+                  <div className="absolute top-0 left-0 right-0 h-[3px] rounded-t-2xl" style={{ background: card.color }} />
+                  <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full pointer-events-none"
+                    style={{ background: `radial-gradient(circle, ${card.shadow} 0%, transparent 65%)` }} />
+
+                  <div className="flex items-start justify-between mb-4">
+                    <span className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded-full"
+                      style={{ background: `${card.color}18`, color: card.color, border: `1px solid ${card.color}30`, fontFamily: "'Space Mono', monospace" }}>
+                      <card.icon size={11} /> {card.badge}
+                    </span>
+                    <ArrowRight size={15} style={{ color: card.color, opacity: 0.6, marginTop: "2px" }} className="group-hover:translate-x-1 transition-transform" />
+                  </div>
+
+                  <p className="text-4xl font-bold tabular-nums mb-0.5" style={{ color: card.color, fontFamily: "'Space Mono', monospace" }}>{card.metric}</p>
+                  <p style={{ fontSize: "0.68rem", color: "rgba(255,255,255,0.35)", marginBottom: "12px", fontFamily: "'Space Mono', monospace" }}>{card.metricSub}</p>
+
+                  <h3 className="text-base font-bold text-white mb-1.5">{card.title}</h3>
+                  <p style={{ fontSize: "0.78rem", color: "rgba(255,255,255,0.45)", lineHeight: 1.55, marginBottom: "16px" }}>{card.desc}</p>
+
+                  <ul className="space-y-1.5 mb-5">
+                    {card.bullets.map((b: string) => (
+                      <li key={b} className="flex items-start gap-2" style={{ fontSize: "0.72rem", color: "rgba(255,255,255,0.55)" }}>
+                        <span style={{ color: card.color, marginTop: "2px", flexShrink: 0 }}>›</span> {b}
+                      </li>
+                    ))}
+                  </ul>
+
+                  <div className="flex items-center gap-1.5" style={{ fontSize: "0.74rem", color: card.color, fontWeight: 600 }}>
+                    Ver análisis completo <ChevronRight size={13} />
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <>
+
         {/* ── 1. Hero ── */}
         <section className="pt-14 pb-16 border-t border-white/8">
           <div className="max-w-7xl mx-auto px-6">
             <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="mb-10">
-              <a href="/empresas" className="inline-flex items-center gap-1.5 text-xs text-white/45 hover:text-white transition-colors mb-6">
-                <ArrowLeft size={13} /> Volver a vista general
-              </a>
+              <button onClick={() => setShowPanel(true)} className="inline-flex items-center gap-1.5 text-xs text-white/45 hover:text-white transition-colors mb-6 bg-transparent border-0 p-0 cursor-pointer">
+                <LayoutDashboard size={13} /> Panel principal
+              </button>
               <motion.p
                 initial={{ opacity: 0, y: 6 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -692,6 +794,9 @@ export default function AnalisisTurismoPage() {
             </motion.a>
           </div>
         </section>
+
+          </>
+        )}
 
       </main>
 

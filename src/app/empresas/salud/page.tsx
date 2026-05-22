@@ -50,10 +50,10 @@ export default function AnalisisSaludPage() {
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.45, ease: E }}>
-              <a href="/empresas"
+              <a href="/empresas/resumen"
                 className="inline-flex items-center gap-1.5 text-white/40 hover:text-white/70 transition-colors mb-6"
                 style={{ fontFamily: "var(--font-dm-sans)", fontSize: "0.8rem" }}>
-                <ArrowLeft size={13} /> Volver a vista general
+                <ArrowLeft size={13} /> Panel principal
               </a>
               <p style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.6rem", color: "#00B4D8", letterSpacing: "0.25em", textTransform: "uppercase", marginBottom: "10px" }}>
                 Sector Salud · Caso real aplicado

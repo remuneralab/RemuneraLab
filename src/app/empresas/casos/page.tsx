@@ -4,7 +4,7 @@ import { forwardRef, useEffect, useRef, useState } from "react";
 import { motion, useInView } from "motion/react";
 import {
   Heart, BarChart3, HardHat, Globe, BookOpen,
-  AlertTriangle, TrendingDown, MapPin, Users, ArrowRight,
+  AlertTriangle, ArrowLeft, TrendingDown, MapPin, Users, ArrowRight,
 } from "lucide-react";
 import TabNav from "../TabNav";
 
@@ -528,6 +528,9 @@ export default function CasosPage() {
       {/* Hero */}
       <div className="pt-16">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 py-12 border-b border-white/8">
+          <a href="/empresas/resumen" className="inline-flex items-center gap-1.5 text-xs text-white/45 hover:text-white transition-colors mb-6">
+            <ArrowLeft size={13} /> Panel principal
+          </a>
           <div className="border-l-2 border-[#00B4D8] pl-6">
             <div className="flex items-center gap-2 mb-2 text-white/45">
               <BookOpen size={14} />

@@ -10,7 +10,7 @@ import {
 import {
   ArrowLeft, ArrowRight, TrendingUp, AlertTriangle,
   Users, BarChart3,
-  Building2, ChevronRight, CheckCircle2, Award, Zap, Scale,
+  Building2, ChevronRight, CheckCircle2, Award, Zap, Scale, LayoutDashboard,
 } from "lucide-react";
 import TabNav from "../TabNav";
 import CasoPracticoFinanzas from "./CasoPracticoFinanzas";
@@ -19,7 +19,7 @@ import CasoRealFinanzas from "./CasoRealFinanzas";
 
 const E = [0.16, 1, 0.3, 1] as const;
 
-type InnerTab = "analisis" | "caso";
+type InnerTab = "resumen" | "analisis" | "caso";
 
 function useScrolled(threshold = 24) {
   const [scrolled, setScrolled] = useState(false);
@@ -179,7 +179,7 @@ function fmtKPI(n: number) {
 
 export default function AnalisisFinanzasPage() {
   const scrolled = useScrolled();
-  const [innerTab, setInnerTab] = useState<InnerTab>("analisis");
+  const [innerTab, setInnerTab] = useState<InnerTab>("resumen");
   const [sectorData, setSectorData] = useState<SectorData | null>(null);
   const [b2bLoaded, setB2bLoaded] = useState(false);
 
@@ -222,9 +222,9 @@ export default function AnalisisFinanzasPage() {
         <section className="pt-14 pb-16 border-t border-white/8">
           <div className="max-w-7xl mx-auto px-6">
             <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="mb-10">
-              <a href="/empresas" className="inline-flex items-center gap-1.5 text-xs text-white/45 hover:text-white transition-colors mb-6">
-                <ArrowLeft size={13} /> Volver a vista general
-              </a>
+              <button onClick={() => switchTab("resumen")} className="inline-flex items-center gap-1.5 text-xs text-white/45 hover:text-white transition-colors mb-6">
+                <ArrowLeft size={13} /> Panel principal
+              </button>
               <motion.p
                 initial={{ opacity: 0, y: 6 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -349,6 +349,16 @@ export default function AnalisisFinanzasPage() {
           <div className="max-w-7xl mx-auto px-6">
             <div className="flex gap-1 py-1">
               <button
+                onClick={() => switchTab("resumen")}
+                className={`flex items-center gap-1.5 px-4 py-2 text-xs font-semibold rounded-lg transition-colors border ${
+                  innerTab === "resumen"
+                    ? "bg-[#00B4D8]/15 text-[#00B4D8] border-[#00B4D8]/30"
+                    : "text-white/40 border-white/10 hover:text-white"
+                }`}
+              >
+                <LayoutDashboard size={11} /> Panel principal
+              </button>
+              <button
                 onClick={() => switchTab("analisis")}
                 className={`px-4 py-2 text-xs font-semibold rounded-lg transition-colors border ${
                   innerTab === "analisis"
@@ -372,6 +382,114 @@ export default function AnalisisFinanzasPage() {
             </div>
           </div>
         </div>
+
+        {innerTab === "resumen" && (<>
+        <div className="max-w-7xl mx-auto px-6 py-12">
+          <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45 }} className="mb-8">
+            <p style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.6rem", color: "#00B4D8", letterSpacing: "0.25em", textTransform: "uppercase", marginBottom: "10px" }}>
+              Panel principal · Sector Finanzas · Chile 2024
+            </p>
+            <h2 className="text-2xl font-bold text-white mb-2">Diagnóstico salarial — Sector Finanzas Chile</h2>
+            <p style={{ fontSize: "0.82rem", color: "rgba(255,255,255,0.4)" }}>
+              Resumen ejecutivo · 4 indicadores clave del sector
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-10">
+            {([
+              {
+                color: "#F97316", shadow: "rgba(249,115,22,0.18)",
+                icon: AlertTriangle,
+                badge: "Costo rotación",
+                metric: "$61.2M",
+                metricSub: "por rotación de un Trader",
+                title: "Rotación en mesas de dinero",
+                desc: "El cargo de mayor riesgo del sector. Cada salida voluntaria de un Trader supera los $61 millones en costos directos e indirectos.",
+                bullets: ["Riesgo rotación Trader: 71/100", "3 eventos anuales = $183.6M en riesgo", "Ahorro proyectado: $140.4M con plan"],
+                cta: "Ver análisis de rotación",
+                tab: "analisis" as InnerTab,
+              },
+              {
+                color: "#00B4D8", shadow: "rgba(0,180,216,0.18)",
+                icon: BarChart3,
+                badge: "Bandas salariales",
+                metric: "10",
+                metricSub: "cargos analizados",
+                title: "Brechas entre banca y fintech",
+                desc: "Las fintech pagan hasta $700.000 más por cargo que la banca tradicional. Sin benchmarking, la pérdida de talento es silenciosa.",
+                bullets: ["Salario mediano sectorial: $2.450.000", "Riesgo rotación promedio: 52/100", "Trader: fintech paga $700K más"],
+                cta: "Ver benchmark salarial",
+                tab: "analisis" as InnerTab,
+              },
+              {
+                color: "#2EC4B6", shadow: "rgba(46,196,182,0.18)",
+                icon: Building2,
+                badge: "Brecha de género",
+                metric: "−31%",
+                metricSub: "en compensación total",
+                title: "Mayor exposición legal del sector",
+                desc: "Una brecha del 31% en compensación total es el principal vector de litigación bajo la Ley 20.348 y Ley 21.719.",
+                bullets: ["Focalizada en bonos de Traders y Gerentes", "Plan de nivelación 18 meses", "Riesgo legal reducción 80%"],
+                cta: "Ver caso real aplicado",
+                tab: "caso" as InnerTab,
+              },
+              {
+                color: "#A78BFA", shadow: "rgba(167,139,250,0.18)",
+                icon: Scale,
+                badge: "Cumplimiento legal",
+                metric: "40/100",
+                metricSub: "score actual de tu empresa",
+                title: "Ley de Transparencia Salarial",
+                desc: "La Ley 21.719 exige publicar bandas salariales y auditar brechas. Solo el 31% del equipo conoce su banda hoy.",
+                bullets: ["Multa por cargo no comunicado: $3.9M", "Meta score: 40 → 75 puntos", "Fiscalización prevista 2025–2026"],
+                cta: "Ver cumplimiento legal",
+                tab: "caso" as InnerTab,
+              },
+            ] as const).map((card, i) => (
+              <motion.div
+                key={card.badge}
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.08, duration: 0.42 }}
+                onClick={() => switchTab(card.tab)}
+                className="relative rounded-2xl p-6 cursor-pointer group overflow-hidden"
+                style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)" }}
+                whileHover={{ scale: 1.015, boxShadow: `0 0 32px ${card.shadow}` }}
+              >
+                <div className="absolute top-0 left-0 right-0 h-[3px] rounded-t-2xl" style={{ background: card.color }} />
+                <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full pointer-events-none"
+                  style={{ background: `radial-gradient(circle, ${card.shadow} 0%, transparent 65%)` }} />
+
+                <div className="flex items-start justify-between mb-4">
+                  <span className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded-full"
+                    style={{ background: `${card.color}18`, color: card.color, border: `1px solid ${card.color}30`, fontFamily: "var(--font-space-mono)" }}>
+                    <card.icon size={11} /> {card.badge}
+                  </span>
+                  <ArrowRight size={15} style={{ color: card.color, opacity: 0.6, marginTop: "2px" }} className="group-hover:translate-x-1 transition-transform" />
+                </div>
+
+                <p className="text-4xl font-bold tabular-nums mb-0.5" style={{ color: card.color, fontFamily: "var(--font-space-mono)" }}>{card.metric}</p>
+                <p style={{ fontSize: "0.68rem", color: "rgba(255,255,255,0.35)", marginBottom: "12px", fontFamily: "var(--font-space-mono)" }}>{card.metricSub}</p>
+
+                <h3 className="text-base font-bold text-white mb-1.5">{card.title}</h3>
+                <p style={{ fontSize: "0.78rem", color: "rgba(255,255,255,0.45)", lineHeight: 1.55, marginBottom: "16px" }}>{card.desc}</p>
+
+                <ul className="space-y-1.5 mb-5">
+                  {card.bullets.map(b => (
+                    <li key={b} className="flex items-start gap-2" style={{ fontSize: "0.72rem", color: "rgba(255,255,255,0.55)" }}>
+                      <span style={{ color: card.color, marginTop: "2px", flexShrink: 0 }}>›</span> {b}
+                    </li>
+                  ))}
+                </ul>
+
+                <div className="flex items-center gap-1.5" style={{ fontSize: "0.74rem", color: card.color, fontWeight: 600 }}>
+                  {card.cta} <ChevronRight size={13} />
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+        </>)}
 
         {innerTab === "analisis" && <>
         <LeyTransparencia />

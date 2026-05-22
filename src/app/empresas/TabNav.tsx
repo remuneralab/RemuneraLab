@@ -1,18 +1,19 @@
 "use client";
 
 import { motion } from "motion/react";
-import { Heart, BarChart3, HardHat, Globe, BookOpen, Code2 } from "lucide-react";
+import { Heart, BarChart3, HardHat, Globe, BookOpen, Code2, LayoutDashboard } from "lucide-react";
 
-type Tab = "general" | "salud" | "finanzas" | "mineria" | "turismo" | "casos" | "tecnologia";
+type Tab = "general" | "resumen" | "salud" | "finanzas" | "mineria" | "turismo" | "casos" | "tecnologia";
 
 const TABS = [
-  { id: "general",   label: "Vista general", href: "/empresas",            Icon: null,      iconClass: "" },
-  { id: "salud",     label: "Salud",         href: "/empresas/salud",      Icon: Heart,     iconClass: "text-red-400" },
-  { id: "finanzas",  label: "Finanzas",      href: "/empresas/finanzas",   Icon: BarChart3, iconClass: "text-[#2EC4B6]" },
-  { id: "mineria",   label: "Minería",       href: "/empresas/mineria",    Icon: HardHat,   iconClass: "text-amber-400" },
-  { id: "turismo",   label: "Turismo",       href: "/empresas/turismo",    Icon: Globe,     iconClass: "text-sky-400" },
-  { id: "tecnologia",label: "Tecnología",    href: "/empresas/tecnologia", Icon: Code2,     iconClass: "text-[#00B4D8]" },
-  { id: "casos",     label: "Casos reales",  href: "/empresas/casos",      Icon: BookOpen,  iconClass: "text-violet-400" },
+  { id: "general",    label: "Vista general", href: "/empresas",            Icon: null,             iconClass: "" },
+  { id: "resumen",    label: "Resumen",        href: "/empresas/resumen",   Icon: LayoutDashboard,  iconClass: "text-[#00B4D8]" },
+  { id: "salud",      label: "Salud",          href: "/empresas/salud",     Icon: Heart,            iconClass: "text-red-400" },
+  { id: "finanzas",   label: "Finanzas",       href: "/empresas/finanzas",  Icon: BarChart3,        iconClass: "text-[#2EC4B6]" },
+  { id: "mineria",    label: "Minería",        href: "/empresas/mineria",   Icon: HardHat,          iconClass: "text-amber-400" },
+  { id: "turismo",    label: "Turismo",        href: "/empresas/turismo",   Icon: Globe,            iconClass: "text-sky-400" },
+  { id: "tecnologia", label: "Tecnología",     href: "/empresas/tecnologia",Icon: Code2,            iconClass: "text-[#00B4D8]" },
+  { id: "casos",      label: "Casos reales",   href: "/empresas/casos",     Icon: BookOpen,         iconClass: "text-violet-400" },
 ] as const;
 
 export default function TabNav({ active }: { active: Tab }) {
