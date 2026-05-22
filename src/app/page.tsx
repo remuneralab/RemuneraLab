@@ -2,10 +2,10 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { motion, useInView } from "motion/react";
+import { motion, useInView, AnimatePresence } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Loader2, Mail, User } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
 const E = [0.16, 1, 0.3, 1] as const;
@@ -32,9 +32,14 @@ function CountUp({ target }: { target: number }) {
 
 export default function Home() {
   const router = useRouter();
-  const [sectores, setSectores]     = useState<Sector[]>([]);
-  const [totalAvisos, setTotalAvisos] = useState(0);
-  const [authChecked, setAuthChecked] = useState(false);
+  const [sectores, setSectores]         = useState<Sector[]>([]);
+  const [totalAvisos, setTotalAvisos]   = useState(0);
+  const [authChecked, setAuthChecked]   = useState(false);
+  const [showLogin, setShowLogin]       = useState(false);
+  const [loginEmail, setLoginEmail]     = useState("");
+  const [magicSent, setMagicSent]       = useState(false);
+  const [loginLoading, setLoginLoading] = useState(false);
+  const loginRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -45,6 +50,37 @@ export default function Home() {
       }
     });
   }, [router]);
+
+  useEffect(() => {
+    if (!showLogin) return;
+    function handleClick(e: MouseEvent) {
+      if (loginRef.current && !loginRef.current.contains(e.target as Node)) {
+        setShowLogin(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, [showLogin]);
+
+  async function handleLoginGoogle() {
+    localStorage.removeItem("rl_vincular_registro");
+    window.location.href = "/api/auth/google/init";
+  }
+
+  async function handleLoginMagic(e: React.FormEvent) {
+    e.preventDefault();
+    if (!loginEmail) return;
+    setLoginLoading(true);
+    const origin = window.location.hostname === "localhost"
+      ? "https://remuneralab.vercel.app"
+      : window.location.origin;
+    const { error } = await supabase.auth.signInWithOtp({
+      email: loginEmail,
+      options: { emailRedirectTo: `${origin}/auth/callback` },
+    });
+    setLoginLoading(false);
+    if (!error) setMagicSent(true);
+  }
 
   useEffect(() => {
     fetch("/api/sectores")
@@ -65,6 +101,108 @@ export default function Home() {
 
       {/* ══════════════ HERO ══════════════ */}
       <section className="relative min-h-screen flex flex-col items-center justify-center px-6 overflow-hidden">
+
+        {/* Header login */}
+        <div className="absolute top-0 left-0 right-0 z-50 flex justify-end px-6 py-5">
+          <div ref={loginRef} className="relative">
+            <button
+              onClick={() => setShowLogin(v => !v)}
+              className="flex items-center gap-2 px-4 py-2 rounded-lg transition-all"
+              style={{
+                fontFamily: "var(--font-dm-sans)",
+                fontSize: "0.82rem",
+                color: showLogin ? "#e7e4fd" : "rgba(255,255,255,0.50)",
+                border: "1px solid rgba(133,104,243,0.25)",
+                background: showLogin ? "rgba(133,104,243,0.15)" : "transparent",
+              }}
+            >
+              <User size={13} />
+              Iniciar sesión
+            </button>
+
+            <AnimatePresence>
+              {showLogin && (
+                <motion.div
+                  initial={{ opacity: 0, y: 8, scale: 0.97 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 8, scale: 0.97 }}
+                  transition={{ duration: 0.18, ease: E }}
+                  className="absolute top-full right-0 mt-2 w-72 rounded-xl overflow-hidden"
+                  style={{
+                    background: "#13093a",
+                    border: "1px solid rgba(133,104,243,0.28)",
+                    boxShadow: "0 24px 64px rgba(0,0,0,0.65)",
+                  }}
+                >
+                  <div className="p-5 flex flex-col gap-3">
+                    {magicSent ? (
+                      <div className="flex flex-col items-center text-center gap-2 py-3">
+                        <Mail size={22} style={{ color: "#8568f3" }} />
+                        <p className="text-white font-semibold text-sm" style={{ fontFamily: "var(--font-dm-sans)" }}>
+                          Revisa tu correo
+                        </p>
+                        <p style={{ fontFamily: "var(--font-dm-sans)", fontSize: "0.78rem", color: "rgba(255,255,255,0.40)" }}>
+                          Link enviado a <span style={{ color: "#e7e4fd" }}>{loginEmail}</span>
+                        </p>
+                      </div>
+                    ) : (
+                      <>
+                        <p style={{ fontFamily: "var(--font-dm-sans)", fontSize: "0.78rem", color: "rgba(255,255,255,0.38)" }}>
+                          Accede a tu perfil y análisis guardados
+                        </p>
+
+                        <button
+                          onClick={handleLoginGoogle}
+                          className="w-full flex items-center justify-center gap-3 py-3 rounded-lg font-medium hover:opacity-90 transition-opacity text-sm"
+                          style={{ background: "#fff", color: "#1a1a1a", fontFamily: "var(--font-dm-sans)" }}
+                        >
+                          <svg width="16" height="16" viewBox="0 0 18 18" fill="none">
+                            <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/>
+                            <path d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z" fill="#34A853"/>
+                            <path d="M3.964 10.706A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.706V4.962H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.038l3.007-2.332z" fill="#FBBC05"/>
+                            <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.962L3.964 6.294C4.672 4.169 6.656 3.58 9 3.58z" fill="#EA4335"/>
+                          </svg>
+                          Continuar con Google
+                        </button>
+
+                        <div className="flex items-center gap-2">
+                          <div className="flex-1 h-px" style={{ background: "rgba(255,255,255,0.10)" }} />
+                          <span style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.55rem", color: "rgba(255,255,255,0.22)", letterSpacing: "0.15em" }}>O</span>
+                          <div className="flex-1 h-px" style={{ background: "rgba(255,255,255,0.10)" }} />
+                        </div>
+
+                        <form onSubmit={handleLoginMagic} className="flex gap-2">
+                          <input
+                            type="email"
+                            required
+                            placeholder="tu@correo.com"
+                            value={loginEmail}
+                            onChange={e => setLoginEmail(e.target.value)}
+                            className="flex-1 px-3 py-2.5 rounded-lg text-sm text-white placeholder:text-white/25 focus:outline-none"
+                            style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(133,104,243,0.20)", fontFamily: "var(--font-dm-sans)" }}
+                            onFocus={e => (e.currentTarget.style.borderColor = "rgba(133,104,243,0.50)")}
+                            onBlur={e => (e.currentTarget.style.borderColor = "rgba(133,104,243,0.20)")}
+                          />
+                          <button
+                            type="submit"
+                            disabled={loginLoading}
+                            className="px-3 py-2.5 rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50"
+                            style={{ background: "linear-gradient(135deg, #8568f3, #a387f5)", color: "#fff" }}
+                          >
+                            {loginLoading ? <Loader2 size={14} className="animate-spin" /> : <ArrowRight size={14} />}
+                          </button>
+                        </form>
+                        <p style={{ fontFamily: "var(--font-dm-sans)", fontSize: "0.68rem", color: "rgba(255,255,255,0.22)", textAlign: "center" }}>
+                          Magic link · sin contraseña
+                        </p>
+                      </>
+                    )}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        </div>
 
         {/* Fondo: glows + grid */}
         <div className="pointer-events-none absolute -top-32 -right-32 w-[700px] h-[700px] rounded-full"

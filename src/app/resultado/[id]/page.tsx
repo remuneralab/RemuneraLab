@@ -5,6 +5,7 @@ import { calcularBenchmark } from "@/lib/benchmark";
 import { calcularMercado } from "@/lib/mercado";
 import PercentilHero from "./PercentilHero";
 import ResultadoBento from "./ResultadoBento";
+import ResultadoWidgets from "./ResultadoWidgets";
 
 const JORNADA_COMPLETA = 42;
 const SALARIO_MINIMO   = 539_000;
@@ -148,6 +149,13 @@ export default async function ResultadoPage({ params, searchParams }: Props) {
           pctSobreMinimo={pctSobreMinimo}
         />
       </main>
+
+      <ResultadoWidgets
+        registroId={id}
+        cargo={registro.cargo}
+        industria={registro.industria}
+        region={registro.region}
+      />
 
       <footer className="relative py-8 px-6 mt-12" style={{ borderTop: "1px solid rgba(133,104,243,0.12)" }}>
         <div className="max-w-7xl mx-auto">

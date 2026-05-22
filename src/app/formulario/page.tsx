@@ -6,7 +6,7 @@ import { motion } from "motion/react";
 import { Lock, ShieldCheck, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { sendGAEvent } from "@next/third-parties/google";
-import { clasificarCargo, type CiuoMatch } from "@/lib/ciuo08";
+import { clasificarCargo, sugerirCargos, type CiuoMatch, type CargoSugerencia } from "@/lib/ciuo08";
 
 const CIUO_INDUSTRIA_ESPERADA: Record<string, { industrias: string[]; sector: string }> = {
   "22": { industrias: ["Salud"],                                                sector: "salud" },
@@ -108,6 +108,8 @@ export default function Formulario() {
   const [error, setError]             = useState("");
   const [rateLimited, setRateLimited] = useState(false);
   const [ciuo, setCiuo]               = useState<CiuoMatch | null>(null);
+  const [sugerencias, setSugerencias] = useState<CargoSugerencia[]>([]);
+  const [mostrarSugerencias, setMostrarSugerencias] = useState(false);
   const [esJornadaParcial, setEsJornadaParcial] = useState(false);
   const [horasSemana, setHorasSemana] = useState(20);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
@@ -123,8 +125,19 @@ export default function Formulario() {
   function handleCargoChange(e: React.ChangeEvent<HTMLInputElement>) {
     const value = e.target.value;
     setForm((prev) => ({ ...prev, cargo: value }));
+    const sugs = value.length >= 2 ? sugerirCargos(value) : [];
+    setSugerencias(sugs);
+    setMostrarSugerencias(sugs.length > 0);
     clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(() => setCiuo(clasificarCargo(value)), 350);
+  }
+
+  function seleccionarSugerencia(s: CargoSugerencia) {
+    const titulo = s.titulo.charAt(0).toUpperCase() + s.titulo.slice(1);
+    setForm((prev) => ({ ...prev, cargo: titulo }));
+    setCiuo({ codigo: s.codigo, grupo: s.grupo, confianza: 1.0 });
+    setSugerencias([]);
+    setMostrarSugerencias(false);
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -192,7 +205,7 @@ export default function Formulario() {
         </div>
       </header>
 
-      <main className="relative flex-grow flex items-center justify-center py-16 px-6">
+      <main className="relative flex-grow flex items-center justify-center py-8 sm:py-16 px-4 sm:px-6">
         <div className="max-w-2xl w-full">
 
           {/* Encabezado */}
@@ -221,12 +234,12 @@ export default function Formulario() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.65, delay: 0.08 }}
-            className="rounded-xl border border-white/10 bg-white/4 p-8"
+            className="rounded-xl border border-white/10 bg-white/4 p-5 sm:p-8"
             style={{ backdropFilter: "blur(8px)" }}
           >
 
             {/* Trust badges */}
-            <div className="flex items-center gap-6 mb-8 pb-7" style={{ borderBottom: "1px solid rgba(133,104,243,0.15)" }}>
+            <div className="flex items-center flex-wrap gap-x-6 gap-y-2 mb-8 pb-7" style={{ borderBottom: "1px solid rgba(133,104,243,0.15)" }}>
               <div className="flex items-center gap-2">
                 <Lock size={13} style={{ color: "#8568f3" }} />
                 <span className="uppercase tracking-[0.18em]"
@@ -256,13 +269,41 @@ export default function Formulario() {
                     style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.6rem" }}>
                     Cargo actual
                   </label>
-                  <input
-                    id="cargo" name="cargo" type="text" required
-                    placeholder="Ej: Ingeniero de Software"
-                    value={form.cargo}
-                    onChange={handleCargoChange}
-                    className={fieldClass}
-                  />
+                  <div className="relative">
+                    <input
+                      id="cargo" name="cargo" type="text" required
+                      placeholder="Ej: Ingeniero de Software"
+                      value={form.cargo}
+                      onChange={handleCargoChange}
+                      onBlur={() => setTimeout(() => setMostrarSugerencias(false), 150)}
+                      onFocus={() => sugerencias.length > 0 && setMostrarSugerencias(true)}
+                      autoComplete="off"
+                      className={fieldClass}
+                    />
+                    {mostrarSugerencias && sugerencias.length > 0 && (
+                      <ul className="absolute z-50 top-full left-0 right-0 mt-1 rounded-lg overflow-hidden"
+                        style={{ background: "#1a0d3e", border: "1px solid rgba(133,104,243,0.2)", boxShadow: "0 8px 32px rgba(0,0,0,0.4)" }}>
+                        {sugerencias.map((s) => (
+                          <li
+                            key={`${s.codigo}-${s.titulo}`}
+                            onMouseDown={() => seleccionarSugerencia(s)}
+                            className="px-4 py-2.5 cursor-pointer flex items-center justify-between gap-3 transition-colors"
+                            style={{ borderBottom: "1px solid rgba(133,104,243,0.08)" }}
+                            onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(133,104,243,0.12)")}
+                            onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+                          >
+                            <span className="text-white text-sm">
+                              {s.titulo.charAt(0).toUpperCase() + s.titulo.slice(1)}
+                            </span>
+                            <span className="text-white/25 text-[10px] shrink-0"
+                              style={{ fontFamily: "var(--font-space-mono)" }}>
+                              {s.codigo}
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
                   {ciuo && (
                     <motion.div
                       initial={{ opacity: 0, y: -4 }}
@@ -349,17 +390,15 @@ export default function Formulario() {
                 <div className="flex flex-col">
                   <label className={labelClass} htmlFor="sexo"
                     style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.6rem" }}>
-                    Sexo{" "}
-                    <span className="normal-case tracking-normal text-white/20 font-normal">
-                      (opcional)
-                    </span>
+                    Sexo
                   </label>
-                  <select id="sexo" name="sexo"
+                  <select id="sexo" name="sexo" required
                     value={form.sexo} onChange={handleChange}
                     className={selectClass}>
-                    <option value="">Prefiero no responder</option>
-                    <option value="F">Femenino</option>
-                    <option value="M">Masculino</option>
+                    <option value="" disabled>Selecciona...</option>
+                    <option value="N">Prefiero no responder</option>
+                    <option value="F">Mujer</option>
+                    <option value="M">Hombre</option>
                     <option value="O">Otro</option>
                   </select>
                 </div>
@@ -388,7 +427,7 @@ export default function Formulario() {
                   </div>
 
                   {/* Track + thumb custom */}
-                  <div className="relative h-7 flex items-center select-none">
+                  <div className="relative h-11 flex items-center select-none">
                     <div className="absolute inset-x-0 h-1.5 rounded-full bg-white/10">
                       <div
                         className="h-full rounded-full"

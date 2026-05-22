@@ -12,15 +12,15 @@ interface Props {
   registroId: string;
 }
 
-type Estado = "cargando" | "loggedIn" | "loggedOut";
+type Estado = "cargando" | "loggedIn" | "loggedOut" | "skipped";
 
 export default function LoginPerfil({ registroId }: Props) {
-  const [estado, setEstado]         = useState<Estado>("cargando");
-  const [email, setEmail]           = useState("");
-  const [magicSent, setMagicSent]   = useState(false);
-  const [loading, setLoading]       = useState(false);
-  const [vinculado, setVinculado]   = useState(false);
-  const [userEmail, setUserEmail]   = useState<string | null>(null);
+  const [estado, setEstado]       = useState<Estado>("cargando");
+  const [email, setEmail]         = useState("");
+  const [magicSent, setMagicSent] = useState(false);
+  const [loading, setLoading]     = useState(false);
+  const [vinculado, setVinculado] = useState(false);
+  const [userEmail, setUserEmail] = useState<string | null>(null);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -29,6 +29,7 @@ export default function LoginPerfil({ registroId }: Props) {
         setUserEmail(session.user.email ?? null);
       } else {
         setEstado("loggedOut");
+        sendGAEvent("event", "Login_interno");
       }
     });
   }, []);
@@ -80,7 +81,12 @@ export default function LoginPerfil({ registroId }: Props) {
     setLoading(false);
   }
 
-  if (estado === "cargando") return null;
+  function handleSkip() {
+    sendGAEvent("event", "login_skip");
+    setEstado("skipped");
+  }
+
+  if (estado === "cargando" || estado === "skipped") return null;
 
   return (
     <motion.section
@@ -88,14 +94,16 @@ export default function LoginPerfil({ registroId }: Props) {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-40px" }}
       transition={{ duration: 0.5, ease: E }}
-      className="mt-8 rounded-xl p-8"
-      style={{ border: "1px solid rgba(133,104,243,0.20)", background: "rgba(133,104,243,0.06)" }}
+      className="mt-8 rounded-xl p-6 sm:p-8"
+      style={{ border: "1px solid rgba(133,104,243,0.25)", background: "rgba(133,104,243,0.07)" }}
     >
+
       {/* Estado: ya logueado */}
       {estado === "loggedIn" && (
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
           <div className="flex-1">
-            <p className="uppercase tracking-[0.2em] mb-2" style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.6rem", color: "#8568f3" }}>
+            <p className="uppercase tracking-[0.2em] mb-2"
+              style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.6rem", color: "#8568f3" }}>
               Perfil de carrera
             </p>
             <h3 className="text-white font-semibold text-xl mb-1" style={{ fontFamily: "var(--font-dm-sans)" }}>
@@ -108,7 +116,8 @@ export default function LoginPerfil({ registroId }: Props) {
             </p>
           </div>
           {vinculado ? (
-            <div className="flex items-center gap-2 px-5 py-3 rounded-lg" style={{ background: "rgba(133,104,243,0.15)", border: "1px solid rgba(133,104,243,0.30)" }}>
+            <div className="flex items-center gap-2 px-5 py-3 rounded-lg"
+              style={{ background: "rgba(133,104,243,0.15)", border: "1px solid rgba(133,104,243,0.30)" }}>
               <CheckCircle size={16} style={{ color: "#8568f3" }} />
               <span style={{ fontFamily: "var(--font-dm-sans)", fontSize: "0.88rem", color: "#e7e4fd" }}>Guardado</span>
             </div>
@@ -123,7 +132,8 @@ export default function LoginPerfil({ registroId }: Props) {
                 {loading ? <Loader2 size={15} className="animate-spin" /> : <ArrowRight size={15} />}
                 Guardar en mi perfil
               </button>
-              <a href="/perfil" style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.6rem", color: "rgba(133,104,243,0.65)", letterSpacing: "0.12em" }}
+              <a href="/perfil"
+                style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.6rem", color: "rgba(133,104,243,0.65)", letterSpacing: "0.12em" }}
                 className="uppercase hover:text-[#8568f3] transition-colors">
                 Ver perfil →
               </a>
@@ -135,14 +145,21 @@ export default function LoginPerfil({ registroId }: Props) {
       {/* Estado: no logueado */}
       {estado === "loggedOut" && (
         <div className="flex flex-col lg:flex-row gap-8">
+
+          {/* Lado izquierdo — misión */}
           <div className="flex-1">
-            <p className="uppercase tracking-[0.2em] mb-2" style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.6rem", color: "#8568f3" }}>
-              Perfil de carrera
+            <p className="uppercase tracking-[0.2em] mb-3"
+              style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.6rem", color: "#8568f3" }}>
+              Construye transparencia salarial
             </p>
-            <h3 className="text-white font-semibold text-xl mb-3" style={{ fontFamily: "var(--font-dm-sans)" }}>
-              Haz seguimiento de tu carrera y accede a información personalizada
+            <h3 className="text-white font-semibold text-xl mb-3 leading-snug"
+              style={{ fontFamily: "var(--font-dm-sans)" }}>
+              Cada perfil guardado ayuda a construir un mercado laboral más justo en Chile
             </h3>
-            <ul className="space-y-2 mb-4" style={{ fontFamily: "var(--font-dm-sans)", fontSize: "0.85rem", color: "rgba(255,255,255,0.45)" }}>
+            <p style={{ fontFamily: "var(--font-dm-sans)", fontSize: "0.85rem", color: "rgba(255,255,255,0.45)", lineHeight: 1.65 }} className="mb-4">
+              Al guardar tu análisis, tus datos (siempre anónimos) se suman a una base pública que ayuda a miles de trabajadores a negociar mejor y a organizaciones a detectar brechas salariales reales.
+            </p>
+            <ul className="space-y-2 mb-5" style={{ fontFamily: "var(--font-dm-sans)", fontSize: "0.85rem", color: "rgba(255,255,255,0.45)" }}>
               <li>· Historial de tus análisis a lo largo del tiempo</li>
               <li>· Alertas cuando el mercado de tu cargo cambie</li>
               <li>· Acceso a datos personalizados según tu perfil</li>
@@ -151,18 +168,19 @@ export default function LoginPerfil({ registroId }: Props) {
               <div className="flex items-center gap-2">
                 <ShieldCheck size={12} style={{ color: "rgba(133,104,243,0.60)", flexShrink: 0 }} />
                 <span style={{ fontFamily: "var(--font-dm-sans)", fontSize: "0.78rem", color: "rgba(255,255,255,0.35)" }}>
-                  Todo esto es <span style={{ color: "rgba(255,255,255,0.65)", fontWeight: 500 }}>gratis</span>, siempre. Las consultas salariales también.
+                  Gratis, siempre. Sin suscripciones ni condiciones.
                 </span>
               </div>
               <div className="flex items-center gap-2">
                 <ShieldCheck size={12} style={{ color: "rgba(133,104,243,0.60)", flexShrink: 0 }} />
                 <span style={{ fontFamily: "var(--font-dm-sans)", fontSize: "0.78rem", color: "rgba(255,255,255,0.35)" }}>
-                  Sin suscripciones — ni ahora, ni nunca.
+                  Tus datos son anónimos y nunca se venderán.
                 </span>
               </div>
             </div>
           </div>
 
+          {/* Lado derecho — opciones */}
           <div className="flex-1 max-w-sm">
             <AnimatePresence mode="wait">
               {magicSent ? (
@@ -185,6 +203,7 @@ export default function LoginPerfil({ registroId }: Props) {
                 </motion.div>
               ) : (
                 <motion.div key="form" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col gap-3">
+
                   {/* Google */}
                   <button
                     onClick={handleGoogle}
@@ -229,12 +248,29 @@ export default function LoginPerfil({ registroId }: Props) {
                     </button>
                   </form>
                   <p style={{ fontFamily: "var(--font-dm-sans)", fontSize: "0.72rem", color: "rgba(255,255,255,0.25)", textAlign: "center" }}>
-                    Te enviamos un link · sin contraseña · siempre gratis
+                    Magic link · sin contraseña · siempre gratis
                   </p>
+
+                  <div className="flex items-center gap-3 pt-1">
+                    <div className="flex-1 h-px" style={{ background: "rgba(255,255,255,0.07)" }} />
+                    <span style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.58rem", color: "rgba(255,255,255,0.18)", letterSpacing: "0.15em" }}>O</span>
+                    <div className="flex-1 h-px" style={{ background: "rgba(255,255,255,0.07)" }} />
+                  </div>
+
+                  {/* Continuar sin registrarse */}
+                  <button
+                    onClick={handleSkip}
+                    className="w-full flex items-center justify-center gap-2 py-3 rounded-lg font-medium transition-all hover:bg-white/8 active:scale-[0.98]"
+                    style={{ fontFamily: "var(--font-dm-sans)", fontSize: "0.88rem", color: "rgba(255,255,255,0.75)", border: "1px solid rgba(255,255,255,0.22)" }}
+                  >
+                    Continuar sin registrarme
+                  </button>
+
                 </motion.div>
               )}
             </AnimatePresence>
           </div>
+
         </div>
       )}
     </motion.section>
