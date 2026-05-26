@@ -455,10 +455,10 @@ export default function Formulario() {
                     value={form.sexo} onChange={handleChange}
                     className={selectClass}>
                     <option value="" disabled>Selecciona...</option>
-                    <option value="N">Prefiero no responder</option>
                     <option value="F">Mujer</option>
                     <option value="M">Hombre</option>
                     <option value="O">Otro</option>
+                    <option value="N">Prefiero no responder</option>
                   </select>
                 </div>
 

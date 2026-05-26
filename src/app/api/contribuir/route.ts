@@ -43,7 +43,9 @@ export async function POST(request: Request) {
     !region ||
     !tamano_empresa ||
     salario_min == null ||
-    salario_max == null
+    salario_max == null ||
+    !sexo ||
+    !["M","F","O","N"].includes(sexo)
   ) {
     return NextResponse.json({ error: "Faltan campos requeridos" }, { status: 400 });
   }
