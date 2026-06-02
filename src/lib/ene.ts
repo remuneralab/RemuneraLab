@@ -1,31 +1,31 @@
 // Fuente: INE · Encuesta Nacional de Empleo (ENE)
-// Período: enero 2026 (trimestre móvil Oct–Dic 2025 / Ene 2026)
+// Período: Ene–Mar 2026 (trimestre móvil)
+// Fuente secundaria: Termómetro Laboral Nacional, Observatorio Laboral SENCE
 // Tasa = desocupados / fuerza de trabajo × 100
-// Datasets: DF_DES_SEXO + DF_FDT_SEXO
 
-export const ENE_PERIODO = "enero 2026";
+export const ENE_PERIODO = "Ene–Mar 2026";
 
 export const TASA_NACIONAL   = 8.9;
 export const TASA_HOMBRES    = 8.1;
 export const TASA_MUJERES    = 10.0;
 
 const TASA_POR_REGION: Record<string, number> = {
-  "Arica y Parinacota": 8.7,
-  "Tarapacá":           7.2,
-  "Antofagasta":        8.1,
+  "Arica y Parinacota": 7.7,
+  "Tarapacá":           8.7,
+  "Antofagasta":        7.2,
   "Atacama":            8.1,
-  "Coquimbo":           9.8,
-  "Valparaíso":         7.5,
-  "Metropolitana":      8.5,
-  "O'Higgins":          10.0,
-  "Maule":              7.8,
-  "Ñuble":              6.6,
-  "Biobío":             4.8,
-  "La Araucanía":       6.6,
-  "Los Ríos":           9.6,
-  "Los Lagos":          8.1,
-  "Aysén":              7.7,
-  "Magallanes":         8.4,
+  "Coquimbo":           8.1,
+  "Valparaíso":         9.8,
+  "Metropolitana":      9.6,
+  "O'Higgins":          7.5,
+  "Maule":              8.5,
+  "Ñuble":              8.4,
+  "Biobío":             10.0,
+  "La Araucanía":       7.8,
+  "Los Ríos":           8.1,
+  "Los Lagos":          6.6,
+  "Aysén":              4.8,
+  "Magallanes":         6.6,
 };
 
 export function getTasaRegion(region: string): number | null {

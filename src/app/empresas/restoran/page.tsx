@@ -34,6 +34,9 @@ function fmtM(n: number) {
 function fmtAxis(n: number) {
   return n >= 1_000_000 ? `$${(n / 1_000_000).toFixed(1)}M` : `$${(n / 1000).toFixed(0)}k`;
 }
+function fmtK(n: number) {
+  return `$${Math.round(n / 1000)}k`;
+}
 
 // ─── M01 — Benchmark salarial ─────────────────────────────────────────────────
 type BRow = { cargo: string; p25: number; p50: number; p75: number; empresa: number; percentil: number; estado: "Óptimo" | "Alerta" | "Riesgo"; n: number };
@@ -252,6 +255,18 @@ const COSTO_ROT: CostoRotRow[] = [
   { categoria: "Otros cargos núcleo", salario_ref: 700_000, aviso: 60_000, seleccion: 50_000, documentacion: 25_000, vacante: 180_000, curva_aprendizaje: 250_000, trainer: 75_000, total: 640_000,  factor_meses: 0.91, n_salidas_estimadas: 1 },
 ];
 
+// Lookup: costo de reemplazar UN empleado de un cargo dado (from COSTO_ROT, fallback a "Otros")
+const COSTO_REEMPLAZO_MAP: Record<string, number> = {
+  "Ayudante de Cocina":  622_000,
+  "Garzón/a Senior":     757_000,
+  "Bartender":           805_000,
+  "Auxiliar de Limpieza":380_000,
+  "Encargado de Bodega": 640_000,
+};
+function costoReemplazo(cargo: string): number {
+  return COSTO_REEMPLAZO_MAP[cargo] ?? COSTO_ROT.find(r => r.categoria === "Otros cargos núcleo")?.total ?? 640_000;
+}
+
 // ─── M06 — ICL turismo / servicios ───────────────────────────────────────────
 const ICL = { trimestre: "T1 2026", icl_sector: 4.1, icl_nac: 3.9, ir_sector: 3.7, ir_nac: 3.5, ipc: 4.0 };
 
@@ -315,25 +330,22 @@ const RECS = [
 ];
 
 // ─── Tooltips ──────────────────────────────────────────────────────────────────
-const TS = {
-  background: "#0D2240", border: "1px solid rgba(0,180,216,0.2)",
-  borderRadius: "10px", boxShadow: "0 10px 30px rgba(0,0,0,0.4)", fontSize: "12px",
-};
+const TS = { background: "#ffffff", border: "1px solid #e5e2de", borderRadius: "8px", fontSize: "0.78rem", color: "#1c1c1a", boxShadow: "0 2px 8px rgba(0,0,0,0.08)" };
 
 function TipDotacion({ active, payload, label }: { active?: boolean; payload?: Array<{ name: string; value: number; fill: string }>; label?: string }) {
   if (!active || !payload?.length) return null;
   const row = DOTACION.find(d => d.mes === label);
   return (
     <div style={TS} className="p-3 text-xs">
-      <p className="font-bold text-[#00B4D8] mb-2">{label}</p>
+      <p className="font-bold text-[#041635] mb-2">{label}</p>
       {payload.map((p) => (
         <div key={p.name} className="flex items-center gap-2 mb-1">
           <span className="w-2 h-2 rounded-full" style={{ background: p.fill }} />
-          <span className="text-white/45">{p.name === "nucleo" ? "Núcleo" : "Variable"}:</span>
-          <span className="font-bold text-white">{p.value}</span>
+          <span className="text-[#75777f]">{p.name === "nucleo" ? "Núcleo" : "Variable"}:</span>
+          <span className="font-bold text-[#1c1c1a]">{p.value}</span>
         </div>
       ))}
-      {row && <p className="text-white/35 mt-2 pt-2 border-t border-white/10">Costo empleador: {fmtM(row.costoEmpl)}</p>}
+      {row && <p className="text-[#9a9a9a] mt-2 pt-2 border-t border-[#e5e2de]">Costo empleador: {fmtM(row.costoEmpl)}</p>}
     </div>
   );
 }
@@ -342,11 +354,11 @@ function TipBenchmark({ active, payload, label }: { active?: boolean; payload?: 
   if (!active || !payload?.length) return null;
   return (
     <div style={TS} className="p-3 text-xs">
-      <p className="font-bold text-[#00B4D8] mb-2">{label}</p>
+      <p className="font-bold text-[#041635] mb-2">{label}</p>
       {payload.map((p) => (
         <div key={p.name} className="flex items-center gap-2 mb-1">
-          <span className="text-white/45">{p.name}:</span>
-          <span className="font-bold text-white">{fmtCLP(p.value)}</span>
+          <span className="text-[#75777f]">{p.name}:</span>
+          <span className="font-bold text-[#1c1c1a]">{fmtCLP(p.value)}</span>
         </div>
       ))}
     </div>
@@ -356,17 +368,17 @@ function TipBenchmark({ active, payload, label }: { active?: boolean; payload?: 
 // ─── Sub-componentes ──────────────────────────────────────────────────────────
 function estadoColor(e: "Óptimo" | "Alerta" | "Riesgo") {
   return {
-    Óptimo: { bg: "rgba(6,214,160,0.12)", text: "#06D6A0", dot: "#06D6A0" },
-    Alerta: { bg: "rgba(247,201,72,0.12)", text: "#F7C948", dot: "#F7C948" },
-    Riesgo: { bg: "rgba(255,77,90,0.12)",  text: "#FF4D5A", dot: "#FF4D5A" },
+    Óptimo: { bg: "rgba(42,125,79,0.10)", text: "#2a7d4f", dot: "#2a7d4f" },
+    Alerta: { bg: "rgba(131,85,0,0.10)", text: "#835500", dot: "#835500" },
+    Riesgo: { bg: "rgba(186,26,26,0.10)",  text: "#ba1a1a", dot: "#ba1a1a" },
   }[e];
 }
 
 function riesgoColor(r: number) {
-  if (r >= 65) return { bar: "bg-red-500",    text: "text-red-400",    badge: "bg-red-900/20 text-red-400",       label: "Crítico"  };
-  if (r >= 45) return { bar: "bg-orange-400", text: "text-orange-400", badge: "bg-orange-900/20 text-orange-400", label: "Alto"     };
-  if (r >= 25) return { bar: "bg-yellow-400", text: "text-yellow-400", badge: "bg-yellow-900/20 text-yellow-400", label: "Moderado" };
-  return              { bar: "bg-emerald-500", text: "text-emerald-400", badge: "bg-emerald-900/20 text-emerald-400", label: "Bajo"  };
+  if (r >= 65) return { bar: "bg-[#ba1a1a]",  text: "text-[#ba1a1a]",  badge: "bg-[rgba(186,26,26,0.08)] text-[#ba1a1a]",    label: "Crítico"  };
+  if (r >= 45) return { bar: "bg-[#835500]",  text: "text-[#835500]",  badge: "bg-[rgba(131,85,0,0.08)] text-[#835500]",     label: "Alto"     };
+  if (r >= 25) return { bar: "bg-[#835500]",  text: "text-[#835500]",  badge: "bg-[rgba(131,85,0,0.06)] text-[#835500]",     label: "Moderado" };
+  return              { bar: "bg-[#2a7d4f]",  text: "text-[#2a7d4f]",  badge: "bg-[rgba(42,125,79,0.08)] text-[#2a7d4f]",   label: "Bajo"     };
 }
 
 // ─── BandChart ───────────────────────────────────────────────────────────────
@@ -381,9 +393,9 @@ function BandChart({ b }: { b: BandaRow }) {
   const empPct = pct(b.empresa);
 
   const sources = [
-    { key: "esi",    label: "ESI INE 2024",      color: "#00B4D8", data: b.esi    },
-    { key: "avisos", label: "Avisos lab. 90d",    color: "#F7C948", data: b.avisos },
-    { key: "rl",     label: "RemuneraLab",        color: "#8568f3", data: b.rl    },
+    { key: "esi",    label: "ESI INE 2024",      color: "#041635", data: b.esi    },
+    { key: "avisos", label: "Avisos lab. 90d",    color: "#835500", data: b.avisos },
+    { key: "rl",     label: "RemuneraLab",        color: "#374668", data: b.rl    },
   ];
 
   return (
@@ -393,16 +405,16 @@ function BandChart({ b }: { b: BandaRow }) {
         const p50p = pct(data.p50);
         const p75p = pct(data.p75);
         const diff = ((b.empresa - data.p50) / data.p50) * 100;
-        const dc   = diff < -5 ? "#FF4D5A" : diff < 0 ? "#F7C948" : "#06D6A0";
+        const dc   = diff < -5 ? "#ba1a1a" : diff < 0 ? "#835500" : "#2a7d4f";
         return (
           <div key={key}>
             <div className="flex items-center justify-between mb-1.5 flex-wrap gap-1">
               <div className="flex items-center gap-1.5">
                 <span className="w-2 h-2 rounded-full shrink-0" style={{ background: color }} />
-                <span style={{ fontSize: "0.6rem", color: "rgba(255,255,255,0.4)", fontFamily: "var(--font-space-mono)" }}>{label}</span>
+                <span style={{ fontSize: "0.6rem", color: "#75777f", fontFamily: "var(--font-space-mono)" }}>{label}</span>
               </div>
               <div className="flex items-center gap-3">
-                <span style={{ fontSize: "0.58rem", color: "rgba(255,255,255,0.22)", fontFamily: "var(--font-space-mono)" }}>
+                <span style={{ fontSize: "0.58rem", color: "#aaaaaa", fontFamily: "var(--font-space-mono)" }}>
                   P25 {fmtCLP(data.p25)} · P50 {fmtCLP(data.p50)} · P75 {fmtCLP(data.p75)}
                 </span>
                 <span style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.64rem", fontWeight: 700, color: dc }}>
@@ -411,27 +423,27 @@ function BandChart({ b }: { b: BandaRow }) {
               </div>
             </div>
             <div className="relative h-5">
-              <div className="absolute inset-x-0 top-1/2 h-px -translate-y-1/2 rounded-full" style={{ background: "rgba(255,255,255,0.06)" }} />
+              <div className="absolute inset-x-0 top-1/2 h-px -translate-y-1/2 rounded-full" style={{ background: "#eae8e4" }} />
               <div className="absolute top-1/2 -translate-y-1/2 h-3 rounded-full"
                 style={{ left: `${p25p}%`, width: `${p75p - p25p}%`, background: `${color}18`, border: `1px solid ${color}28` }} />
               <div className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-3 h-3 rounded-full"
                 style={{ left: `${p50p}%`, background: color, zIndex: 2 }} />
               <div className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-2.5 h-2.5 rotate-45"
-                style={{ left: `${empPct}%`, background: "rgba(255,255,255,0.85)", zIndex: 3 }} />
+                style={{ left: `${empPct}%`, background: "#1c1c1a", zIndex: 3 }} />
             </div>
           </div>
         );
       })}
-      <div className="flex flex-wrap items-center gap-x-5 gap-y-1 pt-2" style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}>
+      <div className="flex flex-wrap items-center gap-x-5 gap-y-1 pt-2" style={{ borderTop: "1px solid #e5e2de" }}>
         {([
-          { sym: "●", label: "P50 fuente", c: "rgba(255,255,255,0.28)" },
-          { sym: "◆", label: `Empresa · ${fmtCLP(b.empresa)}`, c: "rgba(255,255,255,0.50)" },
+          { sym: "●", label: "P50 fuente", c: "#9a9a9a" },
+          { sym: "◆", label: `Empresa · ${fmtCLP(b.empresa)}`, c: "#44474e" },
         ] as const).map(l => (
           <span key={l.label} style={{ fontSize: "0.58rem", color: l.c, fontFamily: "var(--font-space-mono)" }}>
             {l.sym}  {l.label}
           </span>
         ))}
-        <span style={{ marginLeft: "auto", fontSize: "0.56rem", color: "rgba(255,255,255,0.20)", fontFamily: "var(--font-space-mono)" }}>
+        <span style={{ marginLeft: "auto", fontSize: "0.56rem", color: "#aaaaaa", fontFamily: "var(--font-space-mono)" }}>
           Banda P25–P75 sombreada
         </span>
       </div>
@@ -460,16 +472,16 @@ function Sidebar({ section, onSection }: { section: Section; onSection: (s: Sect
   return (
     <aside
       className="hidden lg:flex fixed left-0 top-0 h-full flex-col"
-      style={{ width: "240px", background: "rgba(10,15,30,0.98)", borderRight: "1px solid rgba(0,180,216,0.10)", zIndex: 40 }}
+      style={{ width: "240px", background: "#041635", borderRight: "1px solid rgba(255,255,255,0.08)", zIndex: 40 }}
     >
-      <div className="px-6 py-5" style={{ borderBottom: "1px solid rgba(0,180,216,0.08)" }}>
+      <div className="px-6 py-5" style={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
         <span className="font-bold italic text-white" style={{ fontFamily: "var(--font-dm-serif)", fontSize: "1.2rem" }}>RemuneraLab</span>
-        <p style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.46rem", letterSpacing: "0.22em", color: "rgba(0,194,255,0.42)", textTransform: "uppercase", marginTop: "4px" }}>
+        <p style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.46rem", letterSpacing: "0.22em", color: "rgba(255,183,77,0.65)", textTransform: "uppercase", marginTop: "4px" }}>
           Demo empresarial
         </p>
       </div>
-      <div className="px-6 py-3" style={{ borderBottom: "1px solid rgba(0,180,216,0.05)" }}>
-        <p style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.46rem", letterSpacing: "0.14em", color: "rgba(0,180,216,0.35)", textTransform: "uppercase", lineHeight: 1.6 }}>
+      <div className="px-6 py-3" style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+        <p style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.46rem", letterSpacing: "0.14em", color: "rgba(255,255,255,0.4)", textTransform: "uppercase", lineHeight: 1.6 }}>
           {EMPRESA}
         </p>
       </div>
@@ -480,17 +492,17 @@ function Sidebar({ section, onSection }: { section: Section; onSection: (s: Sect
           onClick={() => onSection("resumen")}
           className="flex items-center gap-3 px-3 py-2.5 rounded-lg mb-1 transition-all hover:brightness-110 cursor-pointer"
           style={{
-            background: section === "resumen" ? "rgba(0,180,216,0.14)" : "rgba(0,180,216,0.07)",
-            border: section === "resumen" ? "1px solid rgba(0,180,216,0.35)" : "1px solid rgba(0,180,216,0.20)",
+            background: section === "resumen" ? "rgba(255,183,77,0.15)" : "rgba(255,255,255,0.04)",
+            border: section === "resumen" ? "1px solid rgba(255,183,77,0.4)" : "1px solid rgba(255,255,255,0.08)",
           }}
         >
-          <LayoutDashboard size={14} style={{ color: "#00C2FF", flexShrink: 0 }} />
-          <span style={{ fontFamily: "var(--font-dm-sans)", fontSize: "0.82rem", color: "#00C2FF", fontWeight: 500 }}>
+          <LayoutDashboard size={14} style={{ color: "#FFB74D", flexShrink: 0 }} />
+          <span style={{ fontFamily: "var(--font-dm-sans)", fontSize: "0.82rem", color: "#FFB74D", fontWeight: 500 }}>
             Panel principal
           </span>
         </div>
 
-        <div style={{ height: "1px", background: "rgba(255,255,255,0.05)", margin: "4px 4px 6px" }} />
+        <div style={{ height: "1px", background: "rgba(255,255,255,0.08)", margin: "4px 4px 6px" }} />
 
         {NAV.map(item => {
           const Icon = item.icon;
@@ -501,29 +513,29 @@ function Sidebar({ section, onSection }: { section: Section; onSection: (s: Sect
               onClick={() => onSection(item.id)}
               className="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors cursor-pointer"
               style={{
-                background: active ? "rgba(0,180,216,0.12)" : "transparent",
-                border: active ? "1px solid rgba(0,180,216,0.18)" : "1px solid transparent",
+                background: active ? "rgba(255,183,77,0.12)" : "transparent",
+                border: active ? "1px solid rgba(255,183,77,0.3)" : "1px solid transparent",
               }}
             >
-              <Icon size={14} style={{ color: active ? "#00C2FF" : "rgba(255,255,255,0.22)", flexShrink: 0 }} />
-              <span style={{ fontFamily: "var(--font-dm-sans)", fontSize: "0.82rem", color: active ? "rgba(255,255,255,0.85)" : "rgba(255,255,255,0.30)", fontWeight: active ? 500 : 400 }}>
+              <Icon size={14} style={{ color: active ? "#FFB74D" : "rgba(255,255,255,0.3)", flexShrink: 0 }} />
+              <span style={{ fontFamily: "var(--font-dm-sans)", fontSize: "0.82rem", color: active ? "#ffffff" : "rgba(255,255,255,0.4)", fontWeight: active ? 500 : 400 }}>
                 {item.label}
               </span>
             </div>
           );
         })}
       </nav>
-      <div className="px-5 py-4" style={{ borderTop: "1px solid rgba(0,180,216,0.08)" }}>
+      <div className="px-5 py-4" style={{ borderTop: "1px solid rgba(255,255,255,0.08)" }}>
         <span
           className="inline-block mb-3 text-[10px] px-2.5 py-1 rounded-full font-bold uppercase tracking-wider"
-          style={{ background: "rgba(6,214,160,0.12)", color: "#06D6A0", border: "1px solid rgba(6,214,160,0.2)", fontFamily: "var(--font-space-mono)" }}
+          style={{ background: "rgba(255,183,77,0.15)", color: "#FFB74D", border: "1px solid rgba(255,183,77,0.3)", fontFamily: "var(--font-space-mono)" }}
         >
           Demo activa
         </span>
         <a
           href="/empresas/reporte"
           className="flex items-center gap-1.5 hover:opacity-75 transition-opacity"
-          style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.46rem", letterSpacing: "0.14em", color: "rgba(0,194,255,0.45)", textTransform: "uppercase" }}
+          style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.46rem", letterSpacing: "0.14em", color: "rgba(255,255,255,0.4)", textTransform: "uppercase" }}
         >
           Imprimir reporte
         </a>
@@ -536,7 +548,7 @@ function MobileNav({ section, onSection }: { section: Section; onSection: (s: Se
   return (
     <div
       className="lg:hidden fixed top-0 left-0 right-0 z-40"
-      style={{ background: "rgba(10,15,30,0.98)", borderBottom: "1px solid rgba(0,180,216,0.10)" }}
+      style={{ background: "#041635", borderBottom: "1px solid rgba(255,255,255,0.08)" }}
     >
       <div className="flex items-center justify-between px-5 h-12">
         <span className="font-bold italic text-white" style={{ fontFamily: "var(--font-dm-serif)", fontSize: "1.1rem" }}>RemuneraLab</span>
@@ -544,20 +556,20 @@ function MobileNav({ section, onSection }: { section: Section; onSection: (s: Se
           <button
             onClick={() => onSection("resumen")}
             className="flex items-center gap-1 text-xs px-3 py-1 rounded-lg font-semibold hover:opacity-80 transition-opacity"
-            style={{ background: "rgba(0,194,255,0.12)", color: "#00C2FF", border: "1px solid rgba(0,194,255,0.25)" }}
+            style={{ background: "rgba(255,183,77,0.15)", color: "#FFB74D", border: "1px solid rgba(255,183,77,0.3)" }}
           >
             <LayoutDashboard size={11} /> Panel principal
           </button>
           <a
             href="/empresas/reporte"
             className="text-xs px-3 py-1 rounded-lg font-semibold hover:opacity-80 transition-opacity"
-            style={{ background: "rgba(0,194,255,0.1)", color: "#00C2FF", border: "1px solid rgba(0,194,255,0.15)" }}
+            style={{ background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.6)", border: "1px solid rgba(255,255,255,0.12)" }}
           >
             Imprimir
           </a>
         </div>
       </div>
-      <div className="flex overflow-x-auto px-2 pb-2 gap-1" style={{ borderTop: "1px solid rgba(0,180,216,0.06)" }}>
+      <div className="flex overflow-x-auto px-2 pb-2 gap-1" style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}>
         {NAV.map(item => {
           const Icon = item.icon;
           const active = section === item.id;
@@ -567,12 +579,12 @@ function MobileNav({ section, onSection }: { section: Section; onSection: (s: Se
               onClick={() => onSection(item.id)}
               className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg whitespace-nowrap transition-all shrink-0"
               style={{
-                background: active ? "rgba(0,180,216,0.14)" : "transparent",
-                border: active ? "1px solid rgba(0,180,216,0.2)" : "1px solid transparent",
-                color: active ? "#00C2FF" : "rgba(255,255,255,0.30)",
+                background: active ? "rgba(255,183,77,0.12)" : "transparent",
+                border: active ? "1px solid rgba(255,183,77,0.3)" : "1px solid transparent",
+                color: active ? "#FFB74D" : "rgba(255,255,255,0.4)",
               }}
             >
-              <Icon size={10} style={{ color: active ? "#00C2FF" : "rgba(255,255,255,0.28)" }} />
+              <Icon size={10} style={{ color: active ? "#FFB74D" : "rgba(255,255,255,0.3)" }} />
               <span style={{ fontSize: "0.68rem", fontFamily: "var(--font-dm-sans)" }}>{item.label}</span>
             </button>
           );
@@ -605,7 +617,7 @@ function PasswordGate({ onAuth }: { onAuth: () => void }) {
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-6" style={{ background: "#0A0F1E" }}>
+    <div className="min-h-screen flex flex-col items-center justify-center px-6" style={{ background: "#fcf9f5" }}>
       <div
         className="pointer-events-none fixed inset-0"
         style={{
@@ -613,8 +625,6 @@ function PasswordGate({ onAuth }: { onAuth: () => void }) {
           backgroundSize: "48px 48px",
         }}
       />
-      <div className="pointer-events-none fixed -top-40 left-1/2 -translate-x-1/2 w-[600px] h-[600px] rounded-full"
-        style={{ background: "radial-gradient(circle,rgba(0,194,255,0.1) 0%,transparent 65%)" }} />
 
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -624,22 +634,22 @@ function PasswordGate({ onAuth }: { onAuth: () => void }) {
         style={shake ? { animation: "shake 0.4s ease" } : {}}
       >
         <div className="text-center mb-8">
-          <p className="font-bold italic mb-2" style={{ fontFamily: "var(--font-dm-serif)", color: "white", fontSize: "1.6rem" }}>
+          <p className="font-bold italic mb-2" style={{ fontFamily: "var(--font-dm-serif)", color: "#041635", fontSize: "1.6rem" }}>
             RemuneraLab
           </p>
-          <p style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.58rem", color: "rgba(255,255,255,0.3)", letterSpacing: "0.22em", textTransform: "uppercase" }}>
+          <p style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.58rem", color: "rgba(4,22,53,0.4)", letterSpacing: "0.22em", textTransform: "uppercase" }}>
             Demo empresarial · Acceso restringido
           </p>
         </div>
 
-        <div className="rounded-2xl p-8" style={{ background: "#1C2438", border: "1px solid rgba(255,255,255,0.08)" }}>
+        <div className="rounded-2xl p-8" style={{ background: "#ffffff", border: "1px solid #e5e2de" }}>
           <div className="flex justify-center mb-6">
-            <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ background: "rgba(0,194,255,0.12)", border: "1px solid rgba(0,194,255,0.2)" }}>
-              <Lock size={20} style={{ color: "#00C2FF" }} />
+            <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ background: "rgba(4,22,53,0.08)", border: "1px solid #c5c6cf" }}>
+              <Lock size={20} style={{ color: "#041635" }} />
             </div>
           </div>
-          <h1 className="text-white text-center font-bold mb-1" style={{ fontSize: "1.15rem" }}>Acceso al demo</h1>
-          <p className="text-center mb-6" style={{ fontSize: "0.78rem", color: "rgba(255,255,255,0.35)" }}>
+          <h1 className="text-[#1c1c1a] text-center font-bold mb-1" style={{ fontSize: "1.15rem" }}>Acceso al demo</h1>
+          <p className="text-center mb-6" style={{ fontSize: "0.78rem", color: "#75777f" }}>
             Restaurante · Viña del Mar · 2026
           </p>
 
@@ -651,14 +661,14 @@ function PasswordGate({ onAuth }: { onAuth: () => void }) {
                 value={val}
                 onChange={(e) => { setVal(e.target.value); setErr(false); }}
                 placeholder="Contraseña de acceso"
-                className="w-full px-4 py-3.5 pr-11 rounded-lg text-white text-sm placeholder:text-white/25 transition-all focus:outline-none"
+                className="w-full px-4 py-3.5 pr-11 rounded-lg text-white text-sm placeholder:text-[#9a9a9a] transition-all focus:outline-none"
                 style={{
-                  background: "rgba(255,255,255,0.05)",
-                  border: err ? "1px solid rgba(255,77,90,0.5)" : "1px solid rgba(255,255,255,0.1)",
+                  background: "#e5e2de",
+                  border: err ? "1px solid #ba1a1a" : "1px solid #c5c6cf",
                 }}
               />
               <button type="button" onClick={() => setShow(v => !v)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/60 transition-colors">
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#9a9a9a] hover:text-white/60 transition-colors">
                 {show ? <EyeOff size={14} /> : <Eye size={14} />}
               </button>
             </div>
@@ -666,7 +676,7 @@ function PasswordGate({ onAuth }: { onAuth: () => void }) {
             <AnimatePresence>
               {err && (
                 <motion.p initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
-                  className="text-center text-xs" style={{ color: "#FF4D5A" }}>
+                  className="text-center text-xs" style={{ color: "#ba1a1a" }}>
                   Contraseña incorrecta
                 </motion.p>
               )}
@@ -675,14 +685,14 @@ function PasswordGate({ onAuth }: { onAuth: () => void }) {
             <button
               type="submit"
               className="py-3.5 rounded-lg font-semibold text-sm flex items-center justify-center gap-2 hover:opacity-90 transition-opacity"
-              style={{ background: "linear-gradient(135deg,#00E5C4,#2EC4B6)", color: "#0A0F1E" }}
+              style={{ background: "#041635", color: "#ffffff" }}
             >
               <ArrowRight size={16} /> Ingresar al dashboard
             </button>
           </form>
         </div>
 
-        <p className="text-center mt-5" style={{ fontSize: "0.72rem", color: "rgba(255,255,255,0.2)" }}>
+        <p className="text-center mt-5" style={{ fontSize: "0.72rem", color: "#9a9a9a" }}>
           Acceso exclusivo para el período de demo · {FECHA}
         </p>
       </motion.div>
@@ -703,6 +713,7 @@ function PasswordGate({ onAuth }: { onAuth: () => void }) {
 // ─── Dashboard principal ──────────────────────────────────────────────────────
 function Dashboard() {
   const [benchTab,    setBenchTab]    = useState<"table" | "chart">("table");
+  const [benchExpand, setBenchExpand] = useState(false);
   const [expandedNucleo, setExpandedNucleo] = useState<number | null>(null);
   const [mercadoTab,  setMercadoTab]  = useState<"presion" | "drift">("presion");
   const [costoExpand, setCostoExpand] = useState(false);
@@ -738,14 +749,8 @@ function Dashboard() {
   }
 
   return (
-    <div className="relative min-h-screen" style={{ background: "#0A0F1E", fontFamily: "var(--font-dm-sans)" }}>
+    <div className="relative min-h-screen" style={{ background: "#fcf9f5", fontFamily: "var(--font-dm-sans)" }}>
       {/* Glows */}
-      <div className="pointer-events-none fixed -top-40 -right-40 w-[700px] h-[700px] rounded-full"
-        style={{ background: "radial-gradient(circle,rgba(0,180,216,0.1) 0%,transparent 65%)" }} />
-      <div className="pointer-events-none fixed bottom-0 -left-24 w-[500px] h-[500px] rounded-full"
-        style={{ background: "radial-gradient(circle,rgba(46,196,182,0.07) 0%,transparent 65%)" }} />
-      <div className="pointer-events-none fixed inset-0"
-        style={{ backgroundImage: "linear-gradient(rgba(0,180,216,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,180,216,0.03) 1px,transparent 1px)", backgroundSize: "64px 64px" }} />
 
       <MobileNav section={activeSection} onSection={switchSection} />
       <Sidebar section={activeSection} onSection={switchSection} />
@@ -754,268 +759,437 @@ function Dashboard() {
         <div className="px-4 sm:px-6 pt-[100px] lg:pt-8 pb-12 max-w-5xl mx-auto">
 
         {activeSection === "resumen" && (<>
-        {/* ── Panel principal — Resumen empresa ── */}
-        <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45, ease: E }} className="mb-8">
-          <p style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.6rem", color: "#00C2FF", letterSpacing: "0.25em", textTransform: "uppercase", marginBottom: "10px" }}>
-            Panel principal · {SECTOR} · {REGION}
-          </p>
-          <h1 className="text-3xl font-bold text-white mb-2">{EMPRESA}</h1>
-          <p style={{ fontSize: "0.82rem", color: "rgba(255,255,255,0.4)" }}>
-            {FECHA} · Resumen ejecutivo · 4 indicadores clave de tu empresa
+
+        {/* ── Vista General ── */}
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35, ease: E }}
+          className="flex items-start justify-between gap-4 mb-6 flex-wrap">
+          <div>
+            <h1 className="text-2xl font-bold text-[#1c1c1a]">Vista General</h1>
+            <p style={{ fontSize: "0.85rem", color: "#75777f", marginTop: "2px" }}>
+              {FECHA} · 20 colaboradores activos
+            </p>
+          </div>
+          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-semibold"
+            style={{ background: "rgba(186,26,26,0.08)", color: "#ba1a1a", border: "1px solid rgba(186,26,26,0.18)" }}>
+            <AlertTriangle size={13} /> 2 alertas activas
+          </span>
+        </motion.div>
+
+        {/* ─── Alerta principal ─── */}
+        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.08, ease: E }}
+          className="rounded-xl p-5 mb-6 flex items-start justify-between gap-4 flex-wrap"
+          style={{ background: "rgba(186,26,26,0.04)", border: "1px solid rgba(186,26,26,0.18)", borderLeft: "4px solid #ba1a1a" }}>
+          <div className="flex-1 min-w-0">
+            <p className="font-bold text-[#1c1c1a] mb-1" style={{ fontSize: "1rem" }}>
+              Tu Ayudante de Cocina y tus Garzones están bajo el mercado
+            </p>
+            <div className="flex flex-wrap gap-x-5 gap-y-1 mt-2">
+              <span style={{ fontSize: "0.82rem", color: "#44474e" }}>
+                Ayudante Cocina paga <strong>{fmtCLP(587_000)}</strong> · Mercado <strong>{fmtCLP(650_000)}</strong>
+              </span>
+              <span style={{ fontSize: "0.82rem", color: "#44474e" }}>
+                Garzón paga <strong>{fmtCLP(710_000)}</strong> · Mercado <strong>{fmtCLP(720_000)}</strong>
+              </span>
+            </div>
+          </div>
+          <div className="text-right shrink-0">
+            <p style={{ fontSize: "0.72rem", color: "#75777f", marginBottom: "2px" }}>Reemplazar los 2 Ayudantes de Cocina</p>
+            <p className="font-bold text-[#ba1a1a]" style={{ fontSize: "1.5rem", lineHeight: 1 }}>{fmtM(2 * costoReemplazo("Ayudante de Cocina"))}</p>
+            <button onClick={() => switchSection("costo_rot")}
+              className="inline-flex items-center gap-1 mt-1 hover:underline"
+              style={{ fontSize: "0.75rem", color: "#041635", fontWeight: 600 }}>
+              ¿Cómo se calcula? <ChevronRight size={11} />
+            </button>
+          </div>
+        </motion.div>
+
+        {/* ─── Estado del equipo ─── */}
+        <p className="font-semibold text-[#1c1c1a] mb-3" style={{ fontSize: "0.9rem" }}>Estado de tu equipo</p>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
+          {(["Garzón/a Senior","Bartender","Cocinero de Partida","Ayudante de Cocina"] as const).map((cargo, i) => {
+            const b = BENCHMARK.find(x => x.cargo === cargo)!;
+            const col = estadoColor(b.estado);
+            const gap = b.empresa - b.p50;
+            return (
+              <motion.div key={cargo} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.12 + i * 0.06, ease: E }}
+                onClick={() => switchSection("benchmark")}
+                className="rounded-xl p-4 bg-white border border-[#e5e2de] cursor-pointer hover:shadow-md transition-shadow">
+                <div className="flex items-start justify-between gap-1 mb-3">
+                  <p className="font-semibold text-[#1c1c1a] leading-snug" style={{ fontSize: "0.8rem" }}>{b.cargo}</p>
+                  <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold shrink-0"
+                    style={{ background: col.bg, color: col.text }}>
+                    {b.estado}
+                  </span>
+                </div>
+                <p className="font-bold text-[#1c1c1a] tabular-nums" style={{ fontSize: "1.1rem" }}>{fmtCLP(b.empresa)}</p>
+                <p style={{ fontSize: "0.72rem", color: "#75777f", marginTop: "2px" }}>Mercado {fmtCLP(b.p50)}</p>
+                <p className="font-semibold tabular-nums mt-1.5" style={{ fontSize: "0.75rem", color: gap >= 0 ? "#2a7d4f" : "#ba1a1a" }}>
+                  {gap >= 0 ? "+" : ""}{fmtCLP(Math.abs(gap))}/mes {gap >= 0 ? "sobre" : "bajo"} mercado
+                </p>
+              </motion.div>
+            );
+          })}
+        </div>
+
+        {/* ─── ¿Qué te conviene hacer? ─── */}
+        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.38, ease: E }}
+          className="rounded-xl border border-[#e5e2de] bg-white p-5 mb-5">
+          <div className="flex items-center gap-2 mb-4">
+            <span className="w-2.5 h-2.5 rounded-full bg-[#ba1a1a]" />
+            <p className="font-semibold text-[#1c1c1a]">¿Qué te conviene hacer con el Ayudante de Cocina?</p>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {([
+              {
+                title: "Ajustar el sueldo ahora",
+                desc: "Subir $63.000/mes cierra la brecha con el mercado. Para los 2 ayudantes el sobrecosto es $126.000/mes — menos del 1% de tu nómina mensual.",
+                detalle: `Evita ${fmtM(2 * costoReemplazo("Ayudante de Cocina"))} en reemplazos`,
+                recomienda: true,
+                section: "benchmark" as Section,
+              },
+              {
+                title: "No hacer nada",
+                desc: `Con 78% de probabilidad de oferta externa en 90 días, perder a ambos antes de enero es el escenario más probable. Reemplazar a cada uno cuesta ${fmtK(costoReemplazo("Ayudante de Cocina"))}.`,
+                detalle: `Riesgo: ${fmtM(2 * costoReemplazo("Ayudante de Cocina"))} (×2 Ayudantes)`,
+                recomienda: false,
+                section: "costo_rot" as Section,
+              },
+              {
+                title: "Formalizar los contratos",
+                desc: "Ambos están en plazo fijo. Pasar a indefinido reduce el score de riesgo de 78→45 y mejora la percepción de estabilidad laboral sin costo salarial adicional.",
+                detalle: "Sin costo adicional",
+                recomienda: false,
+                section: "rotacion" as Section,
+              },
+              {
+                title: "Comunicar las bandas internas",
+                desc: "El 84% renuncia porque no sabe si está bien pagado. Publicar internamente el P50 de mercado tiene efecto inmediato en la intención de búsqueda activa.",
+                detalle: "Sin costo · Efecto inmediato",
+                recomienda: false,
+                section: "recomendaciones" as Section,
+              },
+            ]).map((opt, i) => (
+              <motion.div key={i} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.45 + i * 0.06, ease: E }}
+                onClick={() => switchSection(opt.section)}
+                className="rounded-lg p-4 cursor-pointer group transition-all"
+                style={{
+                  background: opt.recomienda ? "rgba(131,85,0,0.05)" : "#f6f3ef",
+                  border: `1px solid ${opt.recomienda ? "#835500" : "#e5e2de"}`,
+                }}>
+                {opt.recomienda && (
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold mb-2"
+                    style={{ background: "rgba(131,85,0,0.12)", color: "#835500" }}>
+                    ✦ Recomendado
+                  </span>
+                )}
+                <p className="font-semibold text-[#1c1c1a] mb-1" style={{ fontSize: "0.88rem" }}>{opt.title}</p>
+                <p style={{ fontSize: "0.78rem", color: "#75777f", lineHeight: 1.55, marginBottom: "10px" }}>{opt.desc}</p>
+                <div className="flex items-center justify-between">
+                  <span className="font-semibold" style={{ fontSize: "0.75rem", color: opt.recomienda ? "#835500" : "#44474e" }}>
+                    {opt.detalle}
+                  </span>
+                  <ChevronRight size={13} style={{ color: "#9a9a9a" }} className="group-hover:translate-x-0.5 transition-transform" />
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* ─── Dato del sector ─── */}
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.55, ease: E }}
+          className="rounded-xl p-4 border border-[#e5e2de] flex items-start gap-3"
+          style={{ background: "#f6f3ef" }}>
+          <TrendingDown size={16} style={{ color: "#835500", flexShrink: 0, marginTop: "2px" }} />
+          <p style={{ fontSize: "0.82rem", color: "#44474e", lineHeight: 1.65 }}>
+            <strong className="text-[#041635]">Dato del sector:</strong> En gastronomía Valparaíso la rotación de Ayudantes de Cocina promedia cada 18 meses. Perder uno en peak de temporada (diciembre–enero) implica hasta 3 meses de curva de aprendizaje. El mejor momento para retener es antes de la alta temporada — no después.
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-10">
-          {[
-            {
-              color: "#F97316",
-              shadow: "rgba(249,115,22,0.18)",
-              icon: CircleDollarSign,
-              badge: "Costo rotación",
-              metric: "$9.8M",
-              metricSub: "por salida voluntaria",
-              title: "Rotación de personal",
-              desc: "Cada trabajador que se va tiene un costo real medido en reclutamiento, vacante y curva de aprendizaje.",
-              bullets: ["9 salidas voluntarias · 45% tasa rotación", "$405.9M costo empleador anual", "Metodología RemuneraLab 2024"],
-              cta: "Ver análisis de costo rotacional",
-              section: "costo_rot" as Section,
-            },
-            {
-              color: "#00B4D8",
-              shadow: "rgba(0,180,216,0.18)",
-              icon: BarChart2,
-              badge: "Bandas salariales",
-              metric: "2",
-              metricSub: "cargos en zona de riesgo",
-              title: "Posición vs. mercado",
-              desc: "Dos cargos pagan bajo el percentil 25 del mercado regional, generando alto riesgo de fuga de talento.",
-              bullets: ["Ayudante Cocina: P32 · bajo mercado", "Encargado Bodega: P38 · alerta", "4 cargos en zona de alerta"],
-              cta: "Ver benchmark salarial",
-              section: "benchmark" as Section,
-            },
-            {
-              color: "#2EC4B6",
-              shadow: "rgba(46,196,182,0.18)",
-              icon: TrendingUp,
-              badge: "Presión de mercado",
-              metric: "+47%",
-              metricSub: "aumento de avisos de empleo",
-              title: "Tensión en el mercado laboral",
-              desc: "El mercado compite activamente por los mismos perfiles que tienes, especialmente garzones y ayudantes.",
-              bullets: ["Garzón/a: 47 avisos · tensión 88/100", "Prob. oferta activa al talento: 78%", "Bartender: tendencia salarial +4.6%"],
-              cta: "Ver presión de mercado",
-              section: "mercado" as Section,
-            },
-            {
-              color: "#A78BFA",
-              shadow: "rgba(167,139,250,0.18)",
-              icon: Scale,
-              badge: "Cumplimiento legal",
-              metric: "3",
-              metricSub: "normativas vigentes activas",
-              title: "Obligaciones laborales 2024–2025",
-              desc: "Nuevas leyes exigen ajustes en protocolos internos. Incumplir implica multas y riesgo reputacional.",
-              bullets: ["Ley Karin vigente desde ago. 2024", "Transparencia Salarial · Ley 21.561", "Jornada 40 horas · implementación gradual"],
-              cta: "Ver cumplimiento legal",
-              section: "cumplimiento" as Section,
-            },
-          ].map((card, i) => (
-            <motion.div
-              key={card.section}
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.08, duration: 0.42, ease: E }}
-              onClick={() => switchSection(card.section)}
-              className="relative rounded-2xl p-6 cursor-pointer group overflow-hidden"
-              style={{
-                background: "rgba(255,255,255,0.03)",
-                border: `1px solid rgba(255,255,255,0.08)`,
-                transition: "border-color 0.2s, box-shadow 0.2s",
-              }}
-              whileHover={{ scale: 1.015, boxShadow: `0 0 32px ${card.shadow}` }}
-            >
-              {/* top accent line */}
-              <div className="absolute top-0 left-0 right-0 h-[3px] rounded-t-2xl" style={{ background: card.color }} />
-              {/* corner glow */}
-              <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full pointer-events-none"
-                style={{ background: `radial-gradient(circle, ${card.shadow} 0%, transparent 65%)` }} />
-
-              <div className="flex items-start justify-between mb-4">
-                <span
-                  className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded-full"
-                  style={{ background: `${card.color}18`, color: card.color, border: `1px solid ${card.color}30`, fontFamily: "var(--font-space-mono)" }}
-                >
-                  <card.icon size={11} /> {card.badge}
-                </span>
-                <ArrowRight size={15} style={{ color: card.color, opacity: 0.6, marginTop: "2px" }} className="group-hover:translate-x-1 transition-transform" />
-              </div>
-
-              <p className="text-4xl font-bold tabular-nums mb-0.5" style={{ color: card.color, fontFamily: "var(--font-space-mono)" }}>
-                {card.metric}
-              </p>
-              <p style={{ fontSize: "0.68rem", color: "rgba(255,255,255,0.35)", marginBottom: "12px", fontFamily: "var(--font-space-mono)" }}>
-                {card.metricSub}
-              </p>
-
-              <h3 className="text-base font-bold text-white mb-1.5">{card.title}</h3>
-              <p style={{ fontSize: "0.78rem", color: "rgba(255,255,255,0.45)", lineHeight: 1.55, marginBottom: "16px" }}>{card.desc}</p>
-
-              <ul className="space-y-1.5 mb-5">
-                {card.bullets.map(b => (
-                  <li key={b} className="flex items-start gap-2" style={{ fontSize: "0.72rem", color: "rgba(255,255,255,0.55)" }}>
-                    <span style={{ color: card.color, marginTop: "2px", flexShrink: 0 }}>›</span> {b}
-                  </li>
-                ))}
-              </ul>
-
-              <div className="flex items-center gap-1.5" style={{ fontSize: "0.74rem", color: card.color, fontWeight: 600 }}>
-                {card.cta} <ChevronRight size={13} />
-              </div>
-            </motion.div>
-          ))}
-        </div>
         </>)}
 
         {activeSection === "benchmark" && (<>
 
-        {/* ── Encabezado empresa ── */}
-        <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45, ease: E }} className="mb-8">
-          <p style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.6rem", color: "#00C2FF", letterSpacing: "0.25em", textTransform: "uppercase", marginBottom: "10px" }}>
-            Diagnóstico salarial · {SECTOR} · {REGION}
-          </p>
-          <h1 className="text-3xl font-bold text-white mb-2">{EMPRESA}</h1>
-          <p style={{ fontSize: "0.82rem", color: "rgba(255,255,255,0.4)" }}>
-            {FECHA} · 20 trabajadores núcleo · pico 32 personas (enero) · Reporte basado en nómina anual 2026
+        {/* ── Diagnóstico en una línea ── */}
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35, ease: E }} className="mb-6">
+          <h1 className="text-2xl font-bold text-[#1c1c1a] mb-1">Sueldos vs. mercado</h1>
+          <p style={{ fontSize: "0.88rem", color: "#75777f" }}>
+            {FECHA} · {REGION}
           </p>
         </motion.div>
 
-        {/* ── KPIs principales ── */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
-          {[
-            { icon: CircleDollarSign, label: "Costo empleador / año",  valor: fmtM(totalAnualCosto),    sub: `Masa base ${fmtM(totalAnualBase)}`,                               color: "#00B4D8" },
-            { icon: RotateCcw,        label: "Rotación real núcleo",    valor: `${tasaRotacion}%`,         sub: `${salidasVol} vol. · ${salidasEst} estacionales/año`,            color: "#FF4D5A" },
-            { icon: AlertTriangle,    label: "Costo rotación estimado", valor: fmtM(9_780_000),            sub: "9 salidas voluntarias · metodología RemuneraLab",                color: "#F7C948" },
-            { icon: TrendingUp,       label: "Sobrecosto s/masa base",  valor: `+${sobrecostoPct}%`,       sub: "Cotizaciones + beneficios",                                      color: "#06D6A0" },
-          ].map((k, i) => (
-            <motion.div key={i} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.07, ease: E }}
-              className="rounded-xl p-5 border border-white/8 bg-white/4">
-              <k.icon size={16} style={{ color: k.color, marginBottom: "10px" }} />
-              <p className="text-2xl font-bold text-white tabular-nums" style={{ fontFamily: "var(--font-space-mono)" }}>{k.valor}</p>
-              <p style={{ fontSize: "0.7rem", color: "rgba(255,255,255,0.4)", marginTop: "4px" }}>{k.label}</p>
-              <p style={{ fontSize: "0.62rem", color: "rgba(255,255,255,0.25)", marginTop: "2px" }}>{k.sub}</p>
-            </motion.div>
-          ))}
-        </div>
-
-        {/* ── M01 — Benchmark ── */}
-        <section className="mb-8">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <p style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.58rem", color: "#00C2FF", letterSpacing: "0.2em", textTransform: "uppercase", marginBottom: "4px" }}>
-                Módulo 01 · Benchmark salarial
-              </p>
-              <h2 className="text-lg font-bold text-white">Posición vs. mercado — ESI 2024 INE · {REGION}</h2>
-            </div>
-            <div className="flex gap-1 p-1 rounded-lg" style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)" }}>
-              {(["table", "chart"] as const).map(t => (
-                <button key={t} onClick={() => setBenchTab(t)}
-                  className="px-3 py-1 rounded text-xs font-semibold transition-all"
-                  style={benchTab === t ? { background: "rgba(0,180,216,0.15)", color: "#00B4D8" } : { color: "rgba(255,255,255,0.35)" }}>
-                  {t === "table" ? "Tabla" : "Gráfico"}
-                </button>
-              ))}
-            </div>
+        {/* ── Resumen de situación ── */}
+        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.06, ease: E }}
+          className="rounded-xl p-5 mb-7 flex flex-wrap items-center justify-between gap-4"
+          style={{ background: "rgba(186,26,26,0.04)", border: "1px solid rgba(186,26,26,0.18)", borderLeft: "4px solid #ba1a1a" }}>
+          <div>
+            <p className="font-bold text-[#1c1c1a]" style={{ fontSize: "1rem" }}>
+              3 cargos están bajo el mercado. Ajustarlos cuesta <span className="text-[#2a7d4f]">$232k/mes</span> — reemplazar a los 5 en riesgo te costaría <span className="text-[#ba1a1a]">{fmtM(costoReemplazo("Ayudante de Cocina")*2 + costoReemplazo("Encargado de Bodega") + costoReemplazo("Auxiliar de Limpieza")*2)}</span>.
+            </p>
+            <p style={{ fontSize: "0.82rem", color: "#44474e", marginTop: "4px" }}>
+              Ayudante de Cocina · Encargado de Bodega · Auxiliar de Limpieza
+            </p>
           </div>
-
-          {/* Resumen benchmark */}
-          <div className="grid grid-cols-3 gap-3 mb-4">
-            {[
-              { label: "Óptimo", n: optimos, color: "#06D6A0", bg: "rgba(6,214,160,0.08)",  border: "rgba(6,214,160,0.2)" },
-              { label: "Alerta", n: alertas, color: "#F7C948", bg: "rgba(247,201,72,0.08)", border: "rgba(247,201,72,0.2)" },
-              { label: "Riesgo", n: riesgos, color: "#FF4D5A", bg: "rgba(255,77,90,0.08)",  border: "rgba(255,77,90,0.2)" },
-            ].map(s => (
-              <div key={s.label} className="rounded-xl p-4 text-center" style={{ background: s.bg, border: `1px solid ${s.border}` }}>
-                <p className="text-2xl font-bold tabular-nums" style={{ fontFamily: "var(--font-space-mono)", color: s.color }}>{s.n}</p>
-                <p style={{ fontSize: "0.7rem", color: s.color, marginTop: "2px", fontWeight: 600 }}>{s.label}</p>
-                <p style={{ fontSize: "0.6rem", color: "rgba(255,255,255,0.3)", marginTop: "1px" }}>de {BENCHMARK.length} cargos</p>
+          <div className="flex gap-3 shrink-0">
+            {([
+              { n: riesgos, label: "Acción urgente", color: "#ba1a1a", bg: "rgba(186,26,26,0.08)" },
+              { n: alertas, label: "Monitorear",     color: "#835500", bg: "rgba(131,85,0,0.08)" },
+              { n: optimos, label: "Sin cambios",    color: "#2a7d4f", bg: "rgba(42,125,79,0.08)" },
+            ]).map(s => (
+              <div key={s.label} className="text-center rounded-lg px-4 py-2" style={{ background: s.bg }}>
+                <p className="font-bold tabular-nums text-xl" style={{ color: s.color }}>{s.n}</p>
+                <p style={{ fontSize: "0.65rem", color: s.color, fontWeight: 600 }}>{s.label}</p>
               </div>
             ))}
           </div>
+        </motion.div>
 
-          {benchTab === "table" ? (
-            <div className="rounded-xl overflow-hidden border border-white/8">
-              <table className="w-full">
-                <thead>
-                  <tr style={{ background: "rgba(255,255,255,0.04)", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
-                    {["Cargo", "P25", "P50 mercado", "P75", "Sueldo empresa", "Percentil", "Estado"].map(h => (
-                      <th key={h} className="px-4 py-3 text-left"
-                        style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.55rem", color: "rgba(255,255,255,0.35)", letterSpacing: "0.12em", textTransform: "uppercase" }}>
-                        {h}
-                      </th>
+        {/* ── BLOQUE 1: Acción inmediata (Riesgo) ── */}
+        <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.12, ease: E }} className="mb-6">
+          <div className="flex items-center gap-2 mb-3">
+            <span className="w-2.5 h-2.5 rounded-full bg-[#ba1a1a]" />
+            <p className="font-semibold text-[#1c1c1a]">Acción inmediata — {riesgos} cargos bajo el percentil 25</p>
+          </div>
+          <div className="space-y-3">
+            {BENCHMARK.filter(b => b.estado === "Riesgo").map((b, i) => {
+              const gap       = b.p50 - b.empresa;
+              const costoAj   = gap * b.n;
+              const cReempl   = costoReemplazo(b.cargo);
+              return (
+                <motion.div key={b.cargo} initial={{ opacity: 0, x: -6 }} animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.16 + i * 0.06, ease: E }}
+                  className="rounded-xl bg-white border border-[#e5e2de] p-4">
+                  <div className="flex flex-wrap items-start justify-between gap-4 mb-3">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1 flex-wrap">
+                        <span className="font-semibold text-[#1c1c1a]" style={{ fontSize: "0.92rem" }}>{b.cargo}</span>
+                        {b.n > 1 && <span style={{ fontSize: "0.72rem", color: "#9a9a9a" }}>×{b.n} personas</span>}
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold"
+                          style={{ background: "rgba(186,26,26,0.08)", color: "#ba1a1a" }}>
+                          Bajo mercado
+                        </span>
+                      </div>
+                      <p style={{ fontSize: "0.82rem", color: "#44474e" }}>
+                        Pagás <strong className="text-[#1c1c1a]">{fmtCLP(b.empresa)}</strong>
+                        {" · "}Mercado P50 <strong className="text-[#1c1c1a]">{fmtCLP(b.p50)}</strong>
+                        {" · "}Diferencia <strong className="text-[#ba1a1a]">−{fmtCLP(gap)}/mes</strong> por persona
+                      </p>
+                    </div>
+                    <div className="flex gap-3 shrink-0 flex-wrap">
+                      <div className="text-center rounded-lg px-3 py-2" style={{ background: "rgba(42,125,79,0.07)", border: "1px solid rgba(42,125,79,0.15)" }}>
+                        <p className="font-bold tabular-nums" style={{ fontSize: "0.88rem", color: "#2a7d4f" }}>+{fmtCLP(costoAj)}/mes</p>
+                        <p style={{ fontSize: "0.62rem", color: "#2a7d4f" }}>costo de ajustar</p>
+                      </div>
+                      <div className="text-center rounded-lg px-3 py-2" style={{ background: "rgba(186,26,26,0.06)", border: "1px solid rgba(186,26,26,0.12)" }}>
+                        <p className="font-bold tabular-nums" style={{ fontSize: "0.88rem", color: "#ba1a1a" }}>{fmtK(cReempl)}</p>
+                        <p style={{ fontSize: "0.62rem", color: "#ba1a1a" }}>costo si se va uno</p>
+                      </div>
+                    </div>
+                  </div>
+                  {/* Desglose compacto del costo de reemplazo */}
+                  <div className="rounded-lg px-3 py-2.5 flex flex-wrap items-center justify-between gap-2"
+                    style={{ background: "#f6f3ef", border: "1px solid #e5e2de" }}>
+                    <p style={{ fontSize: "0.72rem", color: "#75777f" }}>
+                      ≈ {(cReempl / b.empresa).toFixed(2)}× sueldo mensual · aviso + selección + vacante + curva de aprendizaje
+                    </p>
+                    <button
+                      onClick={() => switchSection("costo_rot")}
+                      className="flex items-center gap-1 hover:opacity-70 transition-opacity shrink-0"
+                      style={{ fontSize: "0.72rem", color: "#041635", fontWeight: 600 }}>
+                      Ver cómo se calcula <ChevronRight size={11} />
+                    </button>
+                  </div>
+                </motion.div>
+              );
+            })}
+          </div>
+        </motion.div>
+
+        {/* ── BLOQUE 2: Monitorear (Alerta) ── */}
+        <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.32, ease: E }} className="mb-6">
+          <div className="flex items-center gap-2 mb-3">
+            <span className="w-2.5 h-2.5 rounded-full bg-[#835500]" />
+            <p className="font-semibold text-[#1c1c1a]">Monitorear — {alertas} cargos en zona de borde</p>
+          </div>
+          <div className="rounded-xl bg-white border border-[#e5e2de] p-4">
+            <p style={{ fontSize: "0.82rem", color: "#44474e", marginBottom: "12px" }}>
+              Están cerca del mercado pero si los sueldos siguen subiendo, en 6 meses pueden pasar a riesgo. No requieren acción hoy, pero sí seguimiento.
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              {BENCHMARK.filter(b => b.estado === "Alerta").map(b => {
+                const gap = b.p50 - b.empresa;
+                return (
+                  <div key={b.cargo} className="flex items-center justify-between rounded-lg px-3 py-2.5"
+                    style={{ background: "#f6f3ef" }}>
+                    <div>
+                      <span className="font-semibold text-[#1c1c1a]" style={{ fontSize: "0.84rem" }}>{b.cargo}</span>
+                      {b.n > 1 && <span className="ml-1.5 text-[#9a9a9a]" style={{ fontSize: "0.7rem" }}>×{b.n}</span>}
+                    </div>
+                    <div className="text-right">
+                      <p className="tabular-nums font-semibold" style={{ fontSize: "0.82rem", color: gap > 0 ? "#835500" : "#2a7d4f" }}>
+                        {gap > 0 ? `−${fmtCLP(gap)}` : `+${fmtCLP(Math.abs(gap))}`}/mes
+                      </p>
+                      <p style={{ fontSize: "0.62rem", color: "#9a9a9a" }}>vs. P50 mercado</p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </motion.div>
+
+        {/* ── BLOQUE 3: Sin acción requerida (Óptimo) ── */}
+        <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.42, ease: E }} className="mb-6">
+          <div className="flex items-center gap-2 mb-3">
+            <span className="w-2.5 h-2.5 rounded-full bg-[#2a7d4f]" />
+            <p className="font-semibold text-[#1c1c1a]">Sin acción requerida — {optimos} cargos en posición competitiva</p>
+          </div>
+          <div className="rounded-xl border border-[#e5e2de] bg-white px-4 py-3 flex flex-wrap gap-x-5 gap-y-1.5 items-center">
+            {BENCHMARK.filter(b => b.estado === "Óptimo").map(b => (
+              <span key={b.cargo} className="flex items-center gap-1.5" style={{ fontSize: "0.82rem", color: "#44474e" }}>
+                <CheckCircle2 size={13} style={{ color: "#2a7d4f", flexShrink: 0 }} />
+                <span className="font-semibold text-[#1c1c1a]">{b.cargo}</span>
+                <span className="text-[#9a9a9a]">{fmtCLP(b.empresa)} · P{b.percentil}</span>
+              </span>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* ── Ver datos completos (colapsable) ── */}
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5, ease: E }}>
+          <button
+            onClick={() => setBenchExpand(v => !v)}
+            className="flex items-center gap-2 mb-3 hover:opacity-70 transition-opacity"
+            style={{ fontSize: "0.82rem", color: "#75777f", fontWeight: 600 }}>
+            {benchExpand ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+            {benchExpand ? "Ocultar tabla completa" : "Ver tabla completa con todos los datos"}
+          </button>
+
+          <AnimatePresence>
+            {benchExpand && (
+              <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.25 }} style={{ overflow: "hidden" }}>
+                <div className="flex justify-end mb-2">
+                  <div className="flex gap-1 p-1 rounded-lg" style={{ background: "#f0ede9" }}>
+                    {(["table", "chart"] as const).map(t => (
+                      <button key={t} onClick={() => setBenchTab(t)}
+                        className="px-3 py-1 rounded text-xs font-semibold transition-all"
+                        style={benchTab === t ? { background: "#ffffff", color: "#041635", boxShadow: "0 1px 3px rgba(0,0,0,0.08)" } : { color: "#75777f" }}>
+                        {t === "table" ? "Tabla" : "Gráfico"}
+                      </button>
                     ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {BENCHMARK.map((b, i) => {
-                    const col = estadoColor(b.estado);
-                    return (
-                      <tr key={i} style={{ borderBottom: "1px solid rgba(255,255,255,0.04)" }}
-                        className="hover:bg-white/3 transition-colors">
-                        <td className="px-4 py-3.5 font-semibold text-white" style={{ fontSize: "0.82rem" }}>
-                          {b.cargo}
-                          {b.n > 1 && <span className="ml-2 text-white/30 text-xs font-normal">×{b.n}</span>}
-                        </td>
-                        <td className="px-4 py-3.5 tabular-nums" style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.72rem", color: "rgba(255,255,255,0.35)" }}>{fmtCLP(b.p25)}</td>
-                        <td className="px-4 py-3.5 tabular-nums font-semibold text-white" style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.78rem" }}>{fmtCLP(b.p50)}</td>
-                        <td className="px-4 py-3.5 tabular-nums" style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.72rem", color: "rgba(255,255,255,0.35)" }}>{fmtCLP(b.p75)}</td>
-                        <td className="px-4 py-3.5 tabular-nums font-bold" style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.82rem", color: b.empresa >= b.p50 ? "#06D6A0" : b.empresa >= b.p25 ? "#F7C948" : "#FF4D5A" }}>
-                          {fmtCLP(b.empresa)}
-                        </td>
-                        <td className="px-4 py-3.5 tabular-nums font-bold" style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.82rem", color: col.text }}>
-                          P{b.percentil}
-                        </td>
-                        <td className="px-4 py-3.5">
-                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold" style={{ background: col.bg, color: col.text }}>
-                            <span className="w-1.5 h-1.5 rounded-full" style={{ background: col.dot }} />
-                            {b.estado}
-                          </span>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          ) : (
-            <div className="rounded-xl border border-white/8 bg-white/4 p-5 h-[340px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={BENCHMARK} barCategoryGap="25%" barGap={3} margin={{ top: 4, right: 8, left: 0, bottom: 40 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" vertical={false} />
-                  <XAxis dataKey="cargo" axisLine={false} tickLine={false}
-                    tick={{ fontSize: 9, fill: "rgba(255,255,255,0.3)", angle: -35, textAnchor: "end" }} interval={0} />
-                  <YAxis axisLine={false} tickLine={false}
-                    tick={{ fontSize: 10, fill: "rgba(255,255,255,0.3)" }} tickFormatter={fmtAxis} width={62} />
-                  <Tooltip content={<TipBenchmark />} cursor={{ fill: "rgba(255,255,255,0.04)" }} />
-                  <Bar dataKey="p50"    name="P50 mercado" fill="rgba(0,180,216,0.3)"  radius={[3,3,0,0]} barSize={14} />
-                  <Bar dataKey="empresa" name="Empresa"    fill="#00B4D8"              radius={[3,3,0,0]} barSize={14} />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          )}
-          <p className="mt-2 text-xs" style={{ color: "rgba(255,255,255,0.25)" }}>
-            Benchmark ESI 2024 INE · CIUO-08 · Sector gastronomía + hotelería · Región de {REGION}. Cascada 7 niveles con shrinkage blending.
-          </p>
-        </section>
+                  </div>
+                </div>
+
+                {benchTab === "table" ? (
+                  <div className="rounded-xl overflow-hidden border border-[#e5e2de] mb-3">
+                    <table className="w-full">
+                      <thead>
+                        <tr style={{ background: "#f6f3ef", borderBottom: "1px solid #e5e2de" }}>
+                          {["Cargo", "P25", "P50 mercado", "P75", "Sueldo empresa", "Percentil", "Estado"].map(h => (
+                            <th key={h} className="px-4 py-3 text-left"
+                              style={{ fontSize: "0.65rem", color: "#75777f", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em" }}>
+                              {h}
+                            </th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {BENCHMARK.map((b, i) => {
+                          const col = estadoColor(b.estado);
+                          return (
+                            <tr key={i} style={{ borderBottom: "1px solid #eae8e4" }} className="hover:bg-[#f6f3ef] transition-colors">
+                              <td className="px-4 py-3 font-semibold text-[#1c1c1a]" style={{ fontSize: "0.82rem" }}>
+                                {b.cargo}
+                                {b.n > 1 && <span className="ml-2 text-[#9a9a9a] text-xs font-normal">×{b.n}</span>}
+                              </td>
+                              <td className="px-4 py-3 tabular-nums" style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.72rem", color: "#9a9a9a" }}>{fmtCLP(b.p25)}</td>
+                              <td className="px-4 py-3 tabular-nums font-semibold text-[#1c1c1a]" style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.78rem" }}>{fmtCLP(b.p50)}</td>
+                              <td className="px-4 py-3 tabular-nums" style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.72rem", color: "#9a9a9a" }}>{fmtCLP(b.p75)}</td>
+                              <td className="px-4 py-3 tabular-nums font-bold" style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.82rem", color: b.empresa >= b.p50 ? "#2a7d4f" : b.empresa >= b.p25 ? "#835500" : "#ba1a1a" }}>
+                                {fmtCLP(b.empresa)}
+                              </td>
+                              <td className="px-4 py-3 tabular-nums font-bold" style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.82rem", color: col.text }}>P{b.percentil}</td>
+                              <td className="px-4 py-3">
+                                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold" style={{ background: col.bg, color: col.text }}>
+                                  <span className="w-1.5 h-1.5 rounded-full" style={{ background: col.dot }} />{b.estado}
+                                </span>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : (
+                  <div className="rounded-xl border border-[#e5e2de] bg-white p-5 h-[320px] mb-3">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={BENCHMARK} barCategoryGap="25%" barGap={3} margin={{ top: 4, right: 8, left: 0, bottom: 40 }}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#e5e2de" vertical={false} />
+                        <XAxis dataKey="cargo" axisLine={false} tickLine={false}
+                          tick={{ fontSize: 9, fill: "#75777f", angle: -35, textAnchor: "end" }} interval={0} />
+                        <YAxis axisLine={false} tickLine={false}
+                          tick={{ fontSize: 10, fill: "#75777f" }} tickFormatter={fmtAxis} width={62} />
+                        <Tooltip content={<TipBenchmark />} cursor={{ fill: "rgba(4,22,53,0.03)" }} />
+                        <Bar dataKey="p50"     name="P50 mercado" fill="rgba(4,22,53,0.15)" radius={[3,3,0,0]} barSize={14} />
+                        <Bar dataKey="empresa" name="Empresa"     fill="#041635"             radius={[3,3,0,0]} barSize={14} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                )}
+                <p style={{ fontSize: "0.72rem", color: "#9a9a9a" }}>
+                  Benchmark ESI 2024 INE · CIUO-08 · Sector gastronomía + hotelería · Región de {REGION}.
+                </p>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </motion.div>
+
         </>)}
 
         {/* ── Bandas salariales ── */}
         {activeSection === "bandas" && (<section className="mb-8">
-          <p style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.58rem", color: "#00C2FF", letterSpacing: "0.2em", textTransform: "uppercase", marginBottom: "4px" }}>
+
+        {/* Diagnóstico en una línea */}
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35, ease: E }} className="mb-6">
+          <h1 className="text-2xl font-bold text-[#1c1c1a] mb-1">Bandas salariales</h1>
+          <p style={{ fontSize: "0.88rem", color: "#75777f" }}>{FECHA} · 3 fuentes · {REGION}</p>
+        </motion.div>
+
+        {/* Decisión clave */}
+        {(() => {
+          const bajoPorLasTres = BANDAS.filter(b => b.empresa < b.esi.p50 && b.empresa < b.avisos.p50 && b.empresa < b.rl.p50);
+          return bajoPorLasTres.length > 0 ? (
+            <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.06, ease: E }}
+              className="rounded-xl p-5 mb-7"
+              style={{ background: "rgba(186,26,26,0.04)", border: "1px solid rgba(186,26,26,0.18)", borderLeft: "4px solid #ba1a1a" }}>
+              <p className="font-bold text-[#1c1c1a]" style={{ fontSize: "1rem" }}>
+                {bajoPorLasTres.length} cargo{bajoPorLasTres.length > 1 ? "s están" : " está"} sistemáticamente bajo la mediana en las 3 fuentes.
+                Ajustar ahora es más barato que reemplazar.
+              </p>
+              <p style={{ fontSize: "0.82rem", color: "#44474e", marginTop: "4px" }}>
+                {bajoPorLasTres.map(b => b.cargo).join(" · ")}
+              </p>
+            </motion.div>
+          ) : (
+            <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.06, ease: E }}
+              className="rounded-xl p-4 mb-7 flex items-center gap-3"
+              style={{ background: "rgba(42,125,79,0.04)", border: "1px solid rgba(42,125,79,0.15)", borderLeft: "4px solid #2a7d4f" }}>
+              <CheckCircle2 size={16} style={{ color: "#2a7d4f", flexShrink: 0 }} />
+              <p style={{ fontSize: "0.9rem", color: "#1c1c1a", fontWeight: 600 }}>
+                Ningún cargo está bajo la mediana en las 3 fuentes simultáneamente. Posición sólida.
+              </p>
+            </motion.div>
+          );
+        })()}
+
+          <p style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.58rem", color: "#041635", letterSpacing: "0.2em", textTransform: "uppercase", marginBottom: "4px" }}>
             Módulo 01b · Bandas salariales
           </p>
-          <h2 className="text-lg font-bold text-white mb-1">¿Cuánto paga el mercado — y de dónde viene ese número?</h2>
-          <p style={{ fontSize: "0.82rem", color: "rgba(255,255,255,0.4)", marginBottom: "20px" }}>
-            Tres fuentes distintas para cada cargo: la encuesta oficial INE, lo que ofrecen los avisos laborales activos, y los sueldos declarados por usuarios de RemuneraLab. El diamante blanco es la posición de tu empresa.
+          <h2 className="text-lg font-bold text-[#1c1c1a] mb-1">¿Cuánto paga el mercado — y de dónde viene ese número?</h2>
+          <p style={{ fontSize: "0.82rem", color: "#75777f", marginBottom: "20px" }}>
+            Tres fuentes distintas para cada cargo: la encuesta oficial INE, lo que ofrecen los avisos laborales activos, y los sueldos declarados por usuarios de RemuneraLab. El diamante negro es la posición de tu empresa.
           </p>
 
           {/* Context chips + leyenda fuentes */}
@@ -1023,26 +1197,26 @@ function Dashboard() {
             <div className="flex flex-wrap gap-2">
               {(["Gastronomía · Turismo", "Región Valparaíso", "Empresa 11–25 trab."] as const).map(c => (
                 <span key={c} className="px-2.5 py-1 rounded-full text-xs"
-                  style={{ background: "rgba(0,194,255,0.07)", border: "1px solid rgba(0,194,255,0.14)", color: "rgba(0,194,255,0.55)", fontFamily: "var(--font-space-mono)", fontSize: "0.58rem" }}>
+                  style={{ background: "rgba(4,22,53,0.05)", border: "1px solid #c5c6cf", color: "#44474e", fontFamily: "var(--font-space-mono)", fontSize: "0.58rem" }}>
                   {c}
                 </span>
               ))}
             </div>
             <div className="flex flex-wrap gap-3">
               {([
-                { color: "#00B4D8", label: "ESI INE 2024" },
-                { color: "#F7C948", label: "Avisos 90d" },
-                { color: "#8568f3", label: "RemuneraLab" },
+                { color: "#041635", label: "ESI INE 2024" },
+                { color: "#835500", label: "Avisos 90d" },
+                { color: "#374668", label: "RemuneraLab" },
               ] as const).map(s => (
                 <span key={s.label} className="flex items-center gap-1.5"
-                  style={{ fontSize: "0.62rem", color: "rgba(255,255,255,0.40)", fontFamily: "var(--font-space-mono)" }}>
+                  style={{ fontSize: "0.62rem", color: "#75777f", fontFamily: "var(--font-space-mono)" }}>
                   <span className="w-2 h-2 rounded-full" style={{ background: s.color }} />
                   {s.label}
                 </span>
               ))}
               <span className="flex items-center gap-1.5"
-                style={{ fontSize: "0.62rem", color: "rgba(255,255,255,0.50)", fontFamily: "var(--font-space-mono)" }}>
-                <span className="w-2 h-2 rotate-45 inline-block" style={{ background: "rgba(255,255,255,0.8)" }} />
+                style={{ fontSize: "0.62rem", color: "#44474e", fontFamily: "var(--font-space-mono)" }}>
+                <span className="w-2 h-2 rotate-45 inline-block" style={{ background: "#1c1c1a" }} />
                 Empresa
               </span>
             </div>
@@ -1056,15 +1230,15 @@ function Dashboard() {
             return (
               <div className="grid grid-cols-3 gap-3 mb-6">
                 {([
-                  { label: "Sobre P50 ESI INE",    n: sobreEsi,    total: BANDAS.length, color: "#00B4D8" },
-                  { label: "Sobre P50 Avisos 90d",  n: sobreAvisos, total: BANDAS.length, color: "#F7C948" },
-                  { label: "Sobre P50 RemuneraLab", n: sobreRl,     total: BANDAS.length, color: "#8568f3" },
+                  { label: "Sobre P50 ESI INE",    n: sobreEsi,    total: BANDAS.length, color: "#041635" },
+                  { label: "Sobre P50 Avisos 90d",  n: sobreAvisos, total: BANDAS.length, color: "#835500" },
+                  { label: "Sobre P50 RemuneraLab", n: sobreRl,     total: BANDAS.length, color: "#374668" },
                 ] as const).map(k => (
-                  <div key={k.label} className="rounded-xl p-4 border border-white/8 bg-white/4">
+                  <div key={k.label} className="rounded-xl p-4 border border-[#e5e2de] bg-white">
                     <p className="font-bold tabular-nums" style={{ fontFamily: "var(--font-space-mono)", fontSize: "1.4rem", color: k.color, lineHeight: 1 }}>
-                      {k.n}<span style={{ fontSize: "0.8rem", color: "rgba(255,255,255,0.30)" }}>/{k.total}</span>
+                      {k.n}<span style={{ fontSize: "0.8rem", color: "#75777f" }}>/{k.total}</span>
                     </p>
-                    <p style={{ fontSize: "0.62rem", color: "rgba(255,255,255,0.32)", marginTop: "5px", lineHeight: 1.4 }}>{k.label}</p>
+                    <p style={{ fontSize: "0.62rem", color: "#75777f", marginTop: "5px", lineHeight: 1.4 }}>{k.label}</p>
                   </div>
                 ))}
               </div>
@@ -1079,30 +1253,30 @@ function Dashboard() {
               const avisosDiff = ((b.empresa - b.avisos.p50) / b.avisos.p50) * 100;
               const rlDiff     = ((b.empresa - b.rl.p50)     / b.rl.p50)     * 100;
               const avgDiff    = (esiDiff + avisosDiff + rlDiff) / 3;
-              const statusColor = avgDiff >= 0 ? "#06D6A0" : avgDiff >= -5 ? "#F7C948" : "#FF4D5A";
+              const statusColor = avgDiff >= 0 ? "#2a7d4f" : avgDiff >= -5 ? "#835500" : "#ba1a1a";
               const statusLabel = avgDiff >= 0 ? "Sobre mediana" : avgDiff >= -5 ? "En borde" : "Bajo mediana";
 
               return (
                 <motion.div key={i} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.03, ease: E }}
-                  className="rounded-xl border border-white/8 bg-white/4 overflow-hidden">
+                  className="rounded-xl border border-[#e5e2de] bg-white overflow-hidden">
 
                   {/* Header */}
-                  <button className="w-full px-5 py-4 text-left hover:bg-white/3 transition-colors"
+                  <button className="w-full px-5 py-4 text-left hover:bg-transparent transition-colors"
                     onClick={() => setBandasOpen(isOpen ? null : i)}>
                     <div className="flex items-center justify-between gap-3">
                       <div className="flex items-center gap-3 min-w-0">
-                        <span className="font-semibold text-white" style={{ fontSize: "0.88rem" }}>{b.cargo}</span>
-                        {b.n > 1 && <span style={{ fontSize: "0.65rem", color: "rgba(255,255,255,0.28)", fontFamily: "var(--font-space-mono)" }}>×{b.n}</span>}
+                        <span className="font-semibold text-[#1c1c1a]" style={{ fontSize: "0.88rem" }}>{b.cargo}</span>
+                        {b.n > 1 && <span style={{ fontSize: "0.65rem", color: "#9a9a9a", fontFamily: "var(--font-space-mono)" }}>×{b.n}</span>}
                       </div>
                       <div className="flex items-center gap-3 shrink-0">
                         {/* Mini 3-dot source preview */}
                         <div className="hidden sm:flex items-center gap-1">
                           {([
-                            { color: "#00B4D8", diff: esiDiff },
-                            { color: "#F7C948", diff: avisosDiff },
-                            { color: "#8568f3", diff: rlDiff },
+                            { color: "#041635", diff: esiDiff },
+                            { color: "#835500", diff: avisosDiff },
+                            { color: "#374668", diff: rlDiff },
                           ] as const).map((s, si) => (
-                            <span key={si} className="text-xs font-bold tabular-nums" style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.60rem", color: s.diff >= 0 ? s.color : s.diff >= -5 ? "#F7C948" : "#FF4D5A" }}>
+                            <span key={si} className="text-xs font-bold tabular-nums" style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.60rem", color: s.diff >= 0 ? s.color : s.diff >= -5 ? "#835500" : "#ba1a1a" }}>
                               {s.diff > 0 ? "+" : ""}{s.diff.toFixed(0)}%
                             </span>
                           ))}
@@ -1112,10 +1286,10 @@ function Dashboard() {
                           <span className="w-1.5 h-1.5 rounded-full" style={{ background: statusColor }} />
                           {statusLabel}
                         </span>
-                        <span style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.78rem", color: "rgba(255,255,255,0.50)" }}>
+                        <span style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.78rem", color: "#44474e" }}>
                           {fmtCLP(b.empresa)}
                         </span>
-                        {isOpen ? <ChevronUp size={13} className="text-white/30" /> : <ChevronDown size={13} className="text-white/30" />}
+                        {isOpen ? <ChevronUp size={13} className="text-[#9a9a9a]" /> : <ChevronDown size={13} className="text-[#9a9a9a]" />}
                       </div>
                     </div>
                   </button>
@@ -1125,7 +1299,7 @@ function Dashboard() {
                     {isOpen && (
                       <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }}
                         transition={{ duration: 0.22 }} style={{ overflow: "hidden" }}>
-                        <div className="px-5 pb-5" style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}>
+                        <div className="px-5 pb-5" style={{ borderTop: "1px solid #e5e2de" }}>
                           <BandChart b={b} />
                         </div>
                       </motion.div>
@@ -1137,9 +1311,9 @@ function Dashboard() {
           </div>
 
           {/* Data quality note */}
-          <div className="mt-4 rounded-xl p-4" style={{ background: "rgba(0,180,216,0.04)", border: "1px solid rgba(0,180,216,0.10)" }}>
-            <p style={{ fontSize: "0.72rem", color: "rgba(255,255,255,0.35)", lineHeight: 1.65 }}>
-              <strong className="text-[#00B4D8]">Fuentes:</strong> ESI INE 2024 (Encuesta Suplementaria de Ingresos, muestra nacional expandida) ·
+          <div className="mt-4 rounded-xl p-4" style={{ background: "rgba(4,22,53,0.03)", border: "1px solid #e5e2de" }}>
+            <p style={{ fontSize: "0.72rem", color: "#75777f", lineHeight: 1.65 }}>
+              <strong className="text-[#041635]">Fuentes:</strong> ESI INE 2024 (Encuesta Suplementaria de Ingresos, muestra nacional expandida) ·
               Avisos laborales: portales Trabajando.cl + Computrabajo, medianas de los últimos 90 días en Región Valparaíso ·
               RemuneraLab: sueldos declarados por usuarios con ≥10 observaciones por cargo. Los percentiles se calculan sin ajuste por jornada.
               <span className="ml-1 text-white/20">Comparación filtrada por sector Gastronomía · Turismo y Hotelería.</span>
@@ -1149,54 +1323,75 @@ function Dashboard() {
 
         {/* ── M02 — Dotación mensual ── */}
         {activeSection === "dotacion" && (<section className="mb-8">
-          <p style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.58rem", color: "#00C2FF", letterSpacing: "0.2em", textTransform: "uppercase", marginBottom: "4px" }}>
+
+        {/* Decisión clave */}
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35, ease: E }} className="mb-6">
+          <h1 className="text-2xl font-bold text-[#1c1c1a] mb-1">Dotación y masa salarial</h1>
+          <p style={{ fontSize: "0.88rem", color: "#75777f" }}>{FECHA} · Evolución mensual 2026</p>
+        </motion.div>
+
+        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.06, ease: E }}
+          className="rounded-xl p-4 mb-6 flex items-start gap-3"
+          style={{ background: "#f6f3ef", border: "1px solid #e5e2de", borderLeft: "4px solid #835500" }}>
+          <TrendingDown size={16} style={{ color: "#835500", flexShrink: 0, marginTop: "2px" }} />
+          <div>
+            <p className="font-semibold text-[#1c1c1a] mb-0.5" style={{ fontSize: "0.9rem" }}>
+              El peak de julio duplica el personal variable. Contratar con 6 semanas de anticipación reduce el costo por vacante en un 40%.
+            </p>
+            <p style={{ fontSize: "0.78rem", color: "#75777f" }}>
+              Núcleo estable: 20 personas · Variable estacional: hasta 12 adicionales en temporada alta (enero, julio)
+            </p>
+          </div>
+        </motion.div>
+
+          <p style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.58rem", color: "#041635", letterSpacing: "0.2em", textTransform: "uppercase", marginBottom: "4px" }}>
             Módulo 02 · Dotación y masa salarial
           </p>
-          <h2 className="text-lg font-bold text-white mb-4">Evolución mensual 2026 — Núcleo + Personal variable</h2>
+          <h2 className="text-lg font-bold text-[#1c1c1a] mb-4">Evolución mensual 2026 — Núcleo + Personal variable</h2>
 
           <div className="grid md:grid-cols-2 gap-4">
             {/* Dotación */}
-            <div className="rounded-xl border border-white/8 bg-white/4 p-5">
-              <p className="text-xs font-semibold text-white/45 mb-4">Personas por mes</p>
+            <div className="rounded-xl border border-[#e5e2de] bg-white p-5">
+              <p className="text-xs font-semibold text-[#75777f] mb-4">Personas por mes</p>
               <div className="h-[200px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={DOTACION} barCategoryGap="20%" barGap={2} margin={{ top: 2, right: 4, left: 0, bottom: 0 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" vertical={false} />
-                    <XAxis dataKey="mes" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: "rgba(255,255,255,0.35)" }} />
-                    <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: "rgba(255,255,255,0.35)" }} domain={[0, 35]} />
-                    <Tooltip content={<TipDotacion />} cursor={{ fill: "rgba(255,255,255,0.04)" }} />
-                    <Bar dataKey="nucleo"   name="nucleo"   fill="#00B4D8" radius={[3,3,0,0]} barSize={12} stackId="a" />
-                    <Bar dataKey="variable" name="variable" fill="rgba(0,180,216,0.3)" radius={[3,3,0,0]} barSize={12} stackId="a" />
+                    <CartesianGrid strokeDasharray="3 3" stroke="#e5e2de" vertical={false} />
+                    <XAxis dataKey="mes" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: "#75777f" }} />
+                    <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: "#75777f" }} domain={[0, 35]} />
+                    <Tooltip content={<TipDotacion />} cursor={{ fill: "#ffffff" }} />
+                    <Bar dataKey="nucleo"   name="nucleo"   fill="#041635" radius={[3,3,0,0]} barSize={12} stackId="a" />
+                    <Bar dataKey="variable" name="variable" fill="rgba(4,22,53,0.2)" radius={[3,3,0,0]} barSize={12} stackId="a" />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
               <div className="flex gap-4 mt-3 text-xs">
-                {[{ color: "#00B4D8", label: "Núcleo (20)" }, { color: "rgba(0,180,216,0.35)", label: "Variable" }].map(l => (
+                {[{ color: "#041635", label: "Núcleo (20)" }, { color: "rgba(4,22,53,0.25)", label: "Variable" }].map(l => (
                   <div key={l.label} className="flex items-center gap-1.5">
                     <span className="w-3 h-3 rounded-sm" style={{ background: l.color }} />
-                    <span style={{ color: "rgba(255,255,255,0.4)" }}>{l.label}</span>
+                    <span style={{ color: "#75777f" }}>{l.label}</span>
                   </div>
                 ))}
               </div>
             </div>
 
             {/* Costo empleador mensual */}
-            <div className="rounded-xl border border-white/8 bg-white/4 p-5">
-              <p className="text-xs font-semibold text-white/45 mb-4">Costo total empleador mensual</p>
+            <div className="rounded-xl border border-[#e5e2de] bg-white p-5">
+              <p className="text-xs font-semibold text-[#75777f] mb-4">Costo total empleador mensual</p>
               <div className="h-[200px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={DOTACION} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" vertical={false} />
-                    <XAxis dataKey="mes" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: "rgba(255,255,255,0.35)" }} />
-                    <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: "rgba(255,255,255,0.35)" }} tickFormatter={fmtAxis} width={58} domain={[25_000_000, 45_000_000]} />
-                    <Tooltip formatter={(v: unknown) => typeof v === "number" ? fmtCLP(v) : String(v)} cursor={{ stroke: "rgba(255,255,255,0.1)" }} contentStyle={TS} labelStyle={{ color: "#00B4D8", fontWeight: 700 }} />
-                    <ReferenceLine y={33_826_550} stroke="rgba(247,201,72,0.4)" strokeDasharray="4 4" label={{ value: "Promedio", position: "right", fill: "#F7C948", fontSize: 9 }} />
-                    <Line dataKey="costoEmpl" name="Costo empleador" stroke="#06D6A0" strokeWidth={2} dot={{ fill: "#06D6A0", r: 3 }} activeDot={{ r: 5 }} />
+                    <CartesianGrid strokeDasharray="3 3" stroke="#e5e2de" vertical={false} />
+                    <XAxis dataKey="mes" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: "#75777f" }} />
+                    <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: "#75777f" }} tickFormatter={fmtAxis} width={58} domain={[25_000_000, 45_000_000]} />
+                    <Tooltip formatter={(v: unknown) => typeof v === "number" ? fmtCLP(v) : String(v)} cursor={{ stroke: "rgba(4,22,53,0.08)" }} contentStyle={TS} labelStyle={{ color: "#041635", fontWeight: 700 }} />
+                    <ReferenceLine y={33_826_550} stroke="rgba(131,85,0,0.5)" strokeDasharray="4 4" label={{ value: "Promedio", position: "right", fill: "#835500", fontSize: 9 }} />
+                    <Line dataKey="costoEmpl" name="Costo empleador" stroke="#2a7d4f" strokeWidth={2} dot={{ fill: "#2a7d4f", r: 3 }} activeDot={{ r: 5 }} />
                   </LineChart>
                 </ResponsiveContainer>
               </div>
-              <div className="flex items-center gap-2 mt-3 text-xs" style={{ color: "rgba(255,255,255,0.35)" }}>
-                <span className="w-5 h-0.5 bg-[#06D6A0] rounded" />
+              <div className="flex items-center gap-2 mt-3 text-xs" style={{ color: "#75777f" }}>
+                <span className="w-5 h-0.5 bg-[#2a7d4f] rounded" />
                 <span>Costo mensual · Promedio anual {fmtM(totalAnualCosto / 12)}</span>
               </div>
             </div>
@@ -1205,267 +1400,398 @@ function Dashboard() {
 
         {/* ── M03 — Riesgo de rotación núcleo ── */}
         {activeSection === "rotacion" && (<section className="mb-8">
-          <p style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.58rem", color: "#00C2FF", letterSpacing: "0.2em", textTransform: "uppercase", marginBottom: "4px" }}>
-            Módulo 03 · Riesgo de rotación voluntaria — Núcleo
-          </p>
-          <h2 className="text-lg font-bold text-white mb-2">Diagnóstico individual · 20 trabajadores permanentes</h2>
-          <p className="text-sm mb-5" style={{ color: "rgba(255,255,255,0.4)" }}>
-            Score compuesto: brecha salarial vs P50, tipo de contrato, antigüedad, jornada y factores de liquidez del cargo.
-            <span className="ml-2 font-bold" style={{ color: "#FF4D5A" }}>{criticos} críticos</span> requieren acción inmediata.
-          </p>
 
-          <div className="space-y-2">
-            {NUCLEO.sort((a, b) => b.riesgo - a.riesgo).map((n, i) => {
-              const rc = riesgoColor(n.riesgo);
-              const isOpen = expandedNucleo === i;
+        {/* Diagnóstico en una línea */}
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35, ease: E }} className="mb-6">
+          <h1 className="text-2xl font-bold text-[#1c1c1a] mb-1">Riesgo de rotación</h1>
+          <p style={{ fontSize: "0.88rem", color: "#75777f" }}>{FECHA} · 20 trabajadores del núcleo</p>
+        </motion.div>
+
+        {/* Resumen de situación */}
+        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.06, ease: E }}
+          className="rounded-xl p-5 mb-7 flex flex-wrap items-center justify-between gap-4"
+          style={{ background: "rgba(186,26,26,0.04)", border: "1px solid rgba(186,26,26,0.18)", borderLeft: "4px solid #ba1a1a" }}>
+          <div>
+            <p className="font-bold text-[#1c1c1a]" style={{ fontSize: "1rem" }}>
+              {criticos} personas con riesgo crítico. Si se van antes de enero, el costo de reemplazo supera <span className="text-[#ba1a1a]">$4.5M</span>.
+            </p>
+            <p style={{ fontSize: "0.82rem", color: "#44474e", marginTop: "4px" }}>
+              Diego B. y Diego L. (Ayudantes Cocina) · Fernanda F. y Vicente D. (Auxiliares) · Francisca O. (Bodega)
+            </p>
+          </div>
+          <div className="flex gap-3 shrink-0">
+            {([
+              { n: NUCLEO.filter(x => x.riesgo >= 65).length, label: "Crítico",  color: "#ba1a1a", bg: "rgba(186,26,26,0.08)"  },
+              { n: NUCLEO.filter(x => x.riesgo >= 45 && x.riesgo < 65).length, label: "Alto", color: "#835500", bg: "rgba(131,85,0,0.08)"  },
+              { n: NUCLEO.filter(x => x.riesgo < 45).length,  label: "Bajo",     color: "#2a7d4f", bg: "rgba(42,125,79,0.08)"  },
+            ]).map(s => (
+              <div key={s.label} className="text-center rounded-lg px-4 py-2" style={{ background: s.bg }}>
+                <p className="font-bold tabular-nums text-xl" style={{ color: s.color }}>{s.n}</p>
+                <p style={{ fontSize: "0.65rem", color: s.color, fontWeight: 600 }}>{s.label}</p>
+              </div>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* BLOQUE 1: Acción inmediata — Crítico (65+) */}
+        <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.12, ease: E }} className="mb-6">
+          <div className="flex items-center gap-2 mb-3">
+            <span className="w-2.5 h-2.5 rounded-full bg-[#ba1a1a]" />
+            <p className="font-semibold text-[#1c1c1a]">Acción esta semana — {NUCLEO.filter(x => x.riesgo >= 65).length} en riesgo crítico</p>
+          </div>
+          <div className="space-y-3">
+            {NUCLEO.filter(n => n.riesgo >= 65).sort((a, b) => b.riesgo - a.riesgo).map((n, i) => {
+              const bench = BENCHMARK.find(b => b.cargo === n.cargo);
+              const gap   = bench ? bench.p50 - n.salario : 0;
               return (
-                <motion.div key={i} initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.03 }}
-                  className="rounded-xl border border-white/8 bg-white/4 overflow-hidden">
-                  <button className="w-full px-4 py-3 flex items-center gap-3 hover:bg-white/3 transition-colors text-left"
-                    onClick={() => setExpandedNucleo(isOpen ? null : i)}>
-                    <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
-                      style={{ background: n.sexo === "F" ? "rgba(255,100,200,0.12)" : "rgba(0,180,216,0.12)" }}>
-                      <Users size={13} style={{ color: n.sexo === "F" ? "#FF64C8" : "#00B4D8" }} />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <span className="font-semibold text-white text-sm">{n.nombre}</span>
-                        <span style={{ fontSize: "0.72rem", color: "rgba(255,255,255,0.4)" }}>{n.cargo}</span>
-                        {n.contrato === "Plazo fijo" && (
-                          <span className="text-[10px] px-2 py-0.5 rounded-full font-bold" style={{ background: "rgba(255,77,90,0.12)", color: "#FF4D5A" }}>
-                            Plazo fijo
-                          </span>
-                        )}
-                        {n.jornada < 44 && (
-                          <span className="text-[10px] px-2 py-0.5 rounded-full font-bold" style={{ background: "rgba(247,201,72,0.12)", color: "#F7C948" }}>
-                            {n.jornada}h/sem
-                          </span>
-                        )}
+                <motion.div key={n.nombre} initial={{ opacity: 0, x: -6 }} animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.16 + i * 0.06, ease: E }}
+                  className="rounded-xl bg-white border border-[#e5e2de] p-4 flex flex-wrap items-center justify-between gap-4">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1 flex-wrap">
+                      <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0"
+                        style={{ background: n.sexo === "F" ? "rgba(255,100,200,0.12)" : "rgba(4,22,53,0.07)" }}>
+                        <Users size={12} style={{ color: n.sexo === "F" ? "#FF64C8" : "#041635" }} />
                       </div>
-                      <div className="flex items-center gap-3 mt-1.5">
-                        <div className="flex-1 h-1.5 bg-white/8 rounded-full overflow-hidden">
-                          <div className={`h-full ${rc.bar} rounded-full transition-all`} style={{ width: `${n.riesgo}%` }} />
-                        </div>
-                        <span className={`font-bold text-sm tabular-nums shrink-0 ${rc.text}`} style={{ fontFamily: "var(--font-space-mono)", minWidth: "36px" }}>
-                          {n.riesgo}
-                        </span>
-                        <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full shrink-0 ${rc.badge}`}>{rc.label}</span>
-                        {isOpen ? <ChevronUp size={13} className="text-white/30 shrink-0" /> : <ChevronDown size={13} className="text-white/30 shrink-0" />}
-                      </div>
+                      <span className="font-semibold text-[#1c1c1a]" style={{ fontSize: "0.92rem" }}>{n.nombre}</span>
+                      <span style={{ fontSize: "0.75rem", color: "#75777f" }}>{n.cargo}</span>
+                      {n.contrato === "Plazo fijo" && (
+                        <span className="text-[10px] px-2 py-0.5 rounded-full font-bold" style={{ background: "rgba(186,26,26,0.10)", color: "#ba1a1a" }}>Plazo fijo</span>
+                      )}
                     </div>
-                  </button>
-
-                  <AnimatePresence>
-                    {isOpen && (
-                      <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.25 }} style={{ overflow: "hidden" }}>
-                        <div className="px-4 pb-4 pt-2 border-t border-white/6">
-                          <div className="grid grid-cols-3 gap-3 mb-3">
-                            {[
-                              { label: "Sueldo base",   valor: fmtCLP(n.salario) },
-                              { label: "Experiencia",   valor: `${n.experiencia} años` },
-                              { label: "Área",          valor: n.area },
-                            ].map(d => (
-                              <div key={d.label}>
-                                <p style={{ fontSize: "0.6rem", color: "rgba(255,255,255,0.3)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "2px" }}>{d.label}</p>
-                                <p className="font-semibold text-white text-sm">{d.valor}</p>
-                              </div>
-                            ))}
-                          </div>
-                          {n.factores.length > 0 && (
-                            <div className="flex flex-wrap gap-2 mt-2">
-                              {n.factores.map(f => (
-                                <span key={f} className="text-xs px-2.5 py-1 rounded-full flex items-center gap-1.5"
-                                  style={{ background: "rgba(255,77,90,0.1)", color: "#FF4D5A", border: "1px solid rgba(255,77,90,0.2)" }}>
-                                  <AlertTriangle size={10} /> {f}
-                                </span>
-                              ))}
-                            </div>
-                          )}
-                          {n.factores.length === 0 && (
-                            <span className="text-xs px-2.5 py-1 rounded-full flex items-center gap-1.5 w-fit"
-                              style={{ background: "rgba(6,214,160,0.1)", color: "#06D6A0", border: "1px solid rgba(6,214,160,0.15)" }}>
-                              <CheckCircle2 size={10} /> Sin factores de riesgo identificados
-                            </span>
-                          )}
-                        </div>
-                      </motion.div>
+                    <div className="flex flex-wrap gap-x-4 gap-y-0.5 mt-1">
+                      {n.factores.map(f => (
+                        <span key={f} style={{ fontSize: "0.75rem", color: "#835500" }}>· {f}</span>
+                      ))}
+                    </div>
+                    {gap > 0 && (
+                      <p style={{ fontSize: "0.78rem", color: "#44474e", marginTop: "4px" }}>
+                        Paga <strong>{fmtCLP(n.salario)}</strong> · Mercado P50 <strong>{fmtCLP(n.salario + gap)}</strong> · brecha <strong className="text-[#ba1a1a]">−{fmtCLP(gap)}/mes</strong>
+                      </p>
                     )}
-                  </AnimatePresence>
+                  </div>
+                  <div className="flex flex-col items-end gap-2 shrink-0">
+                    <div className="flex items-center gap-2">
+                      <div className="w-20 h-1.5 bg-[#e5e2de] rounded-full overflow-hidden">
+                        <div className="h-full bg-[#ba1a1a] rounded-full" style={{ width: `${n.riesgo}%` }} />
+                      </div>
+                      <span className="font-bold text-[#ba1a1a] tabular-nums" style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.88rem" }}>{n.riesgo}/100</span>
+                    </div>
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ background: "rgba(186,26,26,0.08)", color: "#ba1a1a" }}>Crítico</span>
+                  </div>
                 </motion.div>
               );
             })}
           </div>
+        </motion.div>
+
+        {/* BLOQUE 2: Monitorear — Alto (45-64) */}
+        {NUCLEO.filter(n => n.riesgo >= 45 && n.riesgo < 65).length > 0 && (
+          <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.38, ease: E }} className="mb-6">
+            <div className="flex items-center gap-2 mb-3">
+              <span className="w-2.5 h-2.5 rounded-full bg-[#835500]" />
+              <p className="font-semibold text-[#1c1c1a]">Monitorear — {NUCLEO.filter(n => n.riesgo >= 45 && n.riesgo < 65).length} en riesgo alto</p>
+            </div>
+            <div className="rounded-xl bg-white border border-[#e5e2de] p-4">
+              <p style={{ fontSize: "0.82rem", color: "#44474e", marginBottom: "12px" }}>
+                No requieren acción inmediata pero cualquier oferta externa en los próximos 90 días puede inclinar la balanza.
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {NUCLEO.filter(n => n.riesgo >= 45 && n.riesgo < 65).sort((a, b) => b.riesgo - a.riesgo).map(n => (
+                  <div key={n.nombre} className="flex items-center justify-between rounded-lg px-3 py-2.5" style={{ background: "#f6f3ef" }}>
+                    <div>
+                      <span className="font-semibold text-[#1c1c1a]" style={{ fontSize: "0.84rem" }}>{n.nombre}</span>
+                      <span className="ml-2 text-[#9a9a9a]" style={{ fontSize: "0.72rem" }}>{n.cargo}</span>
+                    </div>
+                    <span className="font-bold tabular-nums" style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.82rem", color: "#835500" }}>{n.riesgo}/100</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </motion.div>
+        )}
+
+        {/* BLOQUE 3: Sin acción — Bajo/Moderado */}
+        <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.48, ease: E }} className="mb-6">
+          <div className="flex items-center gap-2 mb-3">
+            <span className="w-2.5 h-2.5 rounded-full bg-[#2a7d4f]" />
+            <p className="font-semibold text-[#1c1c1a]">Sin acción requerida — {NUCLEO.filter(n => n.riesgo < 45).length} con riesgo bajo o moderado</p>
+          </div>
+          <div className="rounded-xl border border-[#e5e2de] bg-white px-4 py-3 flex flex-wrap gap-x-5 gap-y-1.5 items-center">
+            {NUCLEO.filter(n => n.riesgo < 45).sort((a, b) => a.riesgo - b.riesgo).map(n => (
+              <span key={n.nombre} className="flex items-center gap-1.5" style={{ fontSize: "0.82rem", color: "#44474e" }}>
+                <CheckCircle2 size={13} style={{ color: "#2a7d4f", flexShrink: 0 }} />
+                <span className="font-semibold text-[#1c1c1a]">{n.nombre}</span>
+                <span className="text-[#9a9a9a]">{n.riesgo}/100</span>
+              </span>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* Ver tabla completa colapsable */}
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.56, ease: E }}>
+          <button
+            onClick={() => setExpandedNucleo(expandedNucleo === -1 ? null : -1)}
+            className="flex items-center gap-2 mb-3 hover:opacity-70 transition-opacity"
+            style={{ fontSize: "0.82rem", color: "#75777f", fontWeight: 600 }}>
+            {expandedNucleo === -1 ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+            {expandedNucleo === -1 ? "Ocultar tabla completa" : "Ver los 20 trabajadores"}
+          </button>
+          <AnimatePresence>
+            {expandedNucleo === -1 && (
+              <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.25 }} style={{ overflow: "hidden" }}>
+                <div className="space-y-2">
+                  {[...NUCLEO].sort((a, b) => b.riesgo - a.riesgo).map((n, i) => {
+                    const rc = riesgoColor(n.riesgo);
+                    return (
+                      <div key={i} className="rounded-xl border border-[#e5e2de] bg-white px-4 py-3 flex items-center gap-3 flex-wrap">
+                        <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0"
+                          style={{ background: n.sexo === "F" ? "rgba(255,100,200,0.12)" : "rgba(4,22,53,0.07)" }}>
+                          <Users size={12} style={{ color: n.sexo === "F" ? "#FF64C8" : "#041635" }} />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="font-semibold text-[#1c1c1a]" style={{ fontSize: "0.82rem" }}>{n.nombre}</span>
+                            <span style={{ fontSize: "0.70rem", color: "#75777f" }}>{n.cargo}</span>
+                            {n.contrato === "Plazo fijo" && (
+                              <span className="text-[10px] px-2 py-0.5 rounded-full font-bold" style={{ background: "rgba(186,26,26,0.08)", color: "#ba1a1a" }}>PF</span>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-2 mt-1">
+                            <div className="w-24 h-1.5 bg-[#e5e2de] rounded-full overflow-hidden">
+                              <div className={`h-full ${rc.bar} rounded-full`} style={{ width: `${n.riesgo}%` }} />
+                            </div>
+                            <span className={`font-bold tabular-nums text-xs ${rc.text}`} style={{ fontFamily: "var(--font-space-mono)" }}>{n.riesgo}</span>
+                            <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${rc.badge}`}>{rc.label}</span>
+                          </div>
+                        </div>
+                        <div className="text-right shrink-0">
+                          <p className="font-semibold text-[#1c1c1a] tabular-nums" style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.78rem" }}>{fmtCLP(n.salario)}</p>
+                          <p style={{ fontSize: "0.62rem", color: "#9a9a9a" }}>{n.experiencia}a · {n.area}</p>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+                <p className="mt-3" style={{ fontSize: "0.68rem", color: "#9a9a9a" }}>
+                  Score compuesto: brecha salarial vs P50, tipo de contrato, antigüedad, jornada y factores de liquidez del cargo.
+                </p>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </motion.div>
+
         </section>)}
 
         {/* ── M04 — Presión de mercado ── */}
         {activeSection === "mercado" && (<section className="mb-8">
-          <p style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.58rem", color: "#00C2FF", letterSpacing: "0.2em", textTransform: "uppercase", marginBottom: "4px" }}>
-            Módulo 04 · Presión de mercado
-          </p>
-          <h2 className="text-lg font-bold text-white mb-1">¿Cómo te está afectando el mercado hoy?</h2>
-          <p style={{ fontSize: "0.82rem", color: "rgba(255,255,255,0.4)", marginBottom: "24px" }}>
-            Cruzamos los avisos activos de los últimos 90 días con las brechas salariales de tu equipo. Resultado: el índice de tensión y la probabilidad real de que ese cargo reciba una oferta mejor antes de fin de semestre.
-          </p>
 
-          {/* 3 summary KPIs */}
-          <div className="grid grid-cols-3 gap-3 mb-6">
+        {/* Diagnóstico en una línea */}
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35, ease: E }} className="mb-6">
+          <h1 className="text-2xl font-bold text-[#1c1c1a] mb-1">Presión de mercado</h1>
+          <p style={{ fontSize: "0.88rem", color: "#75777f" }}>{FECHA} · Avisos laborales últimos 90 días · Región Valparaíso</p>
+        </motion.div>
+
+        {/* Alerta principal */}
+        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.06, ease: E }}
+          className="rounded-xl p-5 mb-7 flex flex-wrap items-center justify-between gap-4"
+          style={{ background: "rgba(186,26,26,0.04)", border: "1px solid rgba(186,26,26,0.18)", borderLeft: "4px solid #ba1a1a" }}>
+          <div>
+            <p className="font-bold text-[#1c1c1a]" style={{ fontSize: "1rem" }}>
+              El mercado está compitiendo activamente por tu Ayudante de Cocina y Garzón Senior ahora mismo.
+            </p>
+            <p style={{ fontSize: "0.82rem", color: "#44474e", marginTop: "4px" }}>
+              3 cargos con alta presión · tensión 82–88/100 · probabilidad de oferta externa 55–78% en 90 días
+            </p>
+          </div>
+          <div className="flex gap-3 shrink-0">
             {([
-              { label: "Cargos con alta presión", valor: "3 de 6",       sub: "Garzón · Ayudante · Bartender",            color: "#FF4D5A" },
-              { label: "Cargo más expuesto",       valor: "Ayud. Cocina", sub: "Tensión 88/100 · 78% prob. oferta",         color: "#F7C948" },
-              { label: "Mayor brecha salarial",    valor: "−$73.000",     sub: "Ayudante Cocina vs. mediana de avisos /mes", color: "#FF8C42" },
-            ] as const).map(k => (
-              <div key={k.label} className="rounded-xl p-4 border border-white/8 bg-white/4">
-                <p style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.50rem", color: "rgba(255,255,255,0.30)", letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: "8px" }}>{k.label}</p>
-                <p className="font-bold" style={{ fontFamily: "var(--font-space-mono)", fontSize: "1.05rem", color: k.color, lineHeight: 1.15 }}>{k.valor}</p>
-                <p style={{ fontSize: "0.62rem", color: "rgba(255,255,255,0.28)", marginTop: "5px" }}>{k.sub}</p>
+              { n: MERCADO_IMPACT.filter(m => m.nivel === "alta").length,  label: "Alta presión", color: "#ba1a1a", bg: "rgba(186,26,26,0.08)"  },
+              { n: MERCADO_IMPACT.filter(m => m.nivel === "media").length, label: "Media",        color: "#835500", bg: "rgba(131,85,0,0.08)"  },
+              { n: MERCADO_IMPACT.filter(m => m.nivel === "baja").length,  label: "Baja",         color: "#2a7d4f", bg: "rgba(42,125,79,0.08)"  },
+            ]).map(s => (
+              <div key={s.label} className="text-center rounded-lg px-4 py-2" style={{ background: s.bg }}>
+                <p className="font-bold tabular-nums text-xl" style={{ color: s.color }}>{s.n}</p>
+                <p style={{ fontSize: "0.65rem", color: s.color, fontWeight: 600 }}>{s.label}</p>
               </div>
             ))}
           </div>
+        </motion.div>
 
-          {/* Per-position cards */}
-          <div className="space-y-3 mb-5">
-            {MERCADO_IMPACT.map((m, i) => {
-              const isAlta  = m.nivel === "alta";
-              const isMedia = m.nivel === "media";
-              const nivelColor = isAlta ? "#FF4D5A" : isMedia ? "#F7C948" : "#06D6A0";
-              const nivelBg    = isAlta ? "rgba(255,77,90,0.10)" : isMedia ? "rgba(247,201,72,0.10)" : "rgba(6,214,160,0.08)";
-              const nivelLabel = isAlta ? "Alta presión" : isMedia ? "Presión media" : "Presión baja";
-              const probColor  = m.probOferta >= 65 ? "#FF4D5A" : m.probOferta >= 40 ? "#F7C948" : "#06D6A0";
-              const probBg     = m.probOferta >= 65 ? "rgba(255,77,90,0.10)" : m.probOferta >= 40 ? "rgba(247,201,72,0.10)" : "rgba(6,214,160,0.08)";
-              const tensColor  = m.tensionIdx >= 70 ? "#FF4D5A" : m.tensionIdx >= 45 ? "#F7C948" : "#06D6A0";
-              const gapAbs     = m.med90d ? Math.abs(m.empresa - m.med90d) : 0;
-
+        {/* BLOQUE 1: Alta presión — Acción inmediata */}
+        <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.12, ease: E }} className="mb-6">
+          <div className="flex items-center gap-2 mb-3">
+            <span className="w-2.5 h-2.5 rounded-full bg-[#ba1a1a]" />
+            <p className="font-semibold text-[#1c1c1a]">Acción urgente — {MERCADO_IMPACT.filter(m => m.nivel === "alta").length} cargos con alta presión de mercado</p>
+          </div>
+          <div className="space-y-3">
+            {MERCADO_IMPACT.filter(m => m.nivel === "alta").map((m, i) => {
+              const probColor = m.probOferta >= 65 ? "#ba1a1a" : "#835500";
+              const probBg    = m.probOferta >= 65 ? "rgba(186,26,26,0.08)" : "rgba(131,85,0,0.08)";
+              const gapAbs    = m.med90d ? Math.abs(m.empresa - m.med90d) : 0;
               return (
-                <motion.div key={i} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05, ease: E }}
-                  className="rounded-xl border p-5"
-                  style={{ background: isAlta ? "rgba(255,77,90,0.02)" : "rgba(255,255,255,0.02)", borderColor: isAlta ? "rgba(255,77,90,0.14)" : "rgba(255,255,255,0.07)" }}>
-
-                  {/* Header */}
-                  <div className="flex flex-wrap items-start justify-between gap-3 mb-4">
-                    <div>
-                      <div className="flex items-center gap-2 mb-1.5 flex-wrap">
-                        <span className="font-semibold text-white" style={{ fontSize: "0.9rem" }}>{m.cargo}</span>
-                        <span style={{ fontSize: "0.64rem", color: "rgba(255,255,255,0.28)", fontFamily: "var(--font-space-mono)" }}>×{m.n_empresa} en equipo</span>
-                      </div>
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full font-semibold"
-                          style={{ fontSize: "0.66rem", background: nivelBg, color: nivelColor }}>
-                          <span className="w-1.5 h-1.5 rounded-full" style={{ background: nivelColor }} />
-                          {nivelLabel}
-                        </span>
-                        {m.nivel === "baja" && (
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full font-semibold"
-                            style={{ fontSize: "0.62rem", background: "rgba(6,214,160,0.08)", color: "#06D6A0", border: "1px solid rgba(6,214,160,0.15)" }}>
-                            ✦ Ventana de oportunidad
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                    <div className="text-right shrink-0">
-                      <p style={{ fontSize: "0.58rem", fontFamily: "var(--font-space-mono)", color: "rgba(255,255,255,0.28)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "3px" }}>
-                        Prob. oferta externa · 90d
-                      </p>
-                      <span className="inline-flex items-center px-3 py-1 rounded-full font-bold"
-                        style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.95rem", background: probBg, color: probColor }}>
-                        {m.probOferta}%
+                <motion.div key={m.cargo} initial={{ opacity: 0, x: -6 }} animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.16 + i * 0.06, ease: E }}
+                  className="rounded-xl bg-white border border-[#e5e2de] p-4 flex flex-wrap items-start justify-between gap-4"
+                  style={{ borderLeft: "3px solid #ba1a1a" }}>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-2 flex-wrap">
+                      <span className="font-semibold text-[#1c1c1a]" style={{ fontSize: "0.92rem" }}>{m.cargo}</span>
+                      <span style={{ fontSize: "0.72rem", color: "#9a9a9a" }}>×{m.n_empresa} en equipo</span>
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full font-semibold"
+                        style={{ fontSize: "0.65rem", background: "rgba(186,26,26,0.08)", color: "#ba1a1a" }}>
+                        Alta presión · {m.avisos90d} avisos activos
                       </span>
                     </div>
+                    <p style={{ fontSize: "0.78rem", color: "#44474e", lineHeight: 1.65, borderLeft: "3px solid rgba(186,26,26,0.2)", paddingLeft: "10px" }}>
+                      {m.narrativa}
+                    </p>
+                    {gapAbs > 0 && m.salGap < 0 && (
+                      <p style={{ fontSize: "0.75rem", color: "#835500", marginTop: "8px", fontWeight: 600 }}>
+                        ↳ Brecha salarial: −{fmtCLP(gapAbs)}/mes vs. mercado — ajustar ahora cuesta menos que reemplazar
+                      </p>
+                    )}
                   </div>
-
-                  {/* Tension bar */}
-                  <div className="mb-4">
-                    <div className="flex items-center justify-between mb-1.5">
-                      <p style={{ fontSize: "0.58rem", fontFamily: "var(--font-space-mono)", color: "rgba(255,255,255,0.28)", textTransform: "uppercase", letterSpacing: "0.1em" }}>Índice de tensión de mercado</p>
-                      <p style={{ fontSize: "0.72rem", fontFamily: "var(--font-space-mono)", color: tensColor, fontWeight: 700 }}>{m.tensionIdx}/100</p>
-                    </div>
-                    <div className="h-2 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.07)" }}>
-                      <div className="h-full rounded-full" style={{ width: `${m.tensionIdx}%`, background: `linear-gradient(90deg,${tensColor}88,${tensColor})` }} />
-                    </div>
+                  <div className="text-center rounded-lg px-4 py-2 shrink-0" style={{ background: probBg }}>
+                    <p className="font-bold tabular-nums" style={{ fontFamily: "var(--font-space-mono)", fontSize: "1.4rem", color: probColor, lineHeight: 1 }}>{m.probOferta}%</p>
+                    <p style={{ fontSize: "0.60rem", color: probColor, fontWeight: 600, marginTop: "3px" }}>prob. oferta · 90d</p>
                   </div>
-
-                  {/* Data grid */}
-                  <div className="grid grid-cols-2 gap-3 mb-4">
-                    {/* Avisos */}
-                    <div className="rounded-lg p-3" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
-                      <p style={{ fontSize: "0.53rem", fontFamily: "var(--font-space-mono)", color: "rgba(255,255,255,0.26)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "6px" }}>Avisos activos · últimos 90d</p>
-                      <div className="flex items-end gap-2 mb-1">
-                        <p style={{ fontFamily: "var(--font-space-mono)", fontSize: "1.5rem", fontWeight: 700, color: "rgba(255,255,255,0.85)", lineHeight: 1 }}>{m.avisos90d}</p>
-                        <span className="mb-1 inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded font-bold"
-                          style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.65rem", background: m.avisosTrend >= 0 ? "rgba(255,77,90,0.10)" : "rgba(6,214,160,0.10)", color: m.avisosTrend >= 0 ? "#FF4D5A" : "#06D6A0" }}>
-                          {m.avisosTrend >= 0 ? "▲" : "▼"} {Math.abs(m.avisosTrend).toFixed(1)}%
-                        </span>
-                      </div>
-                      <p style={{ fontSize: "0.58rem", color: "rgba(255,255,255,0.25)" }}>vs. período anterior</p>
-                    </div>
-
-                    {/* Salary comparison */}
-                    <div className="rounded-lg p-3" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
-                      <p style={{ fontSize: "0.53rem", fontFamily: "var(--font-space-mono)", color: "rgba(255,255,255,0.26)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "6px" }}>Sueldo empresa vs. mercado</p>
-                      {m.med90d ? (<>
-                        <div className="flex items-center justify-between mb-1">
-                          <span style={{ fontSize: "0.62rem", color: "rgba(255,255,255,0.38)" }}>Empresa</span>
-                          <span style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.70rem", color: "rgba(255,255,255,0.72)", fontWeight: 600 }}>{fmtCLP(m.empresa)}</span>
-                        </div>
-                        <div className="flex items-center justify-between mb-2">
-                          <span style={{ fontSize: "0.62rem", color: "rgba(255,255,255,0.38)" }}>Mercado (med.)</span>
-                          <span style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.70rem", color: "#00B4D8", fontWeight: 600 }}>{fmtCLP(m.med90d)}</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <div className="flex-1 h-1.5 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.08)" }}>
-                            <div className="h-full rounded-full" style={{ width: `${Math.min(100, (m.empresa / m.med90d) * 100)}%`, background: m.salGap < -5 ? "#FF4D5A" : m.salGap < 0 ? "#F7C948" : "#06D6A0" }} />
-                          </div>
-                          <span style={{ fontSize: "0.65rem", fontFamily: "var(--font-space-mono)", fontWeight: 700, color: m.salGap < -5 ? "#FF4D5A" : m.salGap < 0 ? "#F7C948" : "#06D6A0" }}>
-                            {m.salGap > 0 ? "+" : ""}{m.salGap.toFixed(1)}%
-                          </span>
-                        </div>
-                        {gapAbs > 0 && m.salGap < 0 && (
-                          <p style={{ fontSize: "0.56rem", color: "rgba(255,255,255,0.22)", marginTop: "4px" }}>−{fmtCLP(gapAbs)}/mes vs. mediana de avisos</p>
-                        )}
-                      </>) : (
-                        <p style={{ fontSize: "0.72rem", color: "rgba(255,255,255,0.28)" }}>Sin datos suficientes</p>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Narrative */}
-                  <p style={{ fontSize: "0.78rem", color: "rgba(255,255,255,0.48)", lineHeight: 1.65, borderLeft: `3px solid ${nivelColor}30`, paddingLeft: "12px" }}>
-                    {m.narrativa}
-                  </p>
                 </motion.div>
               );
             })}
           </div>
+        </motion.div>
 
-          <p style={{ fontSize: "0.66rem", color: "rgba(255,255,255,0.22)" }}>
-            Fuente: portales Trabajando.cl · Computrabajo · últimos 90 días (mar–may 2026). Índice de tensión calculado sobre avisos activos, tendencia y brecha salarial. Probabilidad de oferta: modelo estimativo.
-          </p>
+        {/* BLOQUE 2: Monitorear — Media */}
+        <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35, ease: E }} className="mb-6">
+          <div className="flex items-center gap-2 mb-3">
+            <span className="w-2.5 h-2.5 rounded-full bg-[#835500]" />
+            <p className="font-semibold text-[#1c1c1a]">Monitorear — {MERCADO_IMPACT.filter(m => m.nivel === "media").length} cargos con presión moderada</p>
+          </div>
+          <div className="rounded-xl bg-white border border-[#e5e2de] p-4">
+            <p style={{ fontSize: "0.82rem", color: "#44474e", marginBottom: "12px" }}>
+              Mercado activo pero no agresivo. Mantén sueldos ajustados y monitorea la tendencia trimestral de avisos.
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              {MERCADO_IMPACT.filter(m => m.nivel === "media").map(m => (
+                <div key={m.cargo} className="rounded-lg p-3" style={{ background: "#f6f3ef" }}>
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="font-semibold text-[#1c1c1a]" style={{ fontSize: "0.84rem" }}>{m.cargo}</span>
+                    <span style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.78rem", color: "#835500", fontWeight: 700 }}>{m.probOferta}%</span>
+                  </div>
+                  <p style={{ fontSize: "0.72rem", color: "#75777f", lineHeight: 1.5 }}>{m.narrativa}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </motion.div>
+
+        {/* BLOQUE 3: Sin acción — Baja + ventana de oportunidad */}
+        {MERCADO_IMPACT.filter(m => m.nivel === "baja").length > 0 && (
+          <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.48, ease: E }} className="mb-6">
+            <div className="flex items-center gap-2 mb-3">
+              <span className="w-2.5 h-2.5 rounded-full bg-[#2a7d4f]" />
+              <p className="font-semibold text-[#1c1c1a]">Ventana de oportunidad — presión baja</p>
+            </div>
+            <div className="rounded-xl border border-[#e5e2de] bg-white px-4 py-3">
+              {MERCADO_IMPACT.filter(m => m.nivel === "baja").map(m => (
+                <div key={m.cargo} className="flex items-start gap-3">
+                  <span className="inline-flex items-center gap-1 mt-0.5 px-2 py-0.5 rounded-full font-semibold shrink-0"
+                    style={{ fontSize: "0.65rem", background: "rgba(42,125,79,0.08)", color: "#2a7d4f" }}>
+                    ✦ {m.cargo}
+                  </span>
+                  <p style={{ fontSize: "0.78rem", color: "#44474e", lineHeight: 1.6 }}>{m.narrativa}</p>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+        )}
+
+        <p style={{ fontSize: "0.66rem", color: "#aaaaaa" }}>
+          Fuente: portales Trabajando.cl · Computrabajo · últimos 90 días (mar–may 2026). Índice de tensión calculado sobre avisos activos, tendencia y brecha salarial. Probabilidad de oferta: modelo estimativo.
+        </p>
+
         </section>)}
 
         {/* ── Calculadora rotación ── */}
         {activeSection === "costo_rot" && (<section className="mb-8">
 
-          <p style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.58rem", color: "#00C2FF", letterSpacing: "0.2em", textTransform: "uppercase", marginBottom: "4px" }}>
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35, ease: E }} className="mb-6">
+          <h1 className="text-2xl font-bold text-[#1c1c1a] mb-1">Costo de rotación</h1>
+          <p style={{ fontSize: "0.88rem", color: "#75777f" }}>{FECHA} · Desglose por cargo · 9 salidas estimadas 2026</p>
+        </motion.div>
+
+        {/* Myth-busting box */}
+        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.06, ease: E }}
+          className="rounded-xl p-5 mb-4"
+          style={{ background: "rgba(4,22,53,0.03)", border: "1px solid #c5c6cf" }}>
+          <p className="font-bold text-[#041635] mb-3" style={{ fontSize: "0.88rem" }}>
+            ¿Por qué no son millones? — Cómo calculamos el costo de reemplazar a alguien
+          </p>
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-3">
+            {([
+              { label: "Aviso laboral",        monto: "40–65k",  desc: "Portal de empleo" },
+              { label: "Selección",             monto: "30–65k",  desc: "Horas jefatura" },
+              { label: "Documentación",         monto: "20–25k",  desc: "Contrato + alta" },
+              { label: "Días sin cubrir",       monto: "100–215k",desc: "Vacante operativa" },
+              { label: "Curva aprendizaje",     monto: "150–345k",desc: "4–6 semanas al 65%" },
+              { label: "Trainer",               monto: "40–95k",  desc: "Senior capacitando" },
+            ]).map(c => (
+              <div key={c.label} className="rounded-lg p-2.5" style={{ background: "#ffffff", border: "1px solid #e5e2de" }}>
+                <p className="font-semibold text-[#041635]" style={{ fontSize: "0.72rem" }}>{c.label}</p>
+                <p style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.78rem", color: "#835500", fontWeight: 700 }}>{c.monto}</p>
+                <p style={{ fontSize: "0.60rem", color: "#9a9a9a" }}>{c.desc}</p>
+              </div>
+            ))}
+          </div>
+          <p style={{ fontSize: "0.78rem", color: "#44474e", lineHeight: 1.6 }}>
+            <strong className="text-[#1c1c1a]">Total por salida: $380k–$805k</strong> según el cargo.
+            Es entre <strong>0.7 y 1.1 meses de sueldo</strong> — no los 3–6 meses que citan consultoras grandes
+            (esas cifras aplican a cargos profesionales especializados, no a operativos de gastronomía).
+            Lo que duele no es una sola salida: es que se van 9 en un año.
+          </p>
+        </motion.div>
+
+        {/* Resumen costo anual */}
+        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.14, ease: E }}
+          className="rounded-xl p-5 mb-7 flex flex-wrap items-center justify-between gap-4"
+          style={{ background: "rgba(186,26,26,0.04)", border: "1px solid rgba(186,26,26,0.18)", borderLeft: "4px solid #ba1a1a" }}>
+          <div>
+            <p className="font-bold text-[#1c1c1a]" style={{ fontSize: "1rem" }}>
+              9 salidas en 2026 = <span className="text-[#ba1a1a]">{fmtM(COSTOROTACION_REAL)}</span> en costos acumulados.
+            </p>
+            <p style={{ fontSize: "0.82rem", color: "#44474e", marginTop: "4px" }}>
+              Ahorro posible con ajustes salariales + contratos: ~<span className="font-semibold text-[#2a7d4f]">{fmtM(COSTOROTACION_REAL * 0.55)}</span>
+            </p>
+          </div>
+          <div className="text-center rounded-lg px-5 py-3 shrink-0" style={{ background: "rgba(186,26,26,0.08)" }}>
+            <p className="font-bold tabular-nums" style={{ fontFamily: "var(--font-space-mono)", fontSize: "1.6rem", color: "#ba1a1a", lineHeight: 1 }}>{fmtM(COSTOROTACION_REAL)}</p>
+            <p style={{ fontSize: "0.62rem", color: "#ba1a1a", fontWeight: 600, marginTop: "3px" }}>costo anual estimado</p>
+          </div>
+        </motion.div>
+
+          <p style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.58rem", color: "#041635", letterSpacing: "0.2em", textTransform: "uppercase", marginBottom: "4px" }}>
             Calculadora · Costo de rotación de personal
           </p>
-          <h2 className="text-lg font-bold text-white mb-1">¿Cuánto le cuesta a tu empresa cada salida?</h2>
-          <p style={{ fontSize: "0.82rem", color: "rgba(255,255,255,0.4)", marginBottom: "24px", lineHeight: 1.6 }}>
+          <h2 className="text-lg font-bold text-[#1c1c1a] mb-1">¿Cuánto le cuesta a tu empresa cada salida?</h2>
+          <p style={{ fontSize: "0.82rem", color: "#75777f", marginBottom: "24px", lineHeight: 1.6 }}>
             Cada cargo tiene un factor diferente según cuánto tarda en reemplazarse. Los factores van de{" "}
-            <strong className="text-white">0.68× a 1.07×</strong> el sueldo mensual — muy por debajo del 1.5× anual
+            <strong className="text-[#1c1c1a]">0.68× a 1.07×</strong> el sueldo mensual — muy por debajo del 1.5× anual
             que citan consultoras globales para cargos operativos.
           </p>
 
           {/* ── 3 métricas resumen ── */}
           <div className="grid grid-cols-3 gap-3 mb-6">
             {[
-              { label: "Costo total 2026",  valor: fmtM(costoRotacion),                                                   sub: "9 salidas voluntarias estimadas",    color: "#FF4D5A" },
-              { label: "Factor promedio",    valor: "1.0×",                                                                sub: "del sueldo mensual de referencia",   color: "#F7C948" },
-              { label: "Ahorro potencial",   valor: fmtM(Math.round((9 - 20 * 0.25) / 9 * costoRotacion)),                sub: "si bajas de 45% → 25% rotación",    color: "#06D6A0" },
+              { label: "Costo total 2026",  valor: fmtM(costoRotacion),                                                   sub: "9 salidas voluntarias estimadas",    color: "#ba1a1a" },
+              { label: "Factor promedio",    valor: "1.0×",                                                                sub: "del sueldo mensual de referencia",   color: "#835500" },
+              { label: "Ahorro potencial",   valor: fmtM(Math.round((9 - 20 * 0.25) / 9 * costoRotacion)),                sub: "si bajas de 45% → 25% rotación",    color: "#2a7d4f" },
             ].map(k => (
-              <div key={k.label} className="rounded-xl p-4 border border-white/8 bg-white/4">
-                <p style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.50rem", color: "rgba(255,255,255,0.30)", letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: "8px" }}>{k.label}</p>
+              <div key={k.label} className="rounded-xl p-4 border border-[#e5e2de] bg-white">
+                <p style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.50rem", color: "#75777f", letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: "8px" }}>{k.label}</p>
                 <p className="font-bold tabular-nums" style={{ fontFamily: "var(--font-space-mono)", fontSize: "1.55rem", color: k.color, lineHeight: 1 }}>{k.valor}</p>
-                <p style={{ fontSize: "0.62rem", color: "rgba(255,255,255,0.28)", marginTop: "5px" }}>{k.sub}</p>
+                <p style={{ fontSize: "0.62rem", color: "#9a9a9a", marginTop: "5px" }}>{k.sub}</p>
               </div>
             ))}
           </div>
@@ -1475,34 +1801,34 @@ function Dashboard() {
             {COSTO_ROT.map((r, i) => {
               const isOpen = rotExpanded === i;
               const comps = [
-                { nombre: "Curva aprendizaje", monto: r.curva_aprendizaje, color: "#FF4D5A", desc: "4–6 semanas al 65% de productividad del nuevo trabajador versus el que salió" },
-                { nombre: "Vacante",           monto: r.vacante,           color: "#F7C948", desc: `${Math.round(r.vacante / (r.salario_ref / 30))} días con turno cubierto por hora extra o posición sin cubrir` },
-                { nombre: "Trainer",           monto: r.trainer,           color: "#FF8C42", desc: "2 semanas de un trabajador senior a 80% de productividad por dedicarse a capacitar al nuevo" },
-                { nombre: "Aviso laboral",     monto: r.aviso,             color: "#00B4D8", desc: "Publicación en Trabajando.cl, Computrabajo u otro portal durante el proceso de búsqueda" },
-                { nombre: "Selección",         monto: r.seleccion,         color: "#2EC4B6", desc: "Horas de jefatura revisando CVs, coordinando y realizando entrevistas (estimado 8h × costo-hora)" },
-                { nombre: "Documentación",     monto: r.documentacion,     color: "#06D6A0", desc: "Finiquito si aplica, contrato nuevo, alta en Previred, Caja de Compensación y AFP" },
+                { nombre: "Curva aprendizaje", monto: r.curva_aprendizaje, color: "#ba1a1a", desc: "4–6 semanas al 65% de productividad del nuevo trabajador versus el que salió" },
+                { nombre: "Vacante",           monto: r.vacante,           color: "#835500", desc: `${Math.round(r.vacante / (r.salario_ref / 30))} días con turno cubierto por hora extra o posición sin cubrir` },
+                { nombre: "Trainer",           monto: r.trainer,           color: "#835500", desc: "2 semanas de un trabajador senior a 80% de productividad por dedicarse a capacitar al nuevo" },
+                { nombre: "Aviso laboral",     monto: r.aviso,             color: "#041635", desc: "Publicación en Trabajando.cl, Computrabajo u otro portal durante el proceso de búsqueda" },
+                { nombre: "Selección",         monto: r.seleccion,         color: "#1e477b", desc: "Horas de jefatura revisando CVs, coordinando y realizando entrevistas (estimado 8h × costo-hora)" },
+                { nombre: "Documentación",     monto: r.documentacion,     color: "#2a7d4f", desc: "Finiquito si aplica, contrato nuevo, alta en Previred, Caja de Compensación y AFP" },
               ].sort((a, b) => b.monto - a.monto);
-              const factorColor = r.factor_meses >= 1.0 ? "#FF4D5A" : r.factor_meses >= 0.85 ? "#F7C948" : "#06D6A0";
+              const factorColor = r.factor_meses >= 1.0 ? "#ba1a1a" : r.factor_meses >= 0.85 ? "#835500" : "#2a7d4f";
               return (
                 <motion.div key={i} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05, ease: E }}
-                  className="rounded-xl border border-white/8 bg-white/4 overflow-hidden">
+                  className="rounded-xl border border-[#e5e2de] bg-white overflow-hidden">
 
                   {/* Header clickeable */}
-                  <button className="w-full px-5 py-4 text-left hover:bg-white/3 transition-colors"
+                  <button className="w-full px-5 py-4 text-left hover:bg-transparent transition-colors"
                     onClick={() => setRotExpanded(isOpen ? null : i)}>
                     <div className="flex items-start justify-between gap-3 mb-3">
                       <div>
-                        <p className="font-semibold text-white" style={{ fontSize: "0.92rem" }}>{r.categoria}</p>
-                        <p style={{ fontSize: "0.68rem", color: "rgba(255,255,255,0.32)", marginTop: "2px" }}>
+                        <p className="font-semibold text-[#1c1c1a]" style={{ fontSize: "0.92rem" }}>{r.categoria}</p>
+                        <p style={{ fontSize: "0.68rem", color: "#75777f", marginTop: "2px" }}>
                           {r.n_salidas_estimadas} salida{r.n_salidas_estimadas > 1 ? "s" : ""} estimadas · Sueldo ref. {fmtCLP(r.salario_ref)}
                         </p>
                       </div>
                       <div className="flex items-center gap-3 shrink-0">
                         <div className="text-right">
                           <p className="font-bold tabular-nums" style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.9rem", color: factorColor }}>{r.factor_meses.toFixed(2)}× sueldo</p>
-                          <p style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.65rem", color: "rgba(255,255,255,0.38)" }}>{fmtCLP(r.total)} por salida</p>
+                          <p style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.65rem", color: "#75777f" }}>{fmtCLP(r.total)} por salida</p>
                         </div>
-                        {isOpen ? <ChevronUp size={14} className="text-white/30" /> : <ChevronDown size={14} className="text-white/30" />}
+                        {isOpen ? <ChevronUp size={14} className="text-[#9a9a9a]" /> : <ChevronDown size={14} className="text-[#9a9a9a]" />}
                       </div>
                     </div>
 
@@ -1516,7 +1842,7 @@ function Dashboard() {
                     {/* Leyenda compacta */}
                     <div className="flex flex-wrap gap-x-3 gap-y-0.5 mb-3">
                       {comps.map(c => (
-                        <span key={c.nombre} className="flex items-center gap-1" style={{ fontSize: "0.58rem", color: "rgba(255,255,255,0.32)" }}>
+                        <span key={c.nombre} className="flex items-center gap-1" style={{ fontSize: "0.58rem", color: "#75777f" }}>
                           <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: c.color }} />
                           {c.nombre} {Math.round(c.monto / r.total * 100)}%
                         </span>
@@ -1524,9 +1850,9 @@ function Dashboard() {
                     </div>
 
                     {/* Costo anual */}
-                    <div className="flex items-center justify-between pt-2.5" style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}>
-                      <p style={{ fontSize: "0.68rem", color: "rgba(255,255,255,0.30)" }}>Costo anual ({r.n_salidas_estimadas} salidas)</p>
-                      <p className="font-bold tabular-nums" style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.90rem", color: "#F7C948" }}>
+                    <div className="flex items-center justify-between pt-2.5" style={{ borderTop: "1px solid #e5e2de" }}>
+                      <p style={{ fontSize: "0.68rem", color: "#75777f" }}>Costo anual ({r.n_salidas_estimadas} salidas)</p>
+                      <p className="font-bold tabular-nums" style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.90rem", color: "#835500" }}>
                         {fmtCLP(r.total * r.n_salidas_estimadas)}
                       </p>
                     </div>
@@ -1537,15 +1863,15 @@ function Dashboard() {
                     {isOpen && (
                       <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }}
                         transition={{ duration: 0.25 }} style={{ overflow: "hidden" }}>
-                        <div className="px-5 pb-5 pt-3" style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}>
+                        <div className="px-5 pb-5 pt-3" style={{ borderTop: "1px solid #e5e2de" }}>
 
                           {/* ¿Por qué X× ? */}
-                          <div className="rounded-lg px-4 py-3 mb-4" style={{ background: "rgba(0,180,216,0.06)", border: "1px solid rgba(0,180,216,0.14)" }}>
-                            <p style={{ fontSize: "0.72rem", color: "rgba(255,255,255,0.55)", lineHeight: 1.65 }}>
-                              <strong style={{ color: "#00C2FF" }}>¿Por qué {r.factor_meses.toFixed(2)}×?</strong>{" "}
+                          <div className="rounded-lg px-4 py-3 mb-4" style={{ background: "#f0ede9", border: "1px solid #e5e2de" }}>
+                            <p style={{ fontSize: "0.72rem", color: "#44474e", lineHeight: 1.65 }}>
+                              <strong style={{ color: "#041635" }}>¿Por qué {r.factor_meses.toFixed(2)}×?</strong>{" "}
                               La suma de los 6 componentes da {fmtCLP(r.total)}. Dividido por el sueldo de referencia
                               {" "}{fmtCLP(r.salario_ref)}: {fmtCLP(r.total)} ÷ {fmtCLP(r.salario_ref)} ={" "}
-                              <strong className="text-white">{r.factor_meses.toFixed(2)} meses de sueldo</strong>.
+                              <strong className="text-[#1c1c1a]">{r.factor_meses.toFixed(2)} meses de sueldo</strong>.
                             </p>
                           </div>
 
@@ -1554,21 +1880,21 @@ function Dashboard() {
                             {comps.map((c, j) => {
                               const pct = Math.round(c.monto / r.total * 100);
                               return (
-                                <div key={j} className="rounded-lg p-3" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.05)" }}>
+                                <div key={j} className="rounded-lg p-3" style={{ background: "#ffffff", border: "1px solid #eae8e4" }}>
                                   <div className="flex items-center justify-between mb-1.5">
                                     <div className="flex items-center gap-2">
                                       <span className="w-2 h-2 rounded-full shrink-0" style={{ background: c.color }} />
-                                      <span className="font-semibold text-white" style={{ fontSize: "0.82rem" }}>{c.nombre}</span>
+                                      <span className="font-semibold text-[#1c1c1a]" style={{ fontSize: "0.82rem" }}>{c.nombre}</span>
                                     </div>
                                     <div className="flex items-center gap-3">
-                                      <span style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.65rem", color: "rgba(255,255,255,0.28)" }}>{pct}%</span>
+                                      <span style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.65rem", color: "#9a9a9a" }}>{pct}%</span>
                                       <span className="font-bold tabular-nums" style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.80rem", color: c.color }}>{fmtCLP(c.monto)}</span>
                                     </div>
                                   </div>
-                                  <div className="h-1 rounded-full mb-1.5" style={{ background: "rgba(255,255,255,0.06)" }}>
+                                  <div className="h-1 rounded-full mb-1.5" style={{ background: "#eae8e4" }}>
                                     <div className="h-full rounded-full" style={{ width: `${pct}%`, background: c.color + "70" }} />
                                   </div>
-                                  <p style={{ fontSize: "0.66rem", color: "rgba(255,255,255,0.32)", lineHeight: 1.55 }}>{c.desc}</p>
+                                  <p style={{ fontSize: "0.66rem", color: "#75777f", lineHeight: 1.55 }}>{c.desc}</p>
                                 </div>
                               );
                             })}
@@ -1583,48 +1909,48 @@ function Dashboard() {
           </div>
 
           {/* ── Simulador de ahorro ── */}
-          <div className="rounded-xl p-6 border border-white/8 bg-white/4 mb-4">
-            <p style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.52rem", color: "#06D6A0", letterSpacing: "0.20em", textTransform: "uppercase", marginBottom: "4px" }}>
+          <div className="rounded-xl p-6 border border-[#e5e2de] bg-white mb-4">
+            <p style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.52rem", color: "#2a7d4f", letterSpacing: "0.20em", textTransform: "uppercase", marginBottom: "4px" }}>
               Simulador de ahorro
             </p>
-            <h3 className="font-bold text-white mb-1" style={{ fontSize: "1rem" }}>¿Cuánto ahorras si reduces la rotación?</h3>
-            <p style={{ fontSize: "0.78rem", color: "rgba(255,255,255,0.38)", marginBottom: "20px" }}>
-              Tu rotación voluntaria actual es <strong className="text-white">45%</strong> (9 salidas / 20 del núcleo).
+            <h3 className="font-bold text-[#1c1c1a] mb-1" style={{ fontSize: "1rem" }}>¿Cuánto ahorras si reduces la rotación?</h3>
+            <p style={{ fontSize: "0.78rem", color: "#75777f", marginBottom: "20px" }}>
+              Tu rotación voluntaria actual es <strong className="text-[#1c1c1a]">45%</strong> (9 salidas / 20 del núcleo).
               Mueve el slider para ver el impacto en el costo anual.
             </p>
 
             <div className="flex items-center gap-4 mb-5">
-              <span style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.60rem", color: "rgba(255,255,255,0.32)", minWidth: "36px" }}>Meta</span>
+              <span style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.60rem", color: "#75777f", minWidth: "36px" }}>Meta</span>
               <input
                 type="range" min={5} max={40} step={5} value={rotacionMeta}
                 onChange={e => setRotacionMeta(Number(e.target.value))}
                 className="flex-1 h-1.5 rounded-full appearance-none cursor-pointer"
-                style={{ accentColor: "#06D6A0" }}
+                style={{ accentColor: "#2a7d4f" }}
               />
-              <span className="font-bold tabular-nums" style={{ fontFamily: "var(--font-space-mono)", fontSize: "1.1rem", color: "#06D6A0", minWidth: "48px", textAlign: "right" }}>
+              <span className="font-bold tabular-nums" style={{ fontFamily: "var(--font-space-mono)", fontSize: "1.1rem", color: "#2a7d4f", minWidth: "48px", textAlign: "right" }}>
                 {rotacionMeta}%
               </span>
             </div>
 
             <div className="grid grid-cols-2 gap-4 mb-4">
-              <div className="rounded-xl p-4" style={{ background: "rgba(255,77,90,0.08)", border: "1px solid rgba(255,77,90,0.18)" }}>
-                <p style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.50rem", color: "rgba(255,255,255,0.32)", letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: "8px" }}>
+              <div className="rounded-xl p-4" style={{ background: "rgba(186,26,26,0.08)", border: "1px solid rgba(255,77,90,0.18)" }}>
+                <p style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.50rem", color: "#75777f", letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: "8px" }}>
                   Hoy · 45% rotación
                 </p>
-                <p className="font-bold tabular-nums" style={{ fontFamily: "var(--font-space-mono)", fontSize: "1.6rem", color: "#FF4D5A", lineHeight: 1 }}>{fmtM(costoRotacion)}</p>
-                <p style={{ fontSize: "0.64rem", color: "rgba(255,255,255,0.28)", marginTop: "5px" }}>9 salidas · costo anual estimado</p>
+                <p className="font-bold tabular-nums" style={{ fontFamily: "var(--font-space-mono)", fontSize: "1.6rem", color: "#ba1a1a", lineHeight: 1 }}>{fmtM(costoRotacion)}</p>
+                <p style={{ fontSize: "0.64rem", color: "#9a9a9a", marginTop: "5px" }}>9 salidas · costo anual estimado</p>
               </div>
               {(() => {
                 const metaExits = Math.round(20 * rotacionMeta / 100);
                 const metaCosto = Math.round(metaExits / 9 * costoRotacion);
                 const ahorro    = costoRotacion - metaCosto;
                 return (
-                  <div className="rounded-xl p-4" style={{ background: "rgba(6,214,160,0.08)", border: "1px solid rgba(6,214,160,0.18)" }}>
-                    <p style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.50rem", color: "rgba(255,255,255,0.32)", letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: "8px" }}>
+                  <div className="rounded-xl p-4" style={{ background: "rgba(42,125,79,0.08)", border: "1px solid rgba(6,214,160,0.18)" }}>
+                    <p style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.50rem", color: "#75777f", letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: "8px" }}>
                       Meta · {rotacionMeta}% · {metaExits} salidas
                     </p>
-                    <p className="font-bold tabular-nums" style={{ fontFamily: "var(--font-space-mono)", fontSize: "1.6rem", color: "#06D6A0", lineHeight: 1 }}>{fmtM(metaCosto)}</p>
-                    <p style={{ fontSize: "0.68rem", color: "#06D6A0", marginTop: "5px", fontWeight: 600 }}>
+                    <p className="font-bold tabular-nums" style={{ fontFamily: "var(--font-space-mono)", fontSize: "1.6rem", color: "#2a7d4f", lineHeight: 1 }}>{fmtM(metaCosto)}</p>
+                    <p style={{ fontSize: "0.68rem", color: "#2a7d4f", marginTop: "5px", fontWeight: 600 }}>
                       Ahorro: {fmtM(ahorro)} / año
                     </p>
                   </div>
@@ -1633,17 +1959,17 @@ function Dashboard() {
             </div>
 
             {rotacionMeta <= 30 && (
-              <div className="pt-4" style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}>
-                <p style={{ fontSize: "0.64rem", color: "rgba(255,255,255,0.30)", marginBottom: "10px" }}>
+              <div className="pt-4" style={{ borderTop: "1px solid #e5e2de" }}>
+                <p style={{ fontSize: "0.64rem", color: "#75777f", marginBottom: "10px" }}>
                   Palancas clave para llegar al {rotacionMeta}%:
                 </p>
                 <div className="flex flex-wrap gap-2">
                   {[
-                    { label: "Convertir contratos a indefinido",        color: "#FF4D5A", show: true },
-                    { label: "Ajuste salarial Ayudantes + Auxiliares",  color: "#FF4D5A", show: true },
-                    { label: `Reajuste julio +${ICL.ir_sector}%`,       color: "#F7C948", show: true },
-                    { label: "Contrato multi-temporada",                 color: "#00B4D8", show: rotacionMeta <= 25 },
-                    { label: "Publicar bandas salariales internas",      color: "#06D6A0", show: rotacionMeta <= 20 },
+                    { label: "Convertir contratos a indefinido",        color: "#ba1a1a", show: true },
+                    { label: "Ajuste salarial Ayudantes + Auxiliares",  color: "#ba1a1a", show: true },
+                    { label: `Reajuste julio +${ICL.ir_sector}%`,       color: "#835500", show: true },
+                    { label: "Contrato multi-temporada",                 color: "#041635", show: rotacionMeta <= 25 },
+                    { label: "Publicar bandas salariales internas",      color: "#2a7d4f", show: rotacionMeta <= 20 },
                   ].filter(p => p.show).map((p, idx) => (
                     <span key={idx} className="text-xs px-3 py-1 rounded-full font-medium"
                       style={{ background: p.color + "18", color: p.color, border: `1px solid ${p.color}30` }}>
@@ -1656,9 +1982,9 @@ function Dashboard() {
           </div>
 
           {/* Nota metodología */}
-          <div className="rounded-xl px-5 py-4 border-l-2" style={{ borderLeftColor: "rgba(0,180,216,0.35)", background: "rgba(0,180,216,0.04)" }}>
-            <p style={{ fontSize: "0.70rem", color: "rgba(255,255,255,0.38)", lineHeight: 1.7 }}>
-              <strong style={{ color: "rgba(255,255,255,0.55)" }}>Metodología:</strong>{" "}
+          <div className="rounded-xl px-5 py-4 border-l-2" style={{ borderLeftColor: "rgba(4,22,53,0.25)", background: "rgba(4,22,53,0.03)" }}>
+            <p style={{ fontSize: "0.70rem", color: "#75777f", lineHeight: 1.7 }}>
+              <strong style={{ color: "#44474e" }}>Metodología:</strong>{" "}
               El factor 1.5× anual aplica a cargos profesionales especializados. Para operativos de gastronomía el
               costo real está entre 0.7 y 1.1 meses de sueldo. Los valores de aviso ($40k–$65k) se basan en tarifas
               de Trabajando.cl y Computrabajo. El costo de vacante supone 10 días promedio antes de cubrir la
@@ -1670,52 +1996,93 @@ function Dashboard() {
 
         {/* ── M06 — ICL ── */}
         {activeSection === "icl" && (<section className="mb-8">
-          <p style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.58rem", color: "#00C2FF", letterSpacing: "0.2em", textTransform: "uppercase", marginBottom: "4px" }}>
+
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35, ease: E }} className="mb-6">
+          <h1 className="text-2xl font-bold text-[#1c1c1a] mb-1">Costo laboral</h1>
+          <p style={{ fontSize: "0.88rem", color: "#75777f" }}>{FECHA} · INE EMRCL {ICL.trimestre}</p>
+        </motion.div>
+
+        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.06, ease: E }}
+          className="rounded-xl p-4 mb-6 flex items-start gap-3"
+          style={{ background: "rgba(131,85,0,0.04)", border: "1px solid rgba(131,85,0,0.15)", borderLeft: "4px solid #835500" }}>
+          <AlertTriangle size={16} style={{ color: "#835500", flexShrink: 0, marginTop: "2px" }} />
+          <div>
+            <p className="font-semibold text-[#1c1c1a] mb-0.5" style={{ fontSize: "0.9rem" }}>
+              Reajuste de julio confirmado: +{ICL.ir_sector}% para contratos indefinidos del núcleo.
+              Aplícalo en julio o arriesgas conflictos laborales y rotación por expectativas no cumplidas.
+            </p>
+            <p style={{ fontSize: "0.78rem", color: "#75777f" }}>
+              Impacto en nómina: ~+$560k/mes · +$6.7M/año · Alineado con IR sectorial +{ICL.ir_sector}%
+            </p>
+          </div>
+        </motion.div>
+
+          <p style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.58rem", color: "#041635", letterSpacing: "0.2em", textTransform: "uppercase", marginBottom: "4px" }}>
             Módulo 06 · Costo laboral — INE EMRCL
           </p>
-          <h2 className="text-lg font-bold text-white mb-4">Índice de Costo Laboral · Turismo y Servicios · {ICL.trimestre}</h2>
+          <h2 className="text-lg font-bold text-[#1c1c1a] mb-4">Índice de Costo Laboral · Turismo y Servicios · {ICL.trimestre}</h2>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
             {[
-              { label: `ICL Turismo/Servicios · ${ICL.trimestre}`, valor: `+${ICL.icl_sector}%`, sub: `vs Nacional +${ICL.icl_nac}%`, color: "#FF4D5A", bg: "rgba(255,77,90,0.08)", border: "rgba(255,77,90,0.2)" },
-              { label: `IR Turismo/Servicios · ${ICL.trimestre}`,  valor: `+${ICL.ir_sector}%`,  sub: `vs Nacional +${ICL.ir_nac}%`,  color: "#F7C948", bg: "rgba(247,201,72,0.08)", border: "rgba(247,201,72,0.2)" },
-              { label: "IPC · referencia inflación",                 valor: `+${ICL.ipc}%`,         sub: "Banco Central · T1 2026",     color: "#00B4D8", bg: "rgba(0,180,216,0.08)", border: "rgba(0,180,216,0.2)" },
+              { label: `ICL Turismo/Servicios · ${ICL.trimestre}`, valor: `+${ICL.icl_sector}%`, sub: `vs Nacional +${ICL.icl_nac}%`, color: "#ba1a1a", bg: "rgba(186,26,26,0.08)", border: "rgba(186,26,26,0.15)" },
+              { label: `IR Turismo/Servicios · ${ICL.trimestre}`,  valor: `+${ICL.ir_sector}%`,  sub: `vs Nacional +${ICL.ir_nac}%`,  color: "#835500", bg: "rgba(131,85,0,0.08)", border: "rgba(247,201,72,0.2)" },
+              { label: "IPC · referencia inflación",                 valor: `+${ICL.ipc}%`,         sub: "Banco Central · T1 2026",     color: "#041635", bg: "#f0ede9", border: "rgba(4,22,53,0.1)" },
             ].map(k => (
               <div key={k.label} className="rounded-xl p-5" style={{ background: k.bg, border: `1px solid ${k.border}` }}>
-                <p style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.55rem", color: "rgba(255,255,255,0.4)", letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: "8px" }}>{k.label}</p>
+                <p style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.55rem", color: "#75777f", letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: "8px" }}>{k.label}</p>
                 <p className="font-bold tabular-nums" style={{ fontFamily: "var(--font-space-mono)", fontSize: "2rem", color: k.color, lineHeight: 1 }}>{k.valor}</p>
-                <p style={{ fontSize: "0.7rem", color: "rgba(255,255,255,0.4)", marginTop: "6px" }}>{k.sub}</p>
+                <p style={{ fontSize: "0.7rem", color: "#75777f", marginTop: "6px" }}>{k.sub}</p>
               </div>
             ))}
           </div>
-          <div className="rounded-xl p-4 border border-white/8 bg-white/4">
-            <p style={{ fontSize: "0.8rem", color: "rgba(255,255,255,0.6)", lineHeight: 1.65 }}>
-              <strong className="text-white">Lectura:</strong> El ICL turismo (+{ICL.icl_sector}%) supera al IPC (+{ICL.ipc}%) en 0.1 pp.
+          <div className="rounded-xl p-4 border border-[#e5e2de] bg-white">
+            <p style={{ fontSize: "0.8rem", color: "#44474e", lineHeight: 1.65 }}>
+              <strong className="text-[#1c1c1a]">Lectura:</strong> El ICL turismo (+{ICL.icl_sector}%) supera al IPC (+{ICL.ipc}%) en 0.1 pp.
               El reajuste de julio (+4%) para contratos indefinidos está alineado con el IR sectorial (+{ICL.ir_sector}%) — decisión correcta.
-              El presupuesto de RRHH 2027 debe contemplar mínimo <strong className="text-white">+{ICL.icl_sector}%</strong> de ajuste base por persona para no deteriorar el poder adquisitivo del equipo núcleo.
+              El presupuesto de RRHH 2027 debe contemplar mínimo <strong className="text-[#1c1c1a]">+{ICL.icl_sector}%</strong> de ajuste base por persona para no deteriorar el poder adquisitivo del equipo núcleo.
             </p>
           </div>
         </section>)}
 
         {/* ── M07 — Brecha de género (nueva visualización) ── */}
         {activeSection === "brecha" && (<section className="mb-8">
-          <p style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.58rem", color: "#00C2FF", letterSpacing: "0.2em", textTransform: "uppercase", marginBottom: "4px" }}>
+
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35, ease: E }} className="mb-6">
+          <h1 className="text-2xl font-bold text-[#1c1c1a] mb-1">Brecha de género</h1>
+          <p style={{ fontSize: "0.88rem", color: "#75777f" }}>{FECHA} · Gap salarial ajustado por nivel jerárquico</p>
+        </motion.div>
+
+        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.06, ease: E }}
+          className="rounded-xl p-4 mb-6 flex items-center gap-3"
+          style={{ background: "rgba(42,125,79,0.04)", border: "1px solid rgba(42,125,79,0.15)", borderLeft: "4px solid #2a7d4f" }}>
+          <CheckCircle2 size={16} style={{ color: "#2a7d4f", flexShrink: 0 }} />
+          <div>
+            <p className="font-semibold text-[#1c1c1a]" style={{ fontSize: "0.9rem" }}>
+              Sin riesgo regulatorio. Brecha ponderada {GAP_POND}% — bajo el umbral de revisión DT (5%).
+            </p>
+            <p style={{ fontSize: "0.78rem", color: "#75777f", marginTop: "2px" }}>
+              Sin acción requerida hoy. Documentar diferencias por antigüedad si alguien pregunta.
+            </p>
+          </div>
+        </motion.div>
+
+          <p style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.58rem", color: "#041635", letterSpacing: "0.2em", textTransform: "uppercase", marginBottom: "4px" }}>
             Módulo 07 · Brecha de género salarial
           </p>
-          <h2 className="text-lg font-bold text-white mb-5">Gap salarial interno por nivel jerárquico · {EMPRESA}</h2>
+          <h2 className="text-lg font-bold text-[#1c1c1a] mb-5">Gap salarial interno por nivel jerárquico · {EMPRESA}</h2>
 
           <div className="space-y-5 mb-4">
             {BRECHA.map((b, i) => {
               const absGap   = Math.abs(b.gap);
               const favMujer = b.gap < 0;
-              const gapColor = absGap >= 15 ? "#FF4D5A" : absGap >= 8 ? "#F7C948" : "#06D6A0";
+              const gapColor = absGap >= 15 ? "#ba1a1a" : absGap >= 8 ? "#835500" : "#2a7d4f";
               const senal    = absGap >= 15 ? "Zona de riesgo" : absGap >= 8 ? "Vigilar" : favMujer ? "Favorable mujer" : "Bajo brecha";
               const hWidth   = Math.round((b.hombre / maxBrechaVal) * 100);
               const mWidth   = Math.round((b.mujer  / maxBrechaVal) * 100);
               return (
-                <div key={i} className="rounded-xl p-4 border border-white/8 bg-white/4">
+                <div key={i} className="rounded-xl p-4 border border-[#e5e2de] bg-white">
                   <div className="flex items-center justify-between mb-3">
-                    <p className="font-semibold text-white" style={{ fontSize: "0.82rem" }}>{b.nivel}</p>
+                    <p className="font-semibold text-[#1c1c1a]" style={{ fontSize: "0.82rem" }}>{b.nivel}</p>
                     <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold"
                       style={{ background: gapColor + "18", color: gapColor }}>
                       {favMujer ? "−" : "+"}{absGap.toFixed(1)}% · {senal}
@@ -1724,25 +2091,25 @@ function Dashboard() {
                   <div className="space-y-2">
                     {/* Hombre */}
                     <div className="flex items-center gap-3">
-                      <span style={{ fontSize: "0.65rem", color: "#00B4D8", fontFamily: "var(--font-space-mono)", minWidth: "48px" }}>Hombre</span>
-                      <div className="flex-1 h-5 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.06)" }}>
+                      <span style={{ fontSize: "0.65rem", color: "#041635", fontFamily: "var(--font-space-mono)", minWidth: "48px" }}>Hombre</span>
+                      <div className="flex-1 h-5 rounded-full overflow-hidden" style={{ background: "#eae8e4" }}>
                         <div className="h-full rounded-full flex items-center justify-end pr-2 transition-all"
-                          style={{ width: `${hWidth}%`, background: "#00B4D8" }}>
+                          style={{ width: `${hWidth}%`, background: "#041635" }}>
                         </div>
                       </div>
-                      <span className="tabular-nums font-bold text-white shrink-0" style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.75rem", minWidth: "84px", textAlign: "right" }}>
+                      <span className="tabular-nums font-bold text-[#1c1c1a] shrink-0" style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.75rem", minWidth: "84px", textAlign: "right" }}>
                         {fmtCLP(b.hombre)}
                       </span>
                     </div>
                     {/* Mujer */}
                     <div className="flex items-center gap-3">
                       <span style={{ fontSize: "0.65rem", color: "#FF64C8", fontFamily: "var(--font-space-mono)", minWidth: "48px" }}>Mujer</span>
-                      <div className="flex-1 h-5 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.06)" }}>
+                      <div className="flex-1 h-5 rounded-full overflow-hidden" style={{ background: "#eae8e4" }}>
                         <div className="h-full rounded-full flex items-center justify-end pr-2 transition-all"
                           style={{ width: `${mWidth}%`, background: "#FF64C8" }}>
                         </div>
                       </div>
-                      <span className="tabular-nums font-bold text-white shrink-0" style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.75rem", minWidth: "84px", textAlign: "right" }}>
+                      <span className="tabular-nums font-bold text-[#1c1c1a] shrink-0" style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.75rem", minWidth: "84px", textAlign: "right" }}>
                         {fmtCLP(b.mujer)}
                       </span>
                     </div>
@@ -1752,9 +2119,9 @@ function Dashboard() {
             })}
           </div>
 
-          <div className="rounded-xl p-4 border-l-2 bg-white/4" style={{ borderLeftColor: "#06D6A0" }}>
-            <p style={{ fontSize: "0.78rem", color: "rgba(255,255,255,0.6)", lineHeight: 1.6 }}>
-              <strong className="text-white">Gap ponderado: {GAP_POND}% — Bajo brecha.</strong>{" "}
+          <div className="rounded-xl p-4 border-l-2 bg-white" style={{ borderLeftColor: "#2a7d4f" }}>
+            <p style={{ fontSize: "0.78rem", color: "#44474e", lineHeight: 1.6 }}>
+              <strong className="text-[#1c1c1a]">Gap ponderado: {GAP_POND}% — Bajo brecha.</strong>{" "}
               El equipo del restaurante muestra equidad remuneracional notable: en el nivel operativo calificado (garzones/cocineros),
               las mujeres ganan un 8.9% más que los hombres, reflejando mayor antigüedad promedio femenina en sala.
               Sin riesgo regulatorio bajo Ley 21.719.
@@ -1764,28 +2131,48 @@ function Dashboard() {
 
         {/* ── M08 — ENE Valparaíso ── */}
         {activeSection === "ene" && (<section className="mb-8">
-          <p style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.58rem", color: "#00C2FF", letterSpacing: "0.2em", textTransform: "uppercase", marginBottom: "4px" }}>
+
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35, ease: E }} className="mb-6">
+          <h1 className="text-2xl font-bold text-[#1c1c1a] mb-1">Mercado laboral</h1>
+          <p style={{ fontSize: "0.88rem", color: "#75777f" }}>{FECHA} · INE ENE oct.–dic. 2024 · {REGION}</p>
+        </motion.div>
+
+        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.06, ease: E }}
+          className="rounded-xl p-4 mb-6 flex items-start gap-3"
+          style={{ background: "rgba(131,85,0,0.04)", border: "1px solid rgba(131,85,0,0.15)", borderLeft: "4px solid #835500" }}>
+          <AlertTriangle size={16} style={{ color: "#835500", flexShrink: 0, marginTop: "2px" }} />
+          <div>
+            <p className="font-semibold text-[#1c1c1a] mb-0.5" style={{ fontSize: "0.9rem" }}>
+              Publica las vacantes de temporada alta con 45–60 días de anticipación. Valparaíso tiene el mercado laboral más ajustado de la región.
+            </p>
+            <p style={{ fontSize: "0.78rem", color: "#75777f" }}>
+              Desocupación Valparaíso {ENE_VALPO}% — {(ENE_VALPO - ENE_NAC).toFixed(1)} pp bajo la media nacional · Próximo peak: diciembre–enero
+            </p>
+          </div>
+        </motion.div>
+
+          <p style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.58rem", color: "#041635", letterSpacing: "0.2em", textTransform: "uppercase", marginBottom: "4px" }}>
             Módulo 08 · Mercado laboral regional
           </p>
-          <h2 className="text-lg font-bold text-white mb-4">Desocupación en {REGION} · INE ENE oct.–dic. 2024</h2>
+          <h2 className="text-lg font-bold text-[#1c1c1a] mb-4">Desocupación en {REGION} · INE ENE oct.–dic. 2024</h2>
 
           <div className="grid grid-cols-3 gap-4 mb-4">
             {[
-              { label: `Tasa desocupación ${REGION}`, valor: `${ENE_VALPO}%`,       sub: "oct.–dic. 2024",        color: "#F7C948", bg: "rgba(247,201,72,0.08)", border: "rgba(247,201,72,0.2)" },
-              { label: "Nacional",                     valor: `${ENE_NAC}%`,          sub: "promedio país",          color: "#00B4D8", bg: "rgba(0,180,216,0.08)", border: "rgba(0,180,216,0.2)" },
-              { label: "Tendencia regional",           valor: `${ENE_TENDENCIA} pp`,  sub: "vs trimestre anterior",  color: "#06D6A0", bg: "rgba(6,214,160,0.08)", border: "rgba(6,214,160,0.2)" },
+              { label: `Tasa desocupación ${REGION}`, valor: `${ENE_VALPO}%`,       sub: "oct.–dic. 2024",        color: "#835500", bg: "rgba(131,85,0,0.08)", border: "rgba(247,201,72,0.2)" },
+              { label: "Nacional",                     valor: `${ENE_NAC}%`,          sub: "promedio país",          color: "#041635", bg: "#f0ede9", border: "rgba(4,22,53,0.1)" },
+              { label: "Tendencia regional",           valor: `${ENE_TENDENCIA} pp`,  sub: "vs trimestre anterior",  color: "#2a7d4f", bg: "rgba(42,125,79,0.08)", border: "rgba(6,214,160,0.2)" },
             ].map(k => (
               <div key={k.label} className="rounded-xl p-5" style={{ background: k.bg, border: `1px solid ${k.border}` }}>
-                <p style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.55rem", color: "rgba(255,255,255,0.4)", letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: "8px" }}>{k.label}</p>
+                <p style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.55rem", color: "#75777f", letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: "8px" }}>{k.label}</p>
                 <p className="font-bold tabular-nums" style={{ fontFamily: "var(--font-space-mono)", fontSize: "1.8rem", color: k.color, lineHeight: 1 }}>{k.valor}</p>
-                <p style={{ fontSize: "0.68rem", color: "rgba(255,255,255,0.35)", marginTop: "6px" }}>{k.sub}</p>
+                <p style={{ fontSize: "0.68rem", color: "#75777f", marginTop: "6px" }}>{k.sub}</p>
               </div>
             ))}
           </div>
-          <div className="rounded-xl p-4 border border-white/8 bg-white/4">
-            <p style={{ fontSize: "0.8rem", color: "rgba(255,255,255,0.6)", lineHeight: 1.65 }}>
-              <strong className="text-white">Contexto:</strong> Valparaíso opera 0.6 pp bajo la media nacional, lo que indica
-              <strong className="text-[#F7C948]"> mercado laboral relativamente ajustado</strong> en la región.
+          <div className="rounded-xl p-4 border border-[#e5e2de] bg-white">
+            <p style={{ fontSize: "0.8rem", color: "#44474e", lineHeight: 1.65 }}>
+              <strong className="text-[#1c1c1a]">Contexto:</strong> Valparaíso opera 0.6 pp bajo la media nacional, lo que indica
+              <strong className="text-[#835500]"> mercado laboral relativamente ajustado</strong> en la región.
               En temporada alta (enero, julio), la competencia por garzones y ayudantes de cocina es alta —
               Viña del Mar concentra además la mayor densidad de restaurantes de la Quinta Región.
               Implicancia: captar personal estacional requiere publicar vacantes con 45–60 días de anticipación y ofrecer condiciones competitivas.
@@ -1796,29 +2183,49 @@ function Dashboard() {
         {/* ── Cumplimiento laboral ── */}
         {activeSection === "cumplimiento" && (
         <section className="mb-8">
-          <p style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.58rem", color: "#00C2FF", letterSpacing: "0.2em", textTransform: "uppercase", marginBottom: "4px" }}>
+
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35, ease: E }} className="mb-6">
+          <h1 className="text-2xl font-bold text-[#1c1c1a] mb-1">Cumplimiento laboral</h1>
+          <p style={{ fontSize: "0.88rem", color: "#75777f" }}>{FECHA} · Diagnóstico preventivo · 3 áreas</p>
+        </motion.div>
+
+        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.06, ease: E }}
+          className="rounded-xl p-4 mb-6 flex items-start gap-3"
+          style={{ background: "rgba(131,85,0,0.04)", border: "1px solid rgba(131,85,0,0.15)", borderLeft: "4px solid #835500" }}>
+          <AlertTriangle size={16} style={{ color: "#835500", flexShrink: 0, marginTop: "2px" }} />
+          <div>
+            <p className="font-semibold text-[#1c1c1a] mb-0.5" style={{ fontSize: "0.9rem" }}>
+              1 acción antes de julio: revisar los 4 contratos a plazo fijo del núcleo antes de que lleguen al año de renovación continua.
+            </p>
+            <p style={{ fontSize: "0.78rem", color: "#75777f" }}>
+              Costo de conversión a indefinido: $0 · Costo de un juicio laboral si no actúas: +$3.000.000
+            </p>
+          </div>
+        </motion.div>
+
+          <p style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.58rem", color: "#041635", letterSpacing: "0.2em", textTransform: "uppercase", marginBottom: "4px" }}>
             Módulo 09 · Cumplimiento laboral
           </p>
-          <h2 className="text-lg font-bold text-white mb-1">Radiografía preventiva</h2>
-          <p style={{ fontSize: "0.82rem", color: "rgba(255,255,255,0.4)", marginBottom: "24px" }}>
+          <h2 className="text-lg font-bold text-[#1c1c1a] mb-1">Radiografía preventiva</h2>
+          <p style={{ fontSize: "0.82rem", color: "#75777f", marginBottom: "24px" }}>
             Revisamos 3 áreas de cumplimiento clave. El objetivo no es alarmar — es anticipar antes de que aparezca un problema con la Dirección del Trabajo.
           </p>
 
           {/* Result banner */}
           <div className="rounded-xl p-4 mb-6 flex flex-wrap items-center gap-4" style={{ background: "rgba(247,201,72,0.05)", border: "1px solid rgba(247,201,72,0.14)" }}>
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style={{ background: "rgba(247,201,72,0.10)", border: "1px solid rgba(247,201,72,0.18)" }}>
-              <Scale size={18} style={{ color: "#F7C948" }} />
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style={{ background: "rgba(131,85,0,0.10)", border: "1px solid rgba(247,201,72,0.18)" }}>
+              <Scale size={18} style={{ color: "#835500" }} />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="font-semibold text-white" style={{ fontSize: "0.9rem" }}>Sin infracciones activas detectadas</p>
-              <p style={{ fontSize: "0.74rem", color: "rgba(255,255,255,0.4)", marginTop: "2px" }}>
+              <p className="font-semibold text-[#1c1c1a]" style={{ fontSize: "0.9rem" }}>Sin infracciones activas detectadas</p>
+              <p style={{ fontSize: "0.74rem", color: "#75777f", marginTop: "2px" }}>
                 2 pilares en verde · 1 en ámbar · Revisar contratos a plazo fijo antes de julio 2026
               </p>
             </div>
             <div className="flex items-center gap-1.5 shrink-0">
-              <span className="w-3 h-3 rounded-full" style={{ background: "#06D6A0", boxShadow: "0 0 6px rgba(6,214,160,0.5)" }} />
-              <span className="w-3 h-3 rounded-full" style={{ background: "#06D6A0", boxShadow: "0 0 6px rgba(6,214,160,0.5)" }} />
-              <span className="w-3 h-3 rounded-full" style={{ background: "#F7C948", boxShadow: "0 0 6px rgba(247,201,72,0.5)" }} />
+              <span className="w-3 h-3 rounded-full" style={{ background: "#2a7d4f", boxShadow: "0 0 6px rgba(6,214,160,0.5)" }} />
+              <span className="w-3 h-3 rounded-full" style={{ background: "#2a7d4f", boxShadow: "0 0 6px rgba(6,214,160,0.5)" }} />
+              <span className="w-3 h-3 rounded-full" style={{ background: "#835500", boxShadow: "0 0 6px rgba(247,201,72,0.5)" }} />
             </div>
           </div>
 
@@ -1837,7 +2244,7 @@ function Dashboard() {
                 { label: "Trabajadores en riesgo",    valor: "0 de 20",        ok: true  },
               ],
               accion: "Sin acción urgente. Monitorear decreto de reajuste IMM esperado para julio 2026 (históricamente +5–8%). Con un reajuste proyectado del 6%, el nuevo IMM sería ~$530.000 — todos los sueldos se mantienen en regla.",
-              accionColor: "#06D6A0",
+              accionColor: "#2a7d4f",
             },
             {
               status: "ambar" as const,
@@ -1852,7 +2259,7 @@ function Dashboard() {
                 { label: "Costo de conversión",          valor: "$0 si es proactiva", ok: true  },
               ],
               accion: "Revisar fecha de inicio de cada contrato. Si alguno se aproxima a 12 meses de vigencia continua, convertirlo proactivamente a indefinido. El costo es cero y elimina el riesgo de demanda por desnaturalización de contrato (art. 161 CT) — un juicio laboral promedio supera los $3.000.000.",
-              accionColor: "#F7C948",
+              accionColor: "#835500",
             },
             {
               status: "verde" as const,
@@ -1867,59 +2274,59 @@ function Dashboard() {
                 { label: "Operativo calificado",    valor: "−8.9% (M gana más)",       ok: true },
               ],
               accion: "Sin acción urgente. Documentar las diferencias por razones objetivas: antigüedad, turno, propinas. Si la empresa supera 100 trabajadores, deberá elaborar el registro público de remuneraciones exigido por Ley 21.220.",
-              accionColor: "#06D6A0",
+              accionColor: "#2a7d4f",
             },
           ] as const).map((pillar, i) => (
             <motion.div key={i} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.08, ease: E }}
               className="rounded-xl border p-5 mb-4"
               style={{
                 background: pillar.status === "ambar" ? "rgba(247,201,72,0.03)" : "rgba(6,214,160,0.02)",
-                borderColor: pillar.status === "ambar" ? "rgba(247,201,72,0.15)" : "rgba(6,214,160,0.12)",
+                borderColor: pillar.status === "ambar" ? "rgba(247,201,72,0.15)" : "rgba(42,125,79,0.10)",
               }}>
               <div className="flex items-start gap-4 mb-4">
                 <div className="shrink-0 w-9 h-9 rounded-xl flex items-center justify-center"
-                  style={{ background: pillar.status === "ambar" ? "rgba(247,201,72,0.10)" : "rgba(6,214,160,0.08)" }}>
-                  <span style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.65rem", fontWeight: 700, color: pillar.status === "ambar" ? "#F7C948" : "#06D6A0" }}>
+                  style={{ background: pillar.status === "ambar" ? "rgba(131,85,0,0.10)" : "rgba(42,125,79,0.08)" }}>
+                  <span style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.65rem", fontWeight: 700, color: pillar.status === "ambar" ? "#835500" : "#2a7d4f" }}>
                     {pillar.num}
                   </span>
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1 flex-wrap">
                     <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full font-bold"
-                      style={{ fontSize: "0.68rem", background: pillar.status === "ambar" ? "rgba(247,201,72,0.10)" : "rgba(6,214,160,0.08)", color: pillar.status === "ambar" ? "#F7C948" : "#06D6A0" }}>
-                      <span className="w-1.5 h-1.5 rounded-full" style={{ background: pillar.status === "ambar" ? "#F7C948" : "#06D6A0" }} />
+                      style={{ fontSize: "0.68rem", background: pillar.status === "ambar" ? "rgba(131,85,0,0.10)" : "rgba(42,125,79,0.08)", color: pillar.status === "ambar" ? "#835500" : "#2a7d4f" }}>
+                      <span className="w-1.5 h-1.5 rounded-full" style={{ background: pillar.status === "ambar" ? "#835500" : "#2a7d4f" }} />
                       {pillar.status === "ambar" ? "Ámbar — revisar" : "Verde — en regla"}
                     </span>
                   </div>
-                  <p className="font-semibold text-white" style={{ fontSize: "0.9rem" }}>{pillar.titulo}</p>
-                  <p style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.52rem", color: "rgba(255,255,255,0.28)", letterSpacing: "0.08em", marginTop: "4px" }}>{pillar.ley}</p>
+                  <p className="font-semibold text-[#1c1c1a]" style={{ fontSize: "0.9rem" }}>{pillar.titulo}</p>
+                  <p style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.52rem", color: "#9a9a9a", letterSpacing: "0.08em", marginTop: "4px" }}>{pillar.ley}</p>
                 </div>
               </div>
 
-              <p style={{ fontSize: "0.78rem", color: "rgba(255,255,255,0.55)", lineHeight: 1.65, marginBottom: "16px" }}>{pillar.hallazgo}</p>
+              <p style={{ fontSize: "0.78rem", color: "#44474e", lineHeight: 1.65, marginBottom: "16px" }}>{pillar.hallazgo}</p>
 
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4">
                 {pillar.detalle.map((d, j) => (
                   <div key={j} className="rounded-lg px-3 py-2.5"
-                    style={{ background: d.ok ? "rgba(6,214,160,0.05)" : "rgba(247,201,72,0.06)", border: `1px solid ${d.ok ? "rgba(6,214,160,0.12)" : "rgba(247,201,72,0.15)"}` }}>
-                    <p style={{ fontSize: "0.53rem", fontFamily: "var(--font-space-mono)", color: "rgba(255,255,255,0.28)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "4px", lineHeight: 1.4 }}>{d.label}</p>
-                    <p style={{ fontSize: "0.78rem", fontWeight: 700, color: d.ok ? "#06D6A0" : "#F7C948" }}>{d.valor}</p>
+                    style={{ background: d.ok ? "rgba(6,214,160,0.05)" : "rgba(247,201,72,0.06)", border: `1px solid ${d.ok ? "rgba(42,125,79,0.10)" : "rgba(247,201,72,0.15)"}` }}>
+                    <p style={{ fontSize: "0.53rem", fontFamily: "var(--font-space-mono)", color: "#9a9a9a", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "4px", lineHeight: 1.4 }}>{d.label}</p>
+                    <p style={{ fontSize: "0.78rem", fontWeight: 700, color: d.ok ? "#2a7d4f" : "#835500" }}>{d.valor}</p>
                   </div>
                 ))}
               </div>
 
-              <div className="rounded-lg px-4 py-3" style={{ background: "rgba(255,255,255,0.025)", borderLeft: `3px solid ${pillar.accionColor}` }}>
+              <div className="rounded-lg px-4 py-3" style={{ background: "rgba(4,22,53,0.03)", borderLeft: `3px solid ${pillar.accionColor}` }}>
                 <p style={{ fontSize: "0.58rem", fontFamily: "var(--font-space-mono)", color: pillar.accionColor, textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: "5px" }}>
                   Acción recomendada
                 </p>
-                <p style={{ fontSize: "0.78rem", color: "rgba(255,255,255,0.5)", lineHeight: 1.65 }}>{pillar.accion}</p>
+                <p style={{ fontSize: "0.78rem", color: "#44474e", lineHeight: 1.65 }}>{pillar.accion}</p>
               </div>
             </motion.div>
           ))}
 
-          <div className="rounded-xl p-4 mt-2" style={{ background: "rgba(0,180,216,0.04)", border: "1px solid rgba(0,180,216,0.10)" }}>
-            <p style={{ fontSize: "0.72rem", color: "rgba(255,255,255,0.38)", lineHeight: 1.65 }}>
-              <strong className="text-[#00B4D8]">Nota:</strong> Este análisis se basa en datos anonimizados proporcionados por la empresa y no reemplaza asesoría legal especializada.
+          <div className="rounded-xl p-4 mt-2" style={{ background: "rgba(4,22,53,0.03)", border: "1px solid #e5e2de" }}>
+            <p style={{ fontSize: "0.72rem", color: "#75777f", lineHeight: 1.65 }}>
+              <strong className="text-[#041635]">Nota:</strong> Este análisis se basa en datos anonimizados proporcionados por la empresa y no reemplaza asesoría legal especializada.
               RemuneraLab actúa como herramienta de diagnóstico preventivo. Para validación jurídica, consultar con un abogado laboral o la Dirección del Trabajo (<strong className="text-white/40">www.dt.gob.cl</strong>).
             </p>
           </div>
@@ -1928,34 +2335,63 @@ function Dashboard() {
         {/* ── Recomendaciones ── */}
         {activeSection === "recomendaciones" && (<>
         <section className="mb-8">
-          <p style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.58rem", color: "#00C2FF", letterSpacing: "0.2em", textTransform: "uppercase", marginBottom: "4px" }}>
+
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35, ease: E }} className="mb-6">
+          <h1 className="text-2xl font-bold text-[#1c1c1a] mb-1">Plan de acción</h1>
+          <p style={{ fontSize: "0.88rem", color: "#75777f" }}>{FECHA} · 5 palancas ordenadas por urgencia y retorno</p>
+        </motion.div>
+
+        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.06, ease: E }}
+          className="rounded-xl p-5 mb-7 flex flex-wrap items-center justify-between gap-4"
+          style={{ background: "rgba(186,26,26,0.04)", border: "1px solid rgba(186,26,26,0.18)", borderLeft: "4px solid #ba1a1a" }}>
+          <div>
+            <p className="font-bold text-[#1c1c1a]" style={{ fontSize: "1rem" }}>
+              Hay 2 acciones que no cuestan nada y pueden reducir tu rotación a la mitad.
+            </p>
+            <p style={{ fontSize: "0.82rem", color: "#44474e", marginTop: "4px" }}>
+              Convertir contratos a indefinido + publicar bandas salariales internas · Costo: $0 · Impacto: inmediato
+            </p>
+          </div>
+          <div className="flex flex-col gap-1 shrink-0 text-right">
+            <div>
+              <p className="font-bold tabular-nums" style={{ fontFamily: "var(--font-space-mono)", fontSize: "1.3rem", color: "#ba1a1a", lineHeight: 1 }}>{fmtM(costoRotacion)}</p>
+              <p style={{ fontSize: "0.62rem", color: "#ba1a1a" }}>costo rotación anual hoy</p>
+            </div>
+            <div>
+              <p className="font-bold tabular-nums" style={{ fontFamily: "var(--font-space-mono)", fontSize: "1.0rem", color: "#2a7d4f" }}>−{fmtM(costoRotacion * 0.55)}</p>
+              <p style={{ fontSize: "0.62rem", color: "#2a7d4f" }}>ahorro con plan completo</p>
+            </div>
+          </div>
+        </motion.div>
+
+          <p style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.58rem", color: "#041635", letterSpacing: "0.2em", textTransform: "uppercase", marginBottom: "4px" }}>
             Plan de acción
           </p>
-          <h2 className="text-lg font-bold text-white mb-2">5 palancas por urgencia y retorno</h2>
-          <p className="text-sm mb-6" style={{ color: "rgba(255,255,255,0.4)" }}>
-            Costo estimado de rotación anual: <strong className="text-white">{fmtM(costoRotacion)}</strong> ·
-            Ahorro proyectado con plan completo: <strong style={{ color: "#06D6A0" }}>~{fmtM(costoRotacion * 0.55)}</strong>
+          <h2 className="text-lg font-bold text-[#1c1c1a] mb-2">5 palancas por urgencia y retorno</h2>
+          <p className="text-sm mb-6" style={{ color: "#75777f" }}>
+            Costo estimado de rotación anual: <strong className="text-[#1c1c1a]">{fmtM(costoRotacion)}</strong> ·
+            Ahorro proyectado con plan completo: <strong style={{ color: "#2a7d4f" }}>~{fmtM(costoRotacion * 0.55)}</strong>
           </p>
 
           <div className="space-y-4">
             {RECS.map((r, i) => (
               <motion.div key={i} initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.06 }}
-                className="rounded-xl border border-white/8 bg-white/4 p-5 flex gap-5">
+                className="rounded-xl border border-[#e5e2de] bg-white p-5 flex gap-5">
                 <span className="shrink-0 w-8 h-8 rounded-lg flex items-center justify-center text-white text-xs font-bold"
                   style={{ background: r.color + "22", color: r.color, fontFamily: "var(--font-space-mono)", border: `1px solid ${r.color}30` }}>
                   {r.num}
                 </span>
                 <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-white mb-2" style={{ fontSize: "0.9rem" }}>{r.titulo}</p>
-                  <p style={{ fontSize: "0.78rem", color: "rgba(255,255,255,0.5)", lineHeight: 1.65 }} className="mb-4">{r.texto}</p>
-                  <div className="grid grid-cols-3 gap-3 pt-3 border-t border-white/8">
+                  <p className="font-semibold text-[#1c1c1a] mb-2" style={{ fontSize: "0.9rem" }}>{r.titulo}</p>
+                  <p style={{ fontSize: "0.78rem", color: "#44474e", lineHeight: 1.65 }} className="mb-4">{r.texto}</p>
+                  <div className="grid grid-cols-3 gap-3 pt-3 border-t border-[#e5e2de]">
                     {[
-                      { label: "Costo",    v: r.costo,    c: "rgba(255,255,255,0.5)" },
-                      { label: "Evita",    v: r.evita,    c: "#FF4D5A" },
-                      { label: "Ganancia", v: r.ganancia, c: "#06D6A0" },
+                      { label: "Costo",    v: r.costo,    c: "#44474e" },
+                      { label: "Evita",    v: r.evita,    c: "#ba1a1a" },
+                      { label: "Ganancia", v: r.ganancia, c: "#2a7d4f" },
                     ].map(d => (
                       <div key={d.label}>
-                        <p style={{ fontSize: "0.55rem", fontFamily: "var(--font-space-mono)", color: "rgba(255,255,255,0.3)", textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: "3px" }}>{d.label}</p>
+                        <p style={{ fontSize: "0.55rem", fontFamily: "var(--font-space-mono)", color: "#75777f", textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: "3px" }}>{d.label}</p>
                         <p style={{ fontSize: "0.75rem", fontWeight: 600, color: d.c, lineHeight: 1.35 }}>{d.v}</p>
                       </div>
                     ))}
@@ -1968,12 +2404,12 @@ function Dashboard() {
 
         {/* ── Compliance Ley 21.719 ── */}
         <section className="mb-8">
-          <div className="rounded-xl p-5 border" style={{ background: "rgba(0,180,216,0.05)", borderColor: "rgba(0,180,216,0.2)" }}>
+          <div className="rounded-xl p-5 border" style={{ background: "#f0ede9", borderColor: "rgba(4,22,53,0.1)" }}>
             <div className="flex items-start gap-3">
-              <Shield size={18} style={{ color: "#00B4D8", flexShrink: 0, marginTop: "2px" }} />
+              <Shield size={18} style={{ color: "#041635", flexShrink: 0, marginTop: "2px" }} />
               <div>
-                <p className="font-semibold text-white mb-1">Ley 21.719 — Protección de Datos · Vigencia 1 dic. 2026</p>
-                <p style={{ fontSize: "0.78rem", color: "rgba(255,255,255,0.5)", lineHeight: 1.6 }}>
+                <p className="font-semibold text-[#1c1c1a] mb-1">Ley 21.719 — Protección de Datos · Vigencia 1 dic. 2026</p>
+                <p style={{ fontSize: "0.78rem", color: "#44474e", lineHeight: 1.6 }}>
                   Esta demo procesa solo datos agregados y anonimizados. No contiene RUTs, nombres reales ni información de trabajadores identificables.
                   El restaurante no tiene empleados únicos por cargo con riesgo de re-identificación (mínimo 2 personas por cargo analizado).
                   Recomendación para plan pagado: firmar DPA antes de cargar planilla real con identificadores personales.
@@ -1984,20 +2420,20 @@ function Dashboard() {
         </section>
 
         {/* ── CTA ── */}
-        <section className="rounded-2xl p-8 text-center border border-white/8 bg-white/4 mb-4">
-          <p className="font-bold text-white text-xl mb-2">¿Listo para activar el plan completo?</p>
-          <p style={{ fontSize: "0.85rem", color: "rgba(255,255,255,0.4)", marginBottom: "20px" }}>
+        <section className="rounded-2xl p-8 text-center border border-[#e5e2de] bg-white mb-4">
+          <p className="font-bold text-[#1c1c1a] text-xl mb-2">¿Listo para activar el plan completo?</p>
+          <p style={{ fontSize: "0.85rem", color: "#75777f", marginBottom: "20px" }}>
             Esta demo expira en 60 días. El plan pagado incluye alertas semanales, actualización en tiempo real y diagnóstico personalizado con tu planilla real.
           </p>
           <a href="/empresas#contacto"
             className="inline-flex items-center gap-2 px-6 py-3 rounded-lg font-semibold text-sm hover:opacity-90 transition-opacity"
-            style={{ background: "linear-gradient(135deg,#06D6A0,#2EC4B6)", color: "#0A0F1E" }}>
+            style={{ background: "#041635", color: "#ffffff" }}>
             Contactar al equipo RemuneraLab <ArrowRight size={15} />
           </a>
         </section>
 
         {/* Pie */}
-        <p className="text-center pb-8" style={{ fontSize: "0.68rem", color: "rgba(255,255,255,0.2)" }}>
+        <p className="text-center pb-8" style={{ fontSize: "0.68rem", color: "#9a9a9a" }}>
           Fuentes: ESI 2024 · CASEN INE · EMRCL {ICL.trimestre} · ENE oct.–dic. 2024 · Avisos laborales portales chilenos (90 días) · nómina proporcionada por el cliente (anonimizada).
           Reporte confidencial — uso exclusivo del período de demo.
         </p>

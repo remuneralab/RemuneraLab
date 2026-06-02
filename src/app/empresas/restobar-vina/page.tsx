@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { motion } from "motion/react";
+import { useState, useEffect, useRef } from "react";
+import { motion, AnimatePresence } from "motion/react";
 import Link from "next/link";
 import {
   ScatterChart, Scatter, XAxis, YAxis, ZAxis, Tooltip as RTooltip,
@@ -11,10 +11,12 @@ import {
 import {
   AlertTriangle, Users, DollarSign, TrendingUp, Lock, Info,
   RotateCcw, Scale, BarChart2, LayoutDashboard, ChevronRight,
+  Eye, EyeOff, ArrowRight,
 } from "lucide-react";
 
 // ─── Auth ────────────────────────────────────────────────────────────────────
 const DEMO_PASSWORD = "restobar2025";
+const STORAGE_KEY   = "rl_restobar_vina_auth";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 function fmtCLP(n: number) {
@@ -37,7 +39,7 @@ interface T {
   pasivoTotal: number; pctMercado: number;
 }
 
-// ─── Datos (planilla mayo 2025) ───────────────────────────────────────────────
+// ─── Datos (planilla mayo 2026) ───────────────────────────────────────────────
 const WORKERS: T[] = [
   { n:1,  nombre:"Carlos Muñoz Rojas",         cargo:"Jefe de Cocina",   area:"Cocina", pt:false, sexo:"M", sueldoBase:720000,  totalImponible:915000,  costoDesvinc:5128776, clasif:"ALTO",  antiguedad:4.08, antiguedadTxt:"4 años 1 mes",    pasivoTotal:4408776, pctMercado:28 },
   { n:2,  nombre:"Sebastián Lara Espinoza",     cargo:"Jefe de Cocina",   area:"Cocina", pt:false, sexo:"M", sueldoBase:720000,  totalImponible:915000,  costoDesvinc:3779976, clasif:"ALTO",  antiguedad:2.83, antiguedadTxt:"2 años 10 meses", pasivoTotal:3059976, pctMercado:28 },
@@ -79,19 +81,19 @@ const PASIVO_SALON  = 30_778_152;
 const PASIVO_BARRA  = 12_812_352;
 
 const PROYECCION = [
-  { mes:"May 25", pasivo:62_420_773 },
-  { mes:"Jun 25", pasivo:64_535_317 },
-  { mes:"Jul 25", pasivo:66_654_271 },
-  { mes:"Ago 25", pasivo:68_773_224 },
-  { mes:"Sep 25", pasivo:70_892_179 },
-  { mes:"Oct 25", pasivo:73_011_133 },
-  { mes:"Nov 25", pasivo:75_130_088 },
-  { mes:"Dic 25", pasivo:77_788_043 },
-  { mes:"Ene 26", pasivo:80_490_912 },
-  { mes:"Feb 26", pasivo:83_306_600 },
-  { mes:"Mar 26", pasivo:85_565_964 },
-  { mes:"Abr 26", pasivo:87_825_324 },
-  { mes:"May 26", pasivo:90_084_686 },
+  { mes:"May 26", pasivo:62_420_773 },
+  { mes:"Jun 26", pasivo:64_535_317 },
+  { mes:"Jul 26", pasivo:66_654_271 },
+  { mes:"Ago 26", pasivo:68_773_224 },
+  { mes:"Sep 26", pasivo:70_892_179 },
+  { mes:"Oct 26", pasivo:73_011_133 },
+  { mes:"Nov 26", pasivo:75_130_088 },
+  { mes:"Dic 26", pasivo:77_788_043 },
+  { mes:"Ene 27", pasivo:80_490_912 },
+  { mes:"Feb 27", pasivo:83_306_600 },
+  { mes:"Mar 27", pasivo:85_565_964 },
+  { mes:"Abr 27", pasivo:87_825_324 },
+  { mes:"May 27", pasivo:90_084_686 },
 ];
 
 const BENCHMARK: Record<string, { p25:number; p50:number; p75:number }> = {
@@ -139,22 +141,22 @@ const PRESION: PresionRow[] = [
 // ─── Estilos ──────────────────────────────────────────────────────────────────
 const MONO = { fontFamily: "var(--font-space-mono)" } as const;
 const SANS = { fontFamily: "var(--font-dm-sans)" } as const;
-const LABEL_CLS = "uppercase tracking-[0.18em] text-white/40 text-[0.6rem] block mb-2";
-const CARD_CLS  = "rounded-xl border border-white/10 p-6";
-const CLASIF_COLOR: Record<Clasif, string> = { ALTO:"#ef4444", MEDIO:"#f59e0b", BAJO:"#22c55e" };
+const LABEL_CLS = "uppercase tracking-[0.18em] text-[#75777f] text-[0.6rem] block mb-2";
+const CARD_CLS  = "rounded-xl border border-[#e5e2de] p-6";
+const CLASIF_COLOR: Record<Clasif, string> = { ALTO:"#ba1a1a", MEDIO:"#835500", BAJO:"#2a7d4f" };
 
 // ─── Tooltip scatter ─────────────────────────────────────────────────────────
 function ScatterTip({ active, payload }: { active?: boolean; payload?: { payload: T }[] }) {
   if (!active || !payload?.length) return null;
   const t = payload[0].payload;
   return (
-    <div className="rounded-lg border border-white/15 p-3 text-xs" style={{ background:"#1a0d3e", ...SANS }}>
-      <p className="text-white font-semibold mb-1">{t.nombre}</p>
-      <p className="text-white/50 mb-2">{t.cargo} · {t.area}</p>
+    <div className="rounded-lg p-3 text-xs" style={{ background:"#ffffff", border:"1px solid #e5e2de", ...SANS }}>
+      <p className="font-semibold mb-1" style={{ color:"#1c1c1a" }}>{t.nombre}</p>
+      <p className="mb-2" style={{ color:"#44474e" }}>{t.cargo} · {t.area}</p>
       <div className="space-y-0.5">
-        <p className="text-white/70">Costo desvinc.: <span className="text-white">{fmtM(t.costoDesvinc)}</span></p>
-        <p className="text-white/70">Percentil mercado: <span className="text-white">P{t.pctMercado}</span></p>
-        <p className="text-white/70">Antigüedad: <span className="text-white">{t.antiguedadTxt}</span></p>
+        <p style={{ color:"#44474e" }}>Costo desvinc.: <span style={{ color:"#1c1c1a" }}>{fmtM(t.costoDesvinc)}</span></p>
+        <p style={{ color:"#44474e" }}>Percentil mercado: <span style={{ color:"#1c1c1a" }}>P{t.pctMercado}</span></p>
+        <p style={{ color:"#44474e" }}>Antigüedad: <span style={{ color:"#1c1c1a" }}>{t.antiguedadTxt}</span></p>
       </div>
     </div>
   );
@@ -166,12 +168,12 @@ function MapaRiesgo() {
   const medio = WORKERS.filter(w => w.clasif === "MEDIO");
   const bajo  = WORKERS.filter(w => w.clasif === "BAJO");
   return (
-    <div className={CARD_CLS} style={{ background:"rgba(255,255,255,0.03)" }}>
+    <div className={CARD_CLS} style={{ background:"#ffffff" }}>
       <div className="flex items-start justify-between mb-1">
         <div>
           <span className={LABEL_CLS} style={MONO}>Mapa de riesgo individual</span>
-          <h2 className="text-white font-semibold text-lg" style={SANS}>Dispersión por Costo y Percentil</h2>
-          <p className="text-white/40 text-sm mt-1" style={SANS}>
+          <h2 className="font-semibold text-lg" style={{ ...SANS, color:"#1c1c1a" }}>Dispersión por Costo y Percentil</h2>
+          <p className="text-sm mt-1" style={{ ...SANS, color:"#75777f" }}>
             Eje X: costo de desvinculación · Eje Y: percentil vs mercado ESI Valparaíso · Tamaño: antigüedad
           </p>
         </div>
@@ -179,34 +181,34 @@ function MapaRiesgo() {
           {(["ALTO","MEDIO","BAJO"] as Clasif[]).map(c => (
             <span key={c} className="flex items-center gap-1.5">
               <span className="w-2.5 h-2.5 rounded-full inline-block" style={{ background: CLASIF_COLOR[c] }} />
-              <span className="text-white/40">{c}</span>
+              <span style={{ color:"#75777f" }}>{c}</span>
             </span>
           ))}
         </div>
       </div>
       <ResponsiveContainer width="100%" height={320}>
         <ScatterChart margin={{ top:20, right:30, bottom:20, left:10 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
+          <CartesianGrid strokeDasharray="3 3" stroke="#f0ede9" />
           <XAxis dataKey="costoDesvinc" type="number" name="Costo desvinc." domain={[0, 8_000_000]}
             tickFormatter={v => fmtM(v as number)}
-            tick={{ fill:"rgba(255,255,255,0.35)", fontSize:11, fontFamily:"var(--font-space-mono)" }}
-            label={{ value:"Costo desvinculación →", position:"insideBottom", offset:-10, fill:"rgba(255,255,255,0.25)", fontSize:10, fontFamily:"var(--font-space-mono)" }}
+            tick={{ fill:"#75777f", fontSize:11, fontFamily:"var(--font-space-mono)" }}
+            label={{ value:"Costo desvinculación →", position:"insideBottom", offset:-10, fill:"#9a9a9a", fontSize:10, fontFamily:"var(--font-space-mono)" }}
           />
           <YAxis dataKey="pctMercado" type="number" name="Percentil mercado" domain={[0, 100]}
             tickFormatter={v => `P${v}`}
-            tick={{ fill:"rgba(255,255,255,0.35)", fontSize:11, fontFamily:"var(--font-space-mono)" }}
-            label={{ value:"Percentil →", angle:-90, position:"insideLeft", offset:15, fill:"rgba(255,255,255,0.25)", fontSize:10, fontFamily:"var(--font-space-mono)" }}
+            tick={{ fill:"#75777f", fontSize:11, fontFamily:"var(--font-space-mono)" }}
+            label={{ value:"Percentil →", angle:-90, position:"insideLeft", offset:15, fill:"#9a9a9a", fontSize:10, fontFamily:"var(--font-space-mono)" }}
           />
           <ZAxis dataKey="antiguedad" range={[60, 400]} />
-          <ReferenceLine y={50} stroke="rgba(255,255,255,0.12)" strokeDasharray="4 4"
-            label={{ value:"Mediana mercado", position:"right", fill:"rgba(255,255,255,0.2)", fontSize:9, fontFamily:"var(--font-space-mono)" }} />
-          <RTooltip content={<ScatterTip />} cursor={{ strokeDasharray:"3 3", stroke:"rgba(255,255,255,0.2)" }} />
-          <Scatter data={alto}  fill="#ef4444" fillOpacity={0.85} />
-          <Scatter data={medio} fill="#f59e0b" fillOpacity={0.85} />
-          <Scatter data={bajo}  fill="#22c55e" fillOpacity={0.85} />
+          <ReferenceLine y={50} stroke="rgba(4,22,53,0.12)" strokeDasharray="4 4"
+            label={{ value:"Mediana mercado", position:"right", fill:"#9a9a9a", fontSize:9, fontFamily:"var(--font-space-mono)" }} />
+          <RTooltip content={<ScatterTip />} cursor={{ strokeDasharray:"3 3", stroke:"rgba(4,22,53,0.2)" }} />
+          <Scatter data={alto}  fill="#ba1a1a" fillOpacity={0.85} />
+          <Scatter data={medio} fill="#835500" fillOpacity={0.85} />
+          <Scatter data={bajo}  fill="#2a7d4f" fillOpacity={0.85} />
         </ScatterChart>
       </ResponsiveContainer>
-      <p className="text-white/30 text-xs mt-2" style={MONO}>
+      <p className="text-xs mt-2" style={{ ...MONO, color:"#9a9a9a" }}>
         ⚠ Cuadrante crítico: inferior-derecho = costo alto + sueldo bajo · {alto.length} trabajadores en riesgo alto
       </p>
     </div>
@@ -223,38 +225,38 @@ function DistribucionMercado() {
     return { cargo: cargo.replace("Garzonero/a", "Garzón/a").replace("Ayudante Cocina","Ay. Cocina"), avg, p50: bm.p50, n: group.length };
   });
   return (
-    <div className={CARD_CLS} style={{ background:"rgba(255,255,255,0.03)" }}>
+    <div className={CARD_CLS} style={{ background:"#ffffff" }}>
       <span className={LABEL_CLS} style={MONO}>Sueldo base promedio por cargo</span>
-      <h2 className="text-white font-semibold text-lg mb-1" style={SANS}>Empresa vs Mediana de Mercado</h2>
-      <p className="text-white/40 text-sm mb-4" style={SANS}>ESI INE Valparaíso/Gastronomía 2024</p>
+      <h2 className="font-semibold text-lg mb-1" style={{ ...SANS, color:"#1c1c1a" }}>Empresa vs Mediana de Mercado</h2>
+      <p className="text-sm mb-4" style={{ ...SANS, color:"#75777f" }}>ESI INE Valparaíso/Gastronomía 2024</p>
       <div className="flex gap-4 text-xs mb-3" style={MONO}>
-        <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-sm inline-block" style={{ background:"#8568f3" }} />Tu empresa</span>
-        <span className="flex items-center gap-1.5"><span className="w-3 h-1 inline-block bg-white/30" />Mediana mercado (P50)</span>
+        <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-sm inline-block" style={{ background:"#041635" }} />Tu empresa</span>
+        <span className="flex items-center gap-1.5"><span className="w-3 h-1 inline-block" style={{ background:"rgba(4,22,53,0.3)" }} />Mediana mercado (P50)</span>
       </div>
       <ResponsiveContainer width="100%" height={300}>
         <BarChart data={data} margin={{ top:5, right:20, bottom:60, left:10 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" vertical={false} />
-          <XAxis dataKey="cargo" tick={{ fill:"rgba(255,255,255,0.45)", fontSize:10, fontFamily:"var(--font-space-mono)" }} angle={-35} textAnchor="end" interval={0} />
-          <YAxis tickFormatter={v => fmtK(v as number)} tick={{ fill:"rgba(255,255,255,0.35)", fontSize:10, fontFamily:"var(--font-space-mono)" }} />
+          <CartesianGrid strokeDasharray="3 3" stroke="#f0ede9" vertical={false} />
+          <XAxis dataKey="cargo" tick={{ fill:"#44474e", fontSize:10, fontFamily:"var(--font-space-mono)" }} angle={-35} textAnchor="end" interval={0} />
+          <YAxis tickFormatter={v => fmtK(v as number)} tick={{ fill:"#75777f", fontSize:10, fontFamily:"var(--font-space-mono)" }} />
           <RTooltip
             formatter={(v, name) => [fmtCLP(Number(v)), name === "avg" ? "Tu empresa" : "Mediana mercado"]}
-            contentStyle={{ background:"#1a0d3e", border:"1px solid rgba(133,104,243,0.2)", borderRadius:8, fontFamily:"var(--font-dm-sans)", fontSize:12 }}
-            labelStyle={{ color:"rgba(255,255,255,0.6)" }}
+            contentStyle={{ background:"#ffffff", border:"1px solid #e5e2de", borderRadius:8, fontFamily:"var(--font-dm-sans)", fontSize:12 }}
+            labelStyle={{ color:"#44474e" }}
           />
           <Bar dataKey="avg" name="avg" radius={[4,4,0,0]}>
             {data.map((d) => {
               const bm = BENCHMARK[d.cargo.replace("Garzón/a","Garzonero/a").replace("Ay. Cocina","Ayudante Cocina")] ?? { p50:580000 };
               const ratio = d.avg / bm.p50;
-              const color = ratio >= 0.95 ? "#22c55e" : ratio >= 0.80 ? "#f59e0b" : "#ef4444";
+              const color = ratio >= 0.95 ? "#2a7d4f" : ratio >= 0.80 ? "#835500" : "#ba1a1a";
               return <Cell key={d.cargo} fill={color} fillOpacity={0.85} />;
             })}
           </Bar>
-          <Bar dataKey="p50" name="p50" fill="rgba(255,255,255,0.2)" radius={[4,4,0,0]} />
+          <Bar dataKey="p50" name="p50" fill="rgba(4,22,53,0.2)" radius={[4,4,0,0]} />
         </BarChart>
       </ResponsiveContainer>
-      <div className="mt-3 p-3 rounded-lg text-xs" style={{ background:"rgba(133,104,243,0.08)", border:"1px solid rgba(133,104,243,0.15)", ...SANS }}>
-        <span className="text-white/50">⚠ </span>
-        <span className="text-white/60">Cargos de Salón excluyen propinas. INE y RemuneraLab no incluyen propinas en ingresos formales.</span>
+      <div className="mt-3 p-3 rounded-lg text-xs" style={{ background:"rgba(4,22,53,0.04)", border:"1px solid #e5e2de", ...SANS }}>
+        <span style={{ color:"#44474e" }}>⚠ </span>
+        <span style={{ color:"#44474e" }}>Cargos de Salón excluyen propinas. INE y RemuneraLab no incluyen propinas en ingresos formales.</span>
       </div>
     </div>
   );
@@ -263,38 +265,38 @@ function DistribucionMercado() {
 // ─── M03: Pasivo Laboral ─────────────────────────────────────────────────────
 function PasivoLaboral() {
   return (
-    <div className={CARD_CLS} style={{ background:"rgba(255,255,255,0.03)" }}>
+    <div className={CARD_CLS} style={{ background:"#ffffff" }}>
       <span className={LABEL_CLS} style={MONO}>Pasivo laboral acumulado</span>
-      <h2 className="text-white font-semibold text-lg mb-4" style={SANS}>Proyección 12 meses</h2>
+      <h2 className="font-semibold text-lg mb-4" style={{ ...SANS, color:"#1c1c1a" }}>Proyección 12 meses</h2>
       <div className="grid grid-cols-3 gap-4 mb-6">
-        {([["Cocina", PASIVO_COCINA, "#f97316"], ["Salón", PASIVO_SALON, "#8568f3"], ["Barra", PASIVO_BARRA, "#22d3ee"]] as [string,number,string][]).map(([area, val, color]) => (
-          <div key={area} className="rounded-lg p-4" style={{ background:"rgba(255,255,255,0.04)", border:`1px solid ${color}25` }}>
+        {([["Cocina", PASIVO_COCINA, "#f97316"], ["Salón", PASIVO_SALON, "#041635"], ["Barra", PASIVO_BARRA, "#2a7d4f"]] as [string,number,string][]).map(([area, val, color]) => (
+          <div key={area} className="rounded-lg p-4" style={{ background:"rgba(4,22,53,0.04)", border:`1px solid ${color}25` }}>
             <p className="text-xs mb-1 uppercase tracking-widest" style={{ color, ...MONO }}>{area}</p>
-            <p className="text-white font-bold text-xl" style={SANS}>{fmtM(val)}</p>
-            <p className="text-white/30 text-xs mt-1" style={MONO}>{Math.round(val / PASIVO_TOTAL * 100)}% del total</p>
+            <p className="font-bold text-xl" style={{ ...SANS, color:"#1c1c1a" }}>{fmtM(val)}</p>
+            <p className="text-xs mt-1" style={{ ...MONO, color:"#9a9a9a" }}>{Math.round(val / PASIVO_TOTAL * 100)}% del total</p>
           </div>
         ))}
       </div>
       <div className="flex items-center justify-between mb-3">
-        <p className="text-white/40 text-sm" style={SANS}>Proyección sin altas ni bajas</p>
-        <p className="text-xs text-white/30" style={MONO}>+$3.01M/mes</p>
+        <p className="text-sm" style={{ ...SANS, color:"#75777f" }}>Proyección sin altas ni bajas</p>
+        <p className="text-xs" style={{ ...MONO, color:"#9a9a9a" }}>+$3.01M/mes</p>
       </div>
       <ResponsiveContainer width="100%" height={200}>
         <LineChart data={PROYECCION} margin={{ top:5, right:20, bottom:5, left:10 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
-          <XAxis dataKey="mes" tick={{ fill:"rgba(255,255,255,0.3)", fontSize:10, fontFamily:"var(--font-space-mono)" }} />
-          <YAxis tickFormatter={v => fmtM(v as number)} tick={{ fill:"rgba(255,255,255,0.3)", fontSize:10, fontFamily:"var(--font-space-mono)" }} />
+          <CartesianGrid strokeDasharray="3 3" stroke="#f0ede9" />
+          <XAxis dataKey="mes" tick={{ fill:"#75777f", fontSize:10, fontFamily:"var(--font-space-mono)" }} />
+          <YAxis tickFormatter={v => fmtM(v as number)} tick={{ fill:"#75777f", fontSize:10, fontFamily:"var(--font-space-mono)" }} />
           <RTooltip
             formatter={(v) => [fmtCLP(Number(v)), "Pasivo total"]}
-            contentStyle={{ background:"#1a0d3e", border:"1px solid rgba(133,104,243,0.2)", borderRadius:8, fontFamily:"var(--font-dm-sans)", fontSize:12 }}
+            contentStyle={{ background:"#ffffff", border:"1px solid #e5e2de", borderRadius:8, fontFamily:"var(--font-dm-sans)", fontSize:12 }}
           />
-          <ReferenceLine x="Ene 26" stroke="rgba(255,255,255,0.15)" strokeDasharray="4 4"
-            label={{ value:"2026", fill:"rgba(255,255,255,0.2)", fontSize:9 }} />
-          <Line type="monotone" dataKey="pasivo" stroke="#8568f3" strokeWidth={2.5} dot={false} />
+          <ReferenceLine x="Ene 27" stroke="rgba(4,22,53,0.15)" strokeDasharray="4 4"
+            label={{ value:"2027", fill:"#9a9a9a", fontSize:9 }} />
+          <Line type="monotone" dataKey="pasivo" stroke="#041635" strokeWidth={2.5} dot={false} />
         </LineChart>
       </ResponsiveContainer>
-      <p className="text-white/30 text-xs mt-3" style={MONO}>
-        Total actual: <span className="text-white/60">{fmtM(PASIVO_TOTAL)}</span> → May 2026: <span className="text-amber-400/80">{fmtM(90_084_686)}</span> (+{fmtM(90_084_686 - PASIVO_TOTAL)})
+      <p className="text-xs mt-3" style={{ ...MONO, color:"#9a9a9a" }}>
+        Total actual: <span style={{ color:"#44474e" }}>{fmtM(PASIVO_TOTAL)}</span> → May 2027: <span style={{ color:"#835500" }}>{fmtM(90_084_686)}</span> (+{fmtM(90_084_686 - PASIVO_TOTAL)})
       </p>
     </div>
   );
@@ -307,37 +309,37 @@ function CardSUE() {
   const sueldoPromElegibles = 570_000;
   const ahorroAnual = elegiblesEstimadas * sueldoPromElegibles * 0.20 * 12;
   return (
-    <div className={CARD_CLS} style={{ background:"rgba(255,255,255,0.03)" }}>
+    <div className={CARD_CLS} style={{ background:"#ffffff" }}>
       <span className={LABEL_CLS} style={MONO}>SUE — Subsidio a la Contratación · Ley N°21.808</span>
-      <h2 className="text-white font-semibold text-lg mb-1" style={SANS}>Ahorro Fiscal Potencial</h2>
-      <p className="text-white/40 text-sm mb-5" style={SANS}>Vigente · SENCE verifica RSH automáticamente</p>
+      <h2 className="font-semibold text-lg mb-1" style={{ ...SANS, color:"#1c1c1a" }}>Ahorro Fiscal Potencial</h2>
+      <p className="text-sm mb-5" style={{ ...SANS, color:"#75777f" }}>Vigente · SENCE verifica RSH automáticamente</p>
       <div className="grid grid-cols-3 gap-4 mb-5">
-        <div className="rounded-lg p-4 text-center" style={{ background:"rgba(255,255,255,0.04)" }}>
-          <p className="text-white font-bold text-2xl" style={SANS}>{mujeres.length}</p>
-          <p className="text-white/40 text-xs mt-1" style={MONO}>Mujeres en planilla</p>
+        <div className="rounded-lg p-4 text-center" style={{ background:"rgba(4,22,53,0.04)" }}>
+          <p className="font-bold text-2xl" style={{ ...SANS, color:"#1c1c1a" }}>{mujeres.length}</p>
+          <p className="text-xs mt-1" style={{ ...MONO, color:"#75777f" }}>Mujeres en planilla</p>
         </div>
-        <div className="rounded-lg p-4 text-center" style={{ background:"rgba(133,104,243,0.1)", border:"1px solid rgba(133,104,243,0.2)" }}>
-          <p className="text-white font-bold text-2xl" style={SANS}>~{elegiblesEstimadas}</p>
-          <p className="text-white/40 text-xs mt-1" style={MONO}>Estimadas elegibles</p>
+        <div className="rounded-lg p-4 text-center" style={{ background:"rgba(4,22,53,0.06)", border:"1px solid rgba(4,22,53,0.15)" }}>
+          <p className="font-bold text-2xl" style={{ ...SANS, color:"#1c1c1a" }}>~{elegiblesEstimadas}</p>
+          <p className="text-xs mt-1" style={{ ...MONO, color:"#75777f" }}>Estimadas elegibles</p>
         </div>
-        <div className="rounded-lg p-4 text-center" style={{ background:"rgba(34,197,94,0.08)", border:"1px solid rgba(34,197,94,0.2)" }}>
-          <p className="text-green-400 font-bold text-2xl" style={SANS}>{fmtM(ahorroAnual)}</p>
-          <p className="text-white/40 text-xs mt-1" style={MONO}>Ahorro fiscal/año</p>
+        <div className="rounded-lg p-4 text-center" style={{ background:"rgba(42,125,79,0.08)", border:"1px solid rgba(42,125,79,0.2)" }}>
+          <p className="font-bold text-2xl" style={{ ...SANS, color:"#2a7d4f" }}>{fmtM(ahorroAnual)}</p>
+          <p className="text-xs mt-1" style={{ ...MONO, color:"#75777f" }}>Ahorro fiscal/año</p>
         </div>
       </div>
       <div className="space-y-2 mb-4">
-        <p className="text-white/50 text-xs" style={MONO}>Mujeres identificadas por nombre:</p>
+        <p className="text-xs" style={{ ...MONO, color:"#44474e" }}>Mujeres identificadas por nombre:</p>
         <div className="flex flex-wrap gap-2">
           {mujeres.map(w => (
-            <span key={w.n} className="text-xs px-2.5 py-1 rounded-full" style={{ background:"rgba(133,104,243,0.12)", border:"1px solid rgba(133,104,243,0.2)", color:"rgba(255,255,255,0.7)", fontFamily:"var(--font-dm-sans)" }}>
+            <span key={w.n} className="text-xs px-2.5 py-1 rounded-full" style={{ background:"rgba(4,22,53,0.06)", border:"1px solid rgba(4,22,53,0.12)", color:"#44474e", fontFamily:"var(--font-dm-sans)" }}>
               {w.nombre.split(" ")[0]} · {w.cargo.split(" ").slice(0,2).join(" ")}
             </span>
           ))}
         </div>
       </div>
-      <div className="rounded-lg p-3 text-xs" style={{ background:"rgba(247,201,72,0.06)", border:"1px solid rgba(247,201,72,0.15)", ...SANS }}>
-        <p className="text-amber-400/80 font-semibold mb-1">⚠ Dato faltante para estimación completa</p>
-        <p className="text-white/50">Esta planilla no incluye edades. Para calcular elegibilidad exacta (grupos 18–24 y mayores de 55) se requiere agregar columna <span className="text-white/70">año_nacimiento</span>.</p>
+      <div className="rounded-lg p-3 text-xs" style={{ background:"rgba(131,85,0,0.06)", border:"1px solid rgba(131,85,0,0.15)", ...SANS }}>
+        <p className="font-semibold mb-1" style={{ color:"#835500" }}>⚠ Dato faltante para estimación completa</p>
+        <p style={{ color:"#44474e" }}>Esta planilla no incluye edades. Para calcular elegibilidad exacta (grupos 18–24 y mayores de 55) se requiere agregar columna <span style={{ color:"#1c1c1a" }}>año_nacimiento</span>.</p>
       </div>
     </div>
   );
@@ -348,31 +350,31 @@ function AlertaCobertura() {
   const garzonesFT    = WORKERS.filter(w => w.cargo === "Garzonero/a" && !w.pt).length;
   const garzonesTotal = WORKERS.filter(w => w.cargo.startsWith("Garzonero")).length;
   return (
-    <div className={CARD_CLS} style={{ background:"rgba(255,255,255,0.03)" }}>
+    <div className={CARD_CLS} style={{ background:"#ffffff" }}>
       <span className={LABEL_CLS} style={MONO}>Cobertura de turnos</span>
-      <h2 className="text-white font-semibold text-lg mb-4" style={SANS}>Alerta de Dotación</h2>
+      <h2 className="font-semibold text-lg mb-4" style={{ ...SANS, color:"#1c1c1a" }}>Alerta de Dotación</h2>
       <div className="grid grid-cols-2 gap-4 mb-5">
-        <div className="rounded-lg p-4" style={{ background:"rgba(255,255,255,0.04)" }}>
-          <p className="text-white/40 text-xs mb-1" style={MONO}>Garzones actuales</p>
-          <p className="text-white font-bold text-3xl" style={SANS}>{garzonesTotal}</p>
-          <p className="text-white/30 text-xs mt-1" style={MONO}>{garzonesFT} FT · 2 PT</p>
+        <div className="rounded-lg p-4" style={{ background:"rgba(4,22,53,0.04)" }}>
+          <p className="text-xs mb-1" style={{ ...MONO, color:"#75777f" }}>Garzones actuales</p>
+          <p className="font-bold text-3xl" style={{ ...SANS, color:"#1c1c1a" }}>{garzonesTotal}</p>
+          <p className="text-xs mt-1" style={{ ...MONO, color:"#9a9a9a" }}>{garzonesFT} FT · 2 PT</p>
         </div>
-        <div className="rounded-lg p-4" style={{ background:"rgba(239,68,68,0.08)", border:"1px solid rgba(239,68,68,0.2)" }}>
-          <p className="text-red-400/70 text-xs mb-1" style={MONO}>Déficit estimado</p>
-          <p className="text-red-400 font-bold text-3xl" style={SANS}>−2</p>
-          <p className="text-white/30 text-xs mt-1" style={MONO}>turnos/semana sin cubrir</p>
+        <div className="rounded-lg p-4" style={{ background:"rgba(186,26,26,0.08)", border:"1px solid rgba(186,26,26,0.2)" }}>
+          <p className="text-xs mb-1" style={{ ...MONO, color:"#ba1a1a" }}>Déficit estimado</p>
+          <p className="font-bold text-3xl" style={{ ...SANS, color:"#ba1a1a" }}>−2</p>
+          <p className="text-xs mt-1" style={{ ...MONO, color:"#9a9a9a" }}>turnos/semana sin cubrir</p>
         </div>
       </div>
       <div className="space-y-3">
-        <div className="flex items-start gap-3 rounded-lg p-3" style={{ background:"rgba(239,68,68,0.06)", border:"1px solid rgba(239,68,68,0.12)" }}>
-          <AlertTriangle size={15} className="text-red-400 shrink-0 mt-0.5" />
-          <p className="text-white/60 text-sm" style={SANS}>
+        <div className="flex items-start gap-3 rounded-lg p-3" style={{ background:"rgba(186,26,26,0.06)", border:"1px solid rgba(186,26,26,0.12)" }}>
+          <AlertTriangle size={15} className="shrink-0 mt-0.5" style={{ color:"#ba1a1a" }} />
+          <p className="text-sm" style={{ ...SANS, color:"#44474e" }}>
             Turno Bloque B (14:00–23:00) queda con 2 garzones en vez de 4 los viernes y sábados — riesgo de servicio y sobreexigencia del equipo presente.
           </p>
         </div>
-        <div className="flex items-start gap-3 rounded-lg p-3" style={{ background:"rgba(133,104,243,0.06)", border:"1px solid rgba(133,104,243,0.12)" }}>
-          <Info size={15} className="text-purple-400 shrink-0 mt-0.5" />
-          <p className="text-white/60 text-sm" style={SANS}>
+        <div className="flex items-start gap-3 rounded-lg p-3" style={{ background:"rgba(4,22,53,0.04)", border:"1px solid rgba(4,22,53,0.10)" }}>
+          <Info size={15} className="shrink-0 mt-0.5" style={{ color:"#041635" }} />
+          <p className="text-sm" style={{ ...SANS, color:"#44474e" }}>
             Contratar 1–2 garzones adicionales cuesta ~$539k–$1.1M/mes. El costo de no hacerlo: pérdida de mesas, errores de servicio y rotación acelerada del equipo actual.
           </p>
         </div>
@@ -384,21 +386,21 @@ function AlertaCobertura() {
 // ─── KPI Header ───────────────────────────────────────────────────────────────
 function KPIRow() {
   const kpis = [
-    { label:"Trabajadores",      value:"31",                  sub:"29 FT · 2 PT",            icon:<Users size={18} />,        color:"#8568f3" },
-    { label:"Costo empresa/mes", value:fmtM(COSTO_EMPRESA),  sub:"incl. cotizaciones",       icon:<DollarSign size={18} />,   color:"#22d3ee" },
-    { label:"Pasivo laboral",    value:fmtM(PASIVO_TOTAL),   sub:"acumulado a may 2025",     icon:<TrendingUp size={18} />,   color:"#f59e0b" },
-    { label:"Exposición máxima", value:"$80.5M",              sub:"costo desvincular todo",   icon:<AlertTriangle size={18} />,color:"#ef4444" },
+    { label:"Trabajadores",      value:"31",                  sub:"29 FT · 2 PT",            icon:<Users size={18} />,        color:"#041635" },
+    { label:"Costo empresa/mes", value:fmtM(COSTO_EMPRESA),  sub:"incl. cotizaciones",       icon:<DollarSign size={18} />,   color:"#041635" },
+    { label:"Pasivo laboral",    value:fmtM(PASIVO_TOTAL),   sub:"acumulado a may 2026",     icon:<TrendingUp size={18} />,   color:"#835500" },
+    { label:"Exposición máxima", value:"$80.5M",              sub:"costo desvincular todo",   icon:<AlertTriangle size={18} />,color:"#ba1a1a" },
   ];
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
       {kpis.map(k => (
-        <div key={k.label} className={`${CARD_CLS} flex flex-col gap-2`} style={{ background:"rgba(255,255,255,0.03)" }}>
+        <div key={k.label} className={`${CARD_CLS} flex flex-col gap-2`} style={{ background:"#ffffff" }}>
           <div className="flex items-center gap-2" style={{ color: k.color }}>
             {k.icon}
-            <span className="text-xs uppercase tracking-widest" style={{ ...MONO, color:"rgba(255,255,255,0.35)" }}>{k.label}</span>
+            <span className="text-xs uppercase tracking-widest" style={{ ...MONO, color:"#75777f" }}>{k.label}</span>
           </div>
-          <p className="text-white font-bold text-2xl leading-none" style={SANS}>{k.value}</p>
-          <p className="text-white/30 text-xs" style={MONO}>{k.sub}</p>
+          <p className="font-bold text-2xl leading-none" style={{ ...SANS, color:"#1c1c1a" }}>{k.value}</p>
+          <p className="text-xs" style={{ ...MONO, color:"#9a9a9a" }}>{k.sub}</p>
         </div>
       ))}
     </div>
@@ -416,48 +418,53 @@ const NAV = [
 function Sidebar({ section, onSection }: { section: Section; onSection: (s: Section) => void }) {
   return (
     <aside className="hidden lg:flex fixed left-0 top-0 h-full flex-col"
-      style={{ width:"240px", background:"rgba(10,5,28,0.98)", borderRight:"1px solid rgba(133,104,243,0.10)", zIndex:40 }}>
-      <div className="px-6 py-5" style={{ borderBottom:"1px solid rgba(133,104,243,0.08)" }}>
+      style={{ width:"240px", background:"#041635", borderRight:"1px solid rgba(255,255,255,0.08)", zIndex:40 }}>
+      <div className="px-6 py-5" style={{ borderBottom:"1px solid rgba(255,255,255,0.08)" }}>
         <Link href="/empresas">
-          <span className="font-semibold text-white" style={{ ...SANS, fontSize:"1.1rem" }}>RemuneraLab</span>
+          <span className="font-bold italic text-white" style={{ fontFamily:"var(--font-dm-serif)", fontSize:"1.1rem" }}>RemuneraLab</span>
         </Link>
-        <p style={{ ...MONO, fontSize:"0.46rem", letterSpacing:"0.22em", color:"rgba(133,104,243,0.5)", textTransform:"uppercase", marginTop:"4px" }}>
+        <p style={{ fontFamily:"var(--font-space-mono)", fontSize:"0.46rem", letterSpacing:"0.22em", color:"rgba(255,183,77,0.65)", textTransform:"uppercase", marginTop:"4px" }}>
           Demo empresarial
         </p>
       </div>
-      <div className="px-6 py-3" style={{ borderBottom:"1px solid rgba(133,104,243,0.05)" }}>
-        <p style={{ ...MONO, fontSize:"0.46rem", letterSpacing:"0.14em", color:"rgba(133,104,243,0.35)", textTransform:"uppercase", lineHeight:1.6 }}>
+      <div className="px-6 py-3" style={{ borderBottom:"1px solid rgba(255,255,255,0.06)" }}>
+        <p style={{ fontFamily:"var(--font-space-mono)", fontSize:"0.46rem", letterSpacing:"0.14em", color:"rgba(255,255,255,0.35)", textTransform:"uppercase", lineHeight:1.6 }}>
           Restobar Viña del Mar
         </p>
       </div>
       <nav className="flex flex-col gap-0.5 px-3 flex-1 overflow-y-auto py-3">
         <div onClick={() => onSection("resumen")} className="flex items-center gap-3 px-3 py-2.5 rounded-lg mb-1 cursor-pointer transition-all hover:brightness-110"
-          style={{ background: section==="resumen" ? "rgba(133,104,243,0.14)" : "rgba(133,104,243,0.07)", border: section==="resumen" ? "1px solid rgba(133,104,243,0.35)" : "1px solid rgba(133,104,243,0.20)" }}>
-          <LayoutDashboard size={14} style={{ color:"#8568f3", flexShrink:0 }} />
-          <span style={{ ...SANS, fontSize:"0.82rem", color:"#a387f5", fontWeight:500 }}>Panel principal</span>
+          style={{ background: section==="resumen" ? "rgba(255,183,77,0.15)" : "rgba(255,183,77,0.07)", border: section==="resumen" ? "1px solid rgba(255,183,77,0.4)" : "1px solid rgba(255,183,77,0.15)" }}>
+          <LayoutDashboard size={14} style={{ color:"#FFB74D", flexShrink:0 }} />
+          <span style={{ ...SANS, fontSize:"0.82rem", color:"#FFB74D", fontWeight:500 }}>Panel principal</span>
         </div>
         <div style={{ height:"1px", background:"rgba(255,255,255,0.05)", margin:"4px 4px 6px" }} />
         {NAV.map(({ id, label, Icon }) => {
           const active = section === id;
           return (
             <div key={id} onClick={() => onSection(id)} className="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors cursor-pointer"
-              style={{ background: active ? "rgba(133,104,243,0.12)" : "transparent", border: active ? "1px solid rgba(133,104,243,0.18)" : "1px solid transparent" }}>
-              <Icon size={14} style={{ color: active ? "#8568f3" : "rgba(255,255,255,0.22)", flexShrink:0 }} />
-              <span style={{ ...SANS, fontSize:"0.82rem", color: active ? "rgba(255,255,255,0.85)" : "rgba(255,255,255,0.30)", fontWeight: active ? 500 : 400 }}>
+              style={{ background: active ? "rgba(255,183,77,0.12)" : "transparent", border: active ? "1px solid rgba(255,183,77,0.3)" : "1px solid transparent" }}>
+              <Icon size={14} style={{ color: active ? "#FFB74D" : "rgba(255,255,255,0.4)", flexShrink:0 }} />
+              <span style={{ ...SANS, fontSize:"0.82rem", color: active ? "white" : "rgba(255,255,255,0.4)", fontWeight: active ? 500 : 400 }}>
                 {label}
               </span>
             </div>
           );
         })}
       </nav>
-      <div className="px-5 py-4" style={{ borderTop:"1px solid rgba(133,104,243,0.08)" }}>
+      <div className="px-5 py-4" style={{ borderTop:"1px solid rgba(255,255,255,0.08)" }}>
         <span className="inline-block mb-2 text-[10px] px-2.5 py-1 rounded-full font-bold uppercase tracking-wider"
-          style={{ background:"rgba(133,104,243,0.12)", color:"#a387f5", border:"1px solid rgba(133,104,243,0.2)", ...MONO }}>
+          style={{ background:"rgba(255,183,77,0.15)", color:"#FFB74D", border:"1px solid rgba(255,183,77,0.4)", ...MONO }}>
           Demo activa
         </span>
-        <p style={{ ...MONO, fontSize:"0.46rem", letterSpacing:"0.14em", color:"rgba(133,104,243,0.25)", textTransform:"uppercase" }}>
-          Mayo 2025 · Confidencial
+        <p style={{ ...MONO, fontSize:"0.46rem", letterSpacing:"0.14em", color:"rgba(255,255,255,0.25)", textTransform:"uppercase" }}>
+          Mayo 2026 · Confidencial
         </p>
+        <Link href="/empresas/reporte">
+          <span className="block mt-2 text-xs" style={{ ...SANS, color:"rgba(255,255,255,0.4)", textDecoration:"underline", cursor:"pointer" }}>
+            Imprimir reporte
+          </span>
+        </Link>
       </div>
     </aside>
   );
@@ -466,24 +473,24 @@ function Sidebar({ section, onSection }: { section: Section; onSection: (s: Sect
 function MobileNav({ section, onSection }: { section: Section; onSection: (s: Section) => void }) {
   return (
     <div className="lg:hidden fixed top-0 left-0 right-0 z-40"
-      style={{ background:"rgba(24,11,59,0.98)", borderBottom:"1px solid rgba(133,104,243,0.10)" }}>
+      style={{ background:"#041635", borderBottom:"1px solid rgba(255,255,255,0.08)" }}>
       <div className="flex items-center justify-between px-5 h-12">
         <Link href="/empresas">
-          <span className="font-semibold text-white" style={{ ...SANS, fontSize:"1.0rem" }}>RemuneraLab</span>
+          <span className="font-bold italic text-white" style={{ fontFamily:"var(--font-dm-serif)", fontSize:"1.0rem" }}>RemuneraLab</span>
         </Link>
         <button onClick={() => onSection("resumen")} className="flex items-center gap-1 text-xs px-3 py-1 rounded-lg font-semibold hover:opacity-80 transition-opacity"
-          style={{ background:"rgba(133,104,243,0.12)", color:"#a387f5", border:"1px solid rgba(133,104,243,0.25)", ...SANS }}>
+          style={{ background:"rgba(255,183,77,0.15)", color:"#FFB74D", border:"1px solid rgba(255,183,77,0.4)", ...SANS }}>
           <LayoutDashboard size={11} /> Panel
         </button>
       </div>
-      <div className="flex overflow-x-auto px-2 pb-2 gap-1" style={{ borderTop:"1px solid rgba(133,104,243,0.06)" }}>
+      <div className="flex overflow-x-auto px-2 pb-2 gap-1" style={{ borderTop:"1px solid rgba(255,255,255,0.06)" }}>
         {NAV.map(({ id, label, Icon }) => {
           const active = section === id;
           return (
             <button key={id} onClick={() => onSection(id)}
               className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg whitespace-nowrap transition-all shrink-0"
-              style={{ background: active ? "rgba(133,104,243,0.14)" : "transparent", border: active ? "1px solid rgba(133,104,243,0.2)" : "1px solid transparent", color: active ? "#a387f5" : "rgba(255,255,255,0.30)" }}>
-              <Icon size={10} style={{ color: active ? "#8568f3" : "rgba(255,255,255,0.28)" }} />
+              style={{ background: active ? "rgba(255,183,77,0.14)" : "rgba(255,255,255,0.06)", border: active ? "1px solid rgba(255,183,77,0.3)" : "1px solid transparent", color: active ? "#FFB74D" : "rgba(255,255,255,0.6)" }}>
+              <Icon size={10} style={{ color: active ? "#FFB74D" : "rgba(255,255,255,0.4)" }} />
               <span style={{ fontSize:"0.68rem", ...SANS }}>{label}</span>
             </button>
           );
@@ -502,28 +509,28 @@ function VistaResumen({ onSection }: { onSection: (s: Section) => void }) {
 
   const cards = [
     {
-      section:"rotacion" as Section, color:"#ef4444",
+      section:"rotacion" as Section, color:"#ba1a1a",
       Icon: RotateCcw, label:"Rotación de Personal",
       metric:`${alto.length}`, metricSub:"trabajadores en riesgo ALTO",
       bullets:[`Exposición en finiquitos: ${fmtM(totalAlto)}`, "Calculadora de escenarios incluida", "10 cargos críticos identificados"],
       cta:"Ver calculadora de rotación",
     },
     {
-      section:"cumplimiento" as Section, color:"#22c55e",
+      section:"cumplimiento" as Section, color:"#2a7d4f",
       Icon: Scale, label:"Cumplimiento y Subsidios",
       metric:fmtM(ahorroSUE), metricSub:"ahorro fiscal potencial/año (SUE)",
       bullets:[`${mujeres.length} mujeres en planilla · ~8 elegibles SUE`, "Ley Karin · vigente agosto 2024", "Jornada 40h: ajuste 2026 en preparación"],
       cta:"Ver cumplimiento legal",
     },
     {
-      section:"mercado" as Section, color:"#f59e0b",
+      section:"mercado" as Section, color:"#835500",
       Icon: TrendingUp, label:"Presión de Mercado",
       metric:"+34%", metricSub:"aumento avisos Garzonero/a (90d)",
       bullets:["Garzonero/a: 52 avisos activos · tensión 88/100", "Jefe de Cocina: −24.2% vs oferta mercado", "Bartender: +25% crecimiento demanda"],
       cta:"Ver presión de mercado",
     },
     {
-      section:"bandas" as Section, color:"#8568f3",
+      section:"bandas" as Section, color:"#041635",
       Icon: BarChart2, label:"Bandas Salariales",
       metric:"3", metricSub:"cargos con brecha >15% vs mercado",
       bullets:["Jefe de Local: empresa paga P25 vs mercado", "Garzonero/a: brecha −10% mediana", "Pasivo laboral: crece $3M/mes"],
@@ -534,14 +541,14 @@ function VistaResumen({ onSection }: { onSection: (s: Section) => void }) {
   return (
     <div className="space-y-8">
       <motion.div initial={{ opacity:0, y:12 }} animate={{ opacity:1, y:0 }} transition={{ duration:0.5 }}>
-        <p className="text-xs uppercase tracking-[0.3em] mb-2" style={{ color:"#8568f3", ...MONO }}>
-          Panel principal · Mayo 2025
+        <p className="text-xs uppercase tracking-[0.3em] mb-2" style={{ color:"#041635", ...MONO }}>
+          Panel principal · Mayo 2026
         </p>
-        <h1 className="text-white font-semibold mb-1" style={{ fontSize:"clamp(1.4rem, 3vw, 1.9rem)", ...SANS }}>
+        <h1 className="font-semibold mb-1" style={{ fontSize:"clamp(1.4rem, 3vw, 1.9rem)", ...SANS, color:"#1c1c1a" }}>
           Restobar Viña del Mar
         </h1>
-        <p className="text-white/40 text-sm" style={SANS}>
-          31 trabajadores · Gastronomía · Región de Valparaíso · Período mayo 2025
+        <p className="text-sm" style={{ ...SANS, color:"#75777f" }}>
+          31 trabajadores · Gastronomía · Región de Valparaíso · Período mayo 2026
         </p>
       </motion.div>
       <motion.div initial={{ opacity:0, y:12 }} animate={{ opacity:1, y:0 }} transition={{ duration:0.5, delay:0.08 }}>
@@ -554,22 +561,22 @@ function VistaResumen({ onSection }: { onSection: (s: Section) => void }) {
             transition={{ delay: 0.12 + i * 0.08, duration:0.42 }}
             onClick={() => onSection(card.section)}
             className="relative rounded-2xl p-6 cursor-pointer group overflow-hidden"
-            style={{ background:"rgba(255,255,255,0.03)", border:"1px solid rgba(255,255,255,0.08)", transition:"border-color 0.2s, box-shadow 0.2s" }}
-            whileHover={{ scale:1.015, boxShadow:`0 0 32px ${card.color}25` }}
+            style={{ background:"#ffffff", border:"1px solid #e5e2de", transition:"border-color 0.2s, box-shadow 0.2s" }}
+            whileHover={{ scale:1.015, boxShadow:`0 0 32px ${card.color}18` }}
           >
             <div className="absolute top-0 left-0 right-0 h-[3px] rounded-t-2xl" style={{ background:card.color }} />
             <div className="flex items-start justify-between mb-4">
               <span className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded-full"
-                style={{ background:`${card.color}18`, color:card.color, border:`1px solid ${card.color}30`, ...MONO }}>
+                style={{ background:`${card.color}12`, color:card.color, border:`1px solid ${card.color}25`, ...MONO }}>
                 <card.Icon size={11} /> {card.label}
               </span>
               <ChevronRight size={15} style={{ color:card.color, opacity:0.6, marginTop:"2px" }} className="group-hover:translate-x-1 transition-transform" />
             </div>
             <p className="text-3xl font-bold tabular-nums mb-0.5" style={{ color:card.color, ...MONO }}>{card.metric}</p>
-            <p className="text-xs mb-4" style={{ color:"rgba(255,255,255,0.35)", ...MONO }}>{card.metricSub}</p>
+            <p className="text-xs mb-4" style={{ color:"#75777f", ...MONO }}>{card.metricSub}</p>
             <ul className="space-y-1.5 mb-4">
               {card.bullets.map(b => (
-                <li key={b} className="flex items-start gap-2 text-xs" style={{ color:"rgba(255,255,255,0.55)" }}>
+                <li key={b} className="flex items-start gap-2 text-xs" style={{ color:"#44474e" }}>
                   <span style={{ color:card.color, flexShrink:0 }}>›</span> {b}
                 </li>
               ))}
@@ -606,80 +613,80 @@ function VistaRotacion() {
     <div className="space-y-6">
       <motion.div initial={{ opacity:0, y:12 }} animate={{ opacity:1, y:0 }} transition={{ duration:0.45 }}>
         <span className={LABEL_CLS} style={MONO}>Calculadora de costos</span>
-        <h2 className="text-white font-semibold text-xl" style={SANS}>Rotación de Personal</h2>
-        <p className="text-white/40 text-sm mt-1" style={SANS}>
+        <h2 className="font-semibold text-xl" style={{ ...SANS, color:"#1c1c1a" }}>Rotación de Personal</h2>
+        <p className="text-sm mt-1" style={{ ...SANS, color:"#75777f" }}>
           Costo estimado por cargo: finiquito (Art. 163 CT) + costo de reposición (reclutamiento + capacitación)
         </p>
       </motion.div>
 
       <div className="grid grid-cols-3 gap-4">
         {[
-          { clasif:"ALTO" as Clasif, workers:altoWorkers, exp:totalAltoExp, color:"#ef4444", bg:"rgba(239,68,68,0.06)", border:"rgba(239,68,68,0.15)" },
-          { clasif:"MEDIO" as Clasif, workers:medio, exp:medio.reduce((s,w)=>s+w.costoDesvinc,0), color:"#f59e0b", bg:"rgba(245,158,11,0.06)", border:"rgba(245,158,11,0.15)" },
-          { clasif:"BAJO" as Clasif, workers:bajo, exp:bajo.reduce((s,w)=>s+w.costoDesvinc,0), color:"#22c55e", bg:"rgba(34,197,94,0.06)", border:"rgba(34,197,94,0.15)" },
+          { clasif:"ALTO" as Clasif, workers:altoWorkers, exp:totalAltoExp, color:"#ba1a1a", bg:"rgba(186,26,26,0.06)", border:"rgba(186,26,26,0.15)" },
+          { clasif:"MEDIO" as Clasif, workers:medio, exp:medio.reduce((s,w)=>s+w.costoDesvinc,0), color:"#835500", bg:"rgba(131,85,0,0.06)", border:"rgba(131,85,0,0.15)" },
+          { clasif:"BAJO" as Clasif, workers:bajo, exp:bajo.reduce((s,w)=>s+w.costoDesvinc,0), color:"#2a7d4f", bg:"rgba(42,125,79,0.06)", border:"rgba(42,125,79,0.15)" },
         ].map(({ clasif, workers, exp, color, bg, border }) => (
           <div key={clasif} className="rounded-xl p-4" style={{ background:bg, border:`1px solid ${border}` }}>
             <p className="text-xs uppercase tracking-widest mb-1" style={{ ...MONO, color }}>Riesgo {clasif}</p>
-            <p className="text-white font-bold text-2xl" style={SANS}>{workers.length}</p>
-            <p className="text-white/40 text-xs mt-1" style={MONO}>{fmtM(exp)} exposición</p>
+            <p className="font-bold text-2xl" style={{ ...SANS, color:"#1c1c1a" }}>{workers.length}</p>
+            <p className="text-xs mt-1" style={{ ...MONO, color:"#75777f" }}>{fmtM(exp)} exposición</p>
           </div>
         ))}
       </div>
 
       <MapaRiesgo />
 
-      <div className={CARD_CLS} style={{ background:"rgba(255,255,255,0.03)" }}>
+      <div className={CARD_CLS} style={{ background:"#ffffff" }}>
         <span className={LABEL_CLS} style={MONO}>Simulador de escenarios · Riesgo ALTO</span>
-        <h3 className="text-white font-semibold mb-4" style={SANS}>¿Cuánto costaría si rotan los trabajadores de mayor riesgo?</h3>
+        <h3 className="font-semibold mb-4" style={{ ...SANS, color:"#1c1c1a" }}>¿Cuánto costaría si rotan los trabajadores de mayor riesgo?</h3>
 
         <div className="mb-6">
           <div className="flex justify-between mb-2">
-            <p className="text-white/60 text-sm" style={SANS}>Salidas estimadas en 12 meses</p>
-            <p className="text-white font-bold text-sm" style={MONO}>{nSalidas} de {altoWorkers.length} ALTO</p>
+            <p className="text-sm" style={{ ...SANS, color:"#44474e" }}>Salidas estimadas en 12 meses</p>
+            <p className="font-bold text-sm" style={{ ...MONO, color:"#1c1c1a" }}>{nSalidas} de {altoWorkers.length} ALTO</p>
           </div>
           <input type="range" min={1} max={altoWorkers.length} value={nSalidas}
             onChange={e => setNSalidas(Number(e.target.value))}
-            className="w-full" style={{ accentColor:"#8568f3" }}
+            className="w-full" style={{ accentColor:"#041635" }}
           />
-          <div className="flex justify-between text-xs text-white/25 mt-1" style={MONO}>
+          <div className="flex justify-between text-xs mt-1" style={{ ...MONO, color:"#9a9a9a" }}>
             <span>1 salida</span><span>{altoWorkers.length} salidas</span>
           </div>
         </div>
 
         <div className="grid grid-cols-3 gap-4 mb-5">
-          <div className="rounded-lg p-4 text-center" style={{ background:"rgba(255,255,255,0.04)" }}>
-            <p className="text-white font-bold text-lg" style={SANS}>{fmtM(totalSeverance)}</p>
-            <p className="text-white/40 text-xs mt-1" style={MONO}>Finiquitos</p>
+          <div className="rounded-lg p-4 text-center" style={{ background:"rgba(4,22,53,0.04)" }}>
+            <p className="font-bold text-lg" style={{ ...SANS, color:"#1c1c1a" }}>{fmtM(totalSeverance)}</p>
+            <p className="text-xs mt-1" style={{ ...MONO, color:"#75777f" }}>Finiquitos</p>
           </div>
-          <div className="rounded-lg p-4 text-center" style={{ background:"rgba(255,255,255,0.04)" }}>
-            <p className="text-white font-bold text-lg" style={SANS}>{fmtM(totalRepos)}</p>
-            <p className="text-white/40 text-xs mt-1" style={MONO}>Reposición</p>
+          <div className="rounded-lg p-4 text-center" style={{ background:"rgba(4,22,53,0.04)" }}>
+            <p className="font-bold text-lg" style={{ ...SANS, color:"#1c1c1a" }}>{fmtM(totalRepos)}</p>
+            <p className="text-xs mt-1" style={{ ...MONO, color:"#75777f" }}>Reposición</p>
           </div>
-          <div className="rounded-lg p-4 text-center" style={{ background:"rgba(239,68,68,0.08)", border:"1px solid rgba(239,68,68,0.2)" }}>
-            <p className="text-red-400 font-bold text-lg" style={SANS}>{fmtM(totalCosto)}</p>
-            <p className="text-white/40 text-xs mt-1" style={MONO}>Costo total</p>
+          <div className="rounded-lg p-4 text-center" style={{ background:"rgba(186,26,26,0.08)", border:"1px solid rgba(186,26,26,0.2)" }}>
+            <p className="font-bold text-lg" style={{ ...SANS, color:"#ba1a1a" }}>{fmtM(totalCosto)}</p>
+            <p className="text-xs mt-1" style={{ ...MONO, color:"#75777f" }}>Costo total</p>
           </div>
         </div>
 
         <div className="space-y-2">
-          <p className="text-white/40 text-xs uppercase tracking-widest mb-3" style={MONO}>Trabajadores incluidos en el escenario</p>
+          <p className="text-xs uppercase tracking-widest mb-3" style={{ ...MONO, color:"#75777f" }}>Trabajadores incluidos en el escenario</p>
           {selected.map(w => (
             <div key={w.n} className="flex items-center justify-between rounded-lg px-4 py-3"
-              style={{ background:"rgba(255,255,255,0.03)", border:"1px solid rgba(239,68,68,0.10)" }}>
+              style={{ background:"rgba(4,22,53,0.03)", border:"1px solid rgba(186,26,26,0.10)" }}>
               <div>
-                <p className="text-white text-sm font-medium" style={SANS}>{w.nombre}</p>
-                <p className="text-white/40 text-xs" style={MONO}>{w.cargo} · {w.area} · {w.antiguedadTxt}</p>
+                <p className="text-sm font-medium" style={{ ...SANS, color:"#1c1c1a" }}>{w.nombre}</p>
+                <p className="text-xs" style={{ ...MONO, color:"#75777f" }}>{w.cargo} · {w.area} · {w.antiguedadTxt}</p>
               </div>
               <div className="text-right">
-                <p className="text-red-400 font-semibold text-sm" style={MONO}>{fmtM(w.costoDesvinc + costoReposicion(w))}</p>
-                <p className="text-white/25 text-[10px]" style={MONO}>finiquito + reposición</p>
+                <p className="font-semibold text-sm" style={{ ...MONO, color:"#ba1a1a" }}>{fmtM(w.costoDesvinc + costoReposicion(w))}</p>
+                <p className="text-[10px]" style={{ ...MONO, color:"#9a9a9a" }}>finiquito + reposición</p>
               </div>
             </div>
           ))}
         </div>
       </div>
 
-      <p className="text-white/20 text-xs text-center pb-2" style={MONO}>
+      <p className="text-xs text-center pb-2" style={{ ...MONO, color:"#9a9a9a" }}>
         Finiquito: Art. 163 CT (indemnización años servicio + aviso previo) · Reposición: estimado reclutamiento + capacitación
       </p>
     </div>
@@ -724,18 +731,18 @@ function VistaCumplimiento() {
   ];
 
   const estadoConf = {
-    accion:     { color:"#ef4444", label:"Requiere acción", bg:"rgba(239,68,68,0.06)",  border:"rgba(239,68,68,0.15)" },
-    proceso:    { color:"#f59e0b", label:"En proceso",      bg:"rgba(245,158,11,0.06)", border:"rgba(245,158,11,0.15)" },
-    oportunidad:{ color:"#22c55e", label:"Oportunidad",     bg:"rgba(34,197,94,0.06)",  border:"rgba(34,197,94,0.15)" },
+    accion:     { color:"#ba1a1a", label:"Requiere acción", bg:"rgba(186,26,26,0.06)",  border:"rgba(186,26,26,0.15)" },
+    proceso:    { color:"#835500", label:"En proceso",      bg:"rgba(131,85,0,0.06)",   border:"rgba(131,85,0,0.15)" },
+    oportunidad:{ color:"#2a7d4f", label:"Oportunidad",     bg:"rgba(42,125,79,0.06)",  border:"rgba(42,125,79,0.15)" },
   };
 
   return (
     <div className="space-y-6">
       <motion.div initial={{ opacity:0, y:12 }} animate={{ opacity:1, y:0 }} transition={{ duration:0.45 }}>
         <span className={LABEL_CLS} style={MONO}>Normativa laboral vigente</span>
-        <h2 className="text-white font-semibold text-xl" style={SANS}>Cumplimiento Legal y Subsidios</h2>
-        <p className="text-white/40 text-sm mt-1" style={SANS}>
-          Leyes laborales activas con impacto directo en esta planilla · Mayo 2025
+        <h2 className="font-semibold text-xl" style={{ ...SANS, color:"#1c1c1a" }}>Cumplimiento Legal y Subsidios</h2>
+        <p className="text-sm mt-1" style={{ ...SANS, color:"#75777f" }}>
+          Leyes laborales activas con impacto directo en esta planilla · Mayo 2026
         </p>
       </motion.div>
 
@@ -746,20 +753,20 @@ function VistaCumplimiento() {
             <div key={ley.ley} className="rounded-xl p-5" style={{ background:conf.bg, border:`1px solid ${conf.border}` }}>
               <div className="flex items-start justify-between mb-2 flex-wrap gap-2">
                 <div>
-                  <p className="text-white font-semibold text-sm" style={SANS}>{ley.ley}</p>
-                  <p className="text-white/40 text-xs mt-0.5" style={MONO}>{ley.vigencia}</p>
+                  <p className="font-semibold text-sm" style={{ ...SANS, color:"#1c1c1a" }}>{ley.ley}</p>
+                  <p className="text-xs mt-0.5" style={{ ...MONO, color:"#75777f" }}>{ley.vigencia}</p>
                 </div>
                 <span className="text-xs px-2.5 py-1 rounded-full font-semibold"
                   style={{ background:`${conf.color}15`, color:conf.color, border:`1px solid ${conf.color}30`, ...MONO }}>
                   {conf.label}
                 </span>
               </div>
-              <p className="text-white/55 text-sm mb-3" style={SANS}>{ley.descripcion}</p>
-              <div className="rounded-lg p-3 mb-2" style={{ background:"rgba(255,255,255,0.03)" }}>
+              <p className="text-sm mb-3" style={{ ...SANS, color:"#44474e" }}>{ley.descripcion}</p>
+              <div className="rounded-lg p-3 mb-2" style={{ background:"rgba(4,22,53,0.03)" }}>
                 <p className="text-xs font-semibold mb-1" style={{ ...MONO, color:conf.color }}>Acción requerida</p>
-                <p className="text-white/60 text-sm" style={SANS}>{ley.accion}</p>
+                <p className="text-sm" style={{ ...SANS, color:"#44474e" }}>{ley.accion}</p>
               </div>
-              <p className="text-white/30 text-xs" style={MONO}>⚠ {ley.riesgo}</p>
+              <p className="text-xs" style={{ ...MONO, color:"#9a9a9a" }}>⚠ {ley.riesgo}</p>
             </div>
           );
         })}
@@ -782,37 +789,37 @@ function VistaPresionMercado() {
     <div className="space-y-6">
       <motion.div initial={{ opacity:0, y:12 }} animate={{ opacity:1, y:0 }} transition={{ duration:0.45 }}>
         <span className={LABEL_CLS} style={MONO}>Análisis de mercado · Región Valparaíso</span>
-        <h2 className="text-white font-semibold text-xl" style={SANS}>Presión de Mercado por Cargo</h2>
-        <p className="text-white/40 text-sm mt-1" style={SANS}>
+        <h2 className="font-semibold text-xl" style={{ ...SANS, color:"#1c1c1a" }}>Presión de Mercado por Cargo</h2>
+        <p className="text-sm mt-1" style={{ ...SANS, color:"#75777f" }}>
           Avisos de empleo activos últimos 90 días · Sector gastronomía · Fuente: JobPortals + RemuneraLab
         </p>
       </motion.div>
 
       <div className="grid grid-cols-3 gap-4">
-        <div className="rounded-xl p-4 border border-white/10" style={{ background:"rgba(239,68,68,0.06)", border:"1px solid rgba(239,68,68,0.15)" }}>
-          <p className="text-xs uppercase tracking-widest mb-1" style={{ ...MONO, color:"#ef4444" }}>Tensión alta</p>
-          <p className="text-white font-bold text-2xl" style={SANS}>{altaTension}</p>
-          <p className="text-white/40 text-xs mt-1" style={MONO}>cargos en alerta</p>
+        <div className="rounded-xl p-4" style={{ background:"rgba(186,26,26,0.06)", border:"1px solid rgba(186,26,26,0.15)" }}>
+          <p className="text-xs uppercase tracking-widest mb-1" style={{ ...MONO, color:"#ba1a1a" }}>Tensión alta</p>
+          <p className="font-bold text-2xl" style={{ ...SANS, color:"#1c1c1a" }}>{altaTension}</p>
+          <p className="text-xs mt-1" style={{ ...MONO, color:"#75777f" }}>cargos en alerta</p>
         </div>
-        <div className={CARD_CLS} style={{ background:"rgba(255,255,255,0.03)" }}>
-          <p className="text-xs uppercase tracking-widest mb-1" style={{ ...MONO, color:"#8568f3" }}>Avisos totales</p>
-          <p className="text-white font-bold text-2xl" style={SANS}>{totalAvisos}</p>
-          <p className="text-white/40 text-xs mt-1" style={MONO}>en 90 días región</p>
+        <div className={CARD_CLS} style={{ background:"#ffffff" }}>
+          <p className="text-xs uppercase tracking-widest mb-1" style={{ ...MONO, color:"#041635" }}>Avisos totales</p>
+          <p className="font-bold text-2xl" style={{ ...SANS, color:"#1c1c1a" }}>{totalAvisos}</p>
+          <p className="text-xs mt-1" style={{ ...MONO, color:"#75777f" }}>en 90 días región</p>
         </div>
-        <div className={CARD_CLS} style={{ background:"rgba(255,255,255,0.03)" }}>
-          <p className="text-xs uppercase tracking-widest mb-1" style={{ ...MONO, color:"#f59e0b" }}>Mayor brecha</p>
-          <p className="text-white font-bold text-2xl" style={SANS}>{maxBrecha.toFixed(1)}%</p>
-          <p className="text-white/40 text-xs mt-1" style={MONO}>Jefe de Cocina</p>
+        <div className={CARD_CLS} style={{ background:"#ffffff" }}>
+          <p className="text-xs uppercase tracking-widest mb-1" style={{ ...MONO, color:"#835500" }}>Mayor brecha</p>
+          <p className="font-bold text-2xl" style={{ ...SANS, color:"#1c1c1a" }}>{maxBrecha.toFixed(1)}%</p>
+          <p className="text-xs mt-1" style={{ ...MONO, color:"#75777f" }}>Jefe de Cocina</p>
         </div>
       </div>
 
-      <div className={CARD_CLS} style={{ background:"rgba(255,255,255,0.03)" }}>
+      <div className={CARD_CLS} style={{ background:"#ffffff" }}>
         <div className="overflow-x-auto">
           <table className="w-full" style={SANS}>
             <thead>
-              <tr style={{ borderBottom:"1px solid rgba(255,255,255,0.06)" }}>
+              <tr style={{ borderBottom:"1px solid #e5e2de" }}>
                 {["Cargo","Avisos 90d","Tendencia","Empresa","Mercado","Brecha","Tensión"].map(h => (
-                  <th key={h} className="text-left py-3 pr-4 last:text-left text-right first:text-left" style={{ ...MONO, fontSize:"0.58rem", color:"rgba(255,255,255,0.30)", textTransform:"uppercase", letterSpacing:"0.12em", fontWeight:500 }}>
+                  <th key={h} className="text-left py-3 pr-4 last:text-left text-right first:text-left" style={{ ...MONO, fontSize:"0.58rem", color:"#75777f", textTransform:"uppercase", letterSpacing:"0.12em", fontWeight:500 }}>
                     {h}
                   </th>
                 ))}
@@ -820,24 +827,24 @@ function VistaPresionMercado() {
             </thead>
             <tbody>
               {sorted.map(row => {
-                const nivelColor = row.nivel === "alta" ? "#ef4444" : row.nivel === "media-alta" ? "#f59e0b" : row.nivel === "media" ? "#eab308" : "#22c55e";
-                const trendColor = row.avisosTrend >= 15 ? "#ef4444" : row.avisosTrend >= 0 ? "#f59e0b" : "#22c55e";
+                const nivelColor = row.nivel === "alta" ? "#ba1a1a" : row.nivel === "media-alta" ? "#835500" : row.nivel === "media" ? "#835500" : "#2a7d4f";
+                const trendColor = row.avisosTrend >= 15 ? "#ba1a1a" : row.avisosTrend >= 0 ? "#835500" : "#2a7d4f";
                 return (
-                  <tr key={row.cargo} style={{ borderBottom:"1px solid rgba(255,255,255,0.04)" }}>
+                  <tr key={row.cargo} style={{ borderBottom:"1px solid #f0ede9" }}>
                     <td className="py-3 pr-4">
-                      <p className="text-white font-medium text-sm">{row.cargo}</p>
-                      <p className="text-white/30" style={{ ...MONO, fontSize:"0.58rem" }}>{row.n_empresa} en planilla</p>
+                      <p className="font-medium text-sm" style={{ color:"#1c1c1a" }}>{row.cargo}</p>
+                      <p style={{ ...MONO, fontSize:"0.58rem", color:"#9a9a9a" }}>{row.n_empresa} en planilla</p>
                     </td>
-                    <td className="text-right py-3 pr-4 text-white font-medium text-sm" style={MONO}>{row.avisos90d}</td>
+                    <td className="text-right py-3 pr-4 font-medium text-sm" style={{ ...MONO, color:"#1c1c1a" }}>{row.avisos90d}</td>
                     <td className="text-right py-3 pr-4 font-medium text-sm" style={{ ...MONO, color:trendColor }}>
                       {row.avisosTrend > 0 ? "+" : ""}{row.avisosTrend.toFixed(1)}%
                     </td>
-                    <td className="text-right py-3 pr-4 text-white/60 text-sm" style={MONO}>{fmtK(row.empresa)}</td>
-                    <td className="text-right py-3 pr-4 text-white/60 text-sm" style={MONO}>{fmtK(row.med90d)}</td>
-                    <td className="text-right py-3 pr-4 font-semibold text-sm" style={{ ...MONO, color:"#ef4444" }}>{row.salGap.toFixed(1)}%</td>
+                    <td className="text-right py-3 pr-4 text-sm" style={{ ...MONO, color:"#44474e" }}>{fmtK(row.empresa)}</td>
+                    <td className="text-right py-3 pr-4 text-sm" style={{ ...MONO, color:"#44474e" }}>{fmtK(row.med90d)}</td>
+                    <td className="text-right py-3 pr-4 font-semibold text-sm" style={{ ...MONO, color:"#ba1a1a" }}>{row.salGap.toFixed(1)}%</td>
                     <td className="py-3">
                       <div className="flex items-center gap-2">
-                        <div className="w-16 h-1.5 rounded-full" style={{ background:"rgba(255,255,255,0.06)" }}>
+                        <div className="w-16 h-1.5 rounded-full" style={{ background:"#f0ede9" }}>
                           <div className="h-full rounded-full" style={{ width:`${row.tensionIdx}%`, background:nivelColor }} />
                         </div>
                         <span style={{ ...MONO, fontSize:"0.65rem", color:nivelColor }}>{row.tensionIdx}</span>
@@ -852,30 +859,30 @@ function VistaPresionMercado() {
       </div>
 
       <div className="space-y-3">
-        <p className="text-white/40 text-xs uppercase tracking-widest" style={MONO}>Cargos con tensión ≥ 70 — análisis detallado</p>
+        <p className="text-xs uppercase tracking-widest" style={{ ...MONO, color:"#75777f" }}>Cargos con tensión ≥ 70 — análisis detallado</p>
         {sorted.filter(r => r.tensionIdx >= 70).map(row => {
-          const nivelColor = row.nivel === "alta" ? "#ef4444" : "#f59e0b";
+          const nivelColor = row.nivel === "alta" ? "#ba1a1a" : "#835500";
           return (
-            <div key={row.cargo} className="rounded-xl p-4" style={{ background:"rgba(239,68,68,0.04)", border:"1px solid rgba(239,68,68,0.10)" }}>
+            <div key={row.cargo} className="rounded-xl p-4" style={{ background:"rgba(186,26,26,0.04)", border:"1px solid rgba(186,26,26,0.10)" }}>
               <div className="flex items-center justify-between mb-2 flex-wrap gap-2">
-                <p className="text-white font-semibold text-sm" style={SANS}>{row.cargo}</p>
+                <p className="font-semibold text-sm" style={{ ...SANS, color:"#1c1c1a" }}>{row.cargo}</p>
                 <div className="flex gap-2">
                   <span className="text-xs px-2 py-0.5 rounded-full" style={{ background:`${nivelColor}15`, color:nivelColor, border:`1px solid ${nivelColor}30`, ...MONO }}>
                     Tensión {row.tensionIdx}/100
                   </span>
-                  <span className="text-xs px-2 py-0.5 rounded-full" style={{ background:"rgba(239,68,68,0.12)", color:"#ef4444", ...MONO }}>
+                  <span className="text-xs px-2 py-0.5 rounded-full" style={{ background:"rgba(186,26,26,0.12)", color:"#ba1a1a", ...MONO }}>
                     Brecha {row.salGap.toFixed(1)}%
                   </span>
                 </div>
               </div>
-              <p className="text-white/50 text-sm" style={SANS}>{row.narrativa}</p>
+              <p className="text-sm" style={{ ...SANS, color:"#44474e" }}>{row.narrativa}</p>
             </div>
           );
         })}
       </div>
 
-      <p className="text-white/20 text-xs text-center pb-2" style={MONO}>
-        Fuente: agregación avisos portales laborales + RemuneraLab · Valparaíso · Gastronomía · 90 días al 21 may 2025
+      <p className="text-xs text-center pb-2" style={{ ...MONO, color:"#9a9a9a" }}>
+        Fuente: agregación avisos portales laborales + RemuneraLab · Valparaíso · Gastronomía · 90 días al 21 may 2026
       </p>
     </div>
   );
@@ -887,14 +894,14 @@ function VistaBandasSalariales() {
     <div className="space-y-6">
       <motion.div initial={{ opacity:0, y:12 }} animate={{ opacity:1, y:0 }} transition={{ duration:0.45 }}>
         <span className={LABEL_CLS} style={MONO}>Análisis de remuneraciones</span>
-        <h2 className="text-white font-semibold text-xl" style={SANS}>Bandas Salariales por Cargo y Área</h2>
-        <p className="text-white/40 text-sm mt-1" style={SANS}>
+        <h2 className="font-semibold text-xl" style={{ ...SANS, color:"#1c1c1a" }}>Bandas Salariales por Cargo y Área</h2>
+        <p className="text-sm mt-1" style={{ ...SANS, color:"#75777f" }}>
           Sueldo base interno vs mediana ESI INE Valparaíso/Gastronomía 2024 · Pasivo acumulado por área
         </p>
       </motion.div>
       <DistribucionMercado />
       <PasivoLaboral />
-      <p className="text-white/20 text-xs text-center pb-2" style={MONO}>
+      <p className="text-xs text-center pb-2" style={{ ...MONO, color:"#9a9a9a" }}>
         Propinas excluidas de todos los cálculos · Art. 42 letra e) CT: no son imponibles ni constituyen renta
       </p>
     </div>
@@ -903,38 +910,102 @@ function VistaBandasSalariales() {
 
 // ─── Password Gate ────────────────────────────────────────────────────────────
 function PasswordGate({ onAuth }: { onAuth: () => void }) {
-  const [pwd, setPwd] = useState("");
-  const [err, setErr] = useState(false);
+  const [val,   setVal]   = useState("");
+  const [show,  setShow]  = useState(false);
+  const [err,   setErr]   = useState(false);
+  const [shake, setShake] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => { inputRef.current?.focus(); }, []);
 
   function submit(e: React.FormEvent) {
     e.preventDefault();
-    if (pwd === DEMO_PASSWORD) { onAuth(); }
-    else { setErr(true); setTimeout(() => setErr(false), 1500); }
+    if (val === DEMO_PASSWORD) {
+      sessionStorage.setItem(STORAGE_KEY, "1");
+      onAuth();
+    } else {
+      setErr(true);
+      setShake(true);
+      setTimeout(() => setShake(false), 500);
+    }
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-6" style={{ background:"#180b3b" }}>
-      <motion.div initial={{ opacity:0, y:16 }} animate={{ opacity:1, y:0 }} className="w-full max-w-sm">
-        <div className="flex justify-center mb-8">
-          <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ background:"rgba(133,104,243,0.15)", border:"1px solid rgba(133,104,243,0.3)" }}>
-            <Lock size={22} style={{ color:"#8568f3" }} />
-          </div>
+    <div className="min-h-screen flex items-center justify-center px-6" style={{ background:"#fcf9f5" }}>
+      <motion.div
+        initial={{ opacity:0, y:16 }} animate={{ opacity:1, y:0 }}
+        transition={{ duration:0.45 }}
+        className={`relative z-10 w-full max-w-sm ${shake ? "animate-shake" : ""}`}
+        style={shake ? { animation:"shake 0.4s ease" } : {}}
+      >
+        <div className="text-center mb-8">
+          <p className="font-bold italic mb-1" style={{ fontFamily:"var(--font-dm-serif)", fontSize:"1.5rem", color:"#041635" }}>RemuneraLab</p>
+          <p style={{ fontFamily:"var(--font-space-mono)", fontSize:"0.55rem", color:"rgba(4,22,53,0.5)", letterSpacing:"0.22em", textTransform:"uppercase" }}>
+            Demo empresarial · Acceso restringido
+          </p>
         </div>
-        <h1 className="text-white text-center font-semibold text-xl mb-1" style={SANS}>Dashboard B2B · Demo</h1>
-        <p className="text-white/40 text-center text-sm mb-8" style={SANS}>Restobar Viña del Mar · 31 trabajadores</p>
-        <form onSubmit={submit} className="space-y-4">
-          <input type="password" value={pwd} onChange={e => setPwd(e.target.value)}
-            placeholder="Contraseña de acceso" autoFocus
-            className="w-full px-4 py-3.5 rounded-lg border text-white placeholder:text-white/25 text-sm focus:outline-none transition-all"
-            style={{ background:"rgba(255,255,255,0.05)", borderColor: err ? "#ef4444" : "rgba(255,255,255,0.1)", ...SANS }}
-          />
-          <button type="submit" className="w-full py-3.5 rounded-lg font-semibold text-white text-sm transition-opacity hover:opacity-90"
-            style={{ background:"linear-gradient(135deg, #8568f3, #a387f5)", ...SANS }}>
-            Acceder
-          </button>
-        </form>
-        {err && <p className="text-red-400 text-center text-sm mt-3" style={SANS}>Contraseña incorrecta</p>}
+
+        <div className="rounded-2xl p-8" style={{ background:"#ffffff", border:"1px solid #e5e2de" }}>
+          <div className="flex justify-center mb-6">
+            <div className="w-12 h-12 rounded-xl flex items-center justify-center"
+              style={{ background:"rgba(4,22,53,0.08)", border:"1px solid rgba(4,22,53,0.15)" }}>
+              <Lock size={20} style={{ color:"#041635" }} />
+            </div>
+          </div>
+          <h1 className="text-center font-semibold mb-1" style={{ ...SANS, fontSize:"1.1rem", color:"#1c1c1a" }}>Acceso al demo</h1>
+          <p className="text-center mb-6" style={{ ...SANS, fontSize:"0.78rem", color:"#75777f" }}>
+            Restobar Viña del Mar · 31 trabajadores · 2026
+          </p>
+
+          <form onSubmit={submit} className="flex flex-col gap-4">
+            <div className="relative">
+              <input
+                ref={inputRef}
+                type={show ? "text" : "password"}
+                value={val}
+                onChange={e => { setVal(e.target.value); setErr(false); }}
+                placeholder="Contraseña de acceso"
+                className="w-full px-4 py-3.5 pr-11 rounded-lg text-sm focus:outline-none transition-all"
+                style={{ background:"#e5e2de", border: err ? "1px solid #ba1a1a" : "1px solid #c5c6cf", color:"#1c1c1a", ...SANS }}
+              />
+              <button type="button" onClick={() => setShow(v => !v)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 transition-colors"
+                style={{ color:"#9a9a9a" }}>
+                {show ? <EyeOff size={14} /> : <Eye size={14} />}
+              </button>
+            </div>
+
+            <AnimatePresence>
+              {err && (
+                <motion.p initial={{ opacity:0, y:-4 }} animate={{ opacity:1, y:0 }} exit={{ opacity:0 }}
+                  className="text-center text-xs" style={{ color:"#ba1a1a", ...SANS }}>
+                  Contraseña incorrecta
+                </motion.p>
+              )}
+            </AnimatePresence>
+
+            <button type="submit"
+              className="py-3.5 rounded-lg font-semibold text-white text-sm flex items-center justify-center gap-2 hover:opacity-90 transition-opacity"
+              style={{ background:"#041635", ...SANS }}>
+              <ArrowRight size={15} /> Ingresar al dashboard
+            </button>
+          </form>
+        </div>
+
+        <p className="text-center mt-5" style={{ ...MONO, fontSize:"0.65rem", color:"rgba(4,22,53,0.3)" }}>
+          Acceso exclusivo para el período de demo · Mayo 2026
+        </p>
       </motion.div>
+
+      <style>{`
+        @keyframes shake {
+          0%,100%{transform:translateX(0)}
+          20%{transform:translateX(-8px)}
+          40%{transform:translateX(8px)}
+          60%{transform:translateX(-5px)}
+          80%{transform:translateX(5px)}
+        }
+      `}</style>
     </div>
   );
 }
@@ -949,12 +1020,7 @@ function Dashboard() {
   }
 
   return (
-    <div className="relative min-h-screen" style={{ background:"#180b3b" }}>
-      <div className="pointer-events-none fixed -top-32 -right-32 w-[600px] h-[600px] rounded-full"
-        style={{ background:"radial-gradient(circle, rgba(133,104,243,0.12) 0%, transparent 65%)" }} />
-      <div className="pointer-events-none fixed -bottom-24 -left-24 w-[400px] h-[400px] rounded-full"
-        style={{ background:"radial-gradient(circle, rgba(34,211,238,0.06) 0%, transparent 65%)" }} />
-
+    <div className="relative min-h-screen" style={{ background:"#fcf9f5" }}>
       <MobileNav section={activeSection} onSection={switchSection} />
       <Sidebar   section={activeSection} onSection={switchSection} />
 
@@ -973,7 +1039,12 @@ function Dashboard() {
 
 // ─── Export ───────────────────────────────────────────────────────────────────
 export default function RestobarVina() {
-  const [authed, setAuthed] = useState(false);
-  if (!authed) return <PasswordGate onAuth={() => setAuthed(true)} />;
-  return <Dashboard />;
+  const [auth, setAuth] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    setAuth(sessionStorage.getItem(STORAGE_KEY) === "1");
+  }, []);
+
+  if (auth === null) return null;
+  return auth ? <Dashboard /> : <PasswordGate onAuth={() => setAuth(true)} />;
 }
