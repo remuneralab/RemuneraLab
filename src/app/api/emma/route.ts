@@ -23,6 +23,17 @@ const NIVELES: NivelCaso[] = ["sin_problemas", "leve", "corregible", "grave"];
 const MAX_PREGUNTA = 500;
 
 // Línea de acción obligatoria según la gravedad. Emma nunca escala antes de tiempo.
+// Base de conocimiento verificada (Código del Trabajo) para consultas fuera de la liquidación.
+// Emma solo puede usar estas reglas y artículos; no debe calcular montos nuevos.
+const CONOCIMIENTO = `VACACIONES (FERIADO ANUAL):
+- Art. 67: con más de un año de servicio, 15 días hábiles de feriado al año con remuneración íntegra.
+- Art. 69: el sábado se considera inhábil para el feriado (se cuentan de lunes a viernes, sin festivos).
+- Art. 68: feriado progresivo: con 10 años de trabajo (con uno o más empleadores; de empleadores anteriores se consideran máximo 10 años) se suma 1 día hábil por cada 3 nuevos años trabajados.
+- Art. 70: el feriado es continuo, pero lo que exceda de 10 días hábiles puede fraccionarse de común acuerdo.
+- Art. 71: remuneración íntegra durante el feriado = el sueldo, si la remuneración es fija; si tiene partes variables, el promedio de lo ganado en los últimos 3 meses trabajados.
+- Art. 73: el feriado no puede compensarse en dinero mientras dura el contrato. Solo al terminar el contrato se paga en dinero el feriado pendiente o proporcional (eso se calcula en el finiquito).
+- Cómo responder: mientras el contrato está vigente NO hay un pago extra por vacaciones; el trabajador sigue recibiendo su remuneración íntegra (con sueldo fijo, su sueldo mensual habitual). Si el usuario tiene sueldo base fijo, puedes decir que durante sus vacaciones recibe su sueldo normal (usa el sueldo base de los datos leídos, sin calcular nada más). Si pregunta por el pago al terminar el contrato, explica que es el feriado proporcional del finiquito y que depende de su fecha de ingreso y salida.`;
+
 const RUTA: Record<NivelCaso, string> = {
   sin_problemas: "La liquidación está correcta. Felicita brevemente y sugiere guardar sus liquidaciones. No sugieras acciones.",
   leve: "Hay puntos a revisar, no errores confirmados. El paso es preguntar y aclarar con su jefatura o RR.HH. PROHIBIDO sugerir la Inspección del Trabajo o un abogado.",
@@ -83,7 +94,10 @@ Cotizaciones faltantes en AFP/salud (van a sus fondos, NO es dinero en mano): ${
 Contexto: ${contexto}
 Gravedad: ${c.nivel}
 
-Línea de acción OBLIGATORIA: ${RUTA[c.nivel]}
+Línea de acción OBLIGATORIA (aplica a los errores de la liquidación): ${RUTA[c.nivel]}
+
+Base de conocimiento verificada (úsala para preguntas sobre estos temas):
+${CONOCIMIENTO}
 
 Conversación previa:
 ${historial}
@@ -96,7 +110,9 @@ Reglas:
 - Tono cercano y prudente: habla de "posibles errores" o "diferencias a tu favor que deberían pagarte"; nunca acuses al empleador de abuso ni de mala fe.
 - NUNCA sumes el dinero que deberían pagarle con las cotizaciones faltantes ni digas que "pierde" el total: son dos cosas distintas. En el bloque de cálculo usa dos totales separados: "Te deberían pagar: $X" y "Faltan en tu AFP/salud: $Y" (omite el que no aplique).
 - Cuando expliques un cálculo, copia la fórmula completa que trae el detalle del hallazgo (por ejemplo, cómo se obtiene el valor hora).
-- NO hagas cálculos nuevos: usa solo las cifras que aparecen arriba (valor hora, mínimos, diferencias). No inventes montos ni datos. Si citas una norma, usa SOLO las indicadas arriba; nunca inventes artículos.
+- NO hagas cálculos nuevos ni multipliques/dividas cifras por tu cuenta: usa solo las cifras que aparecen arriba. No inventes montos ni datos. Si citas una norma, usa SOLO las indicadas arriba (hallazgos o base de conocimiento); nunca inventes artículos.
+- Si la pregunta es sobre un tema laboral que no está en la base de conocimiento, responde en términos generales, sin cifras ni números de artículo, y sugiere confirmarlo en dt.gob.cl.
+- Si la pregunta es sobre otro tema (como vacaciones), responde ese tema y no repitas los errores de la liquidación ni la línea de acción.
 - No incluyas teléfonos ni enlaces (la página ya los muestra).
 - Escribe los montos con números y formato chileno (ej: $95.583), nunca en palabras.
 - Termina con una afirmación. PROHIBIDO terminar con una pregunta: la página ya ofrece botones para seguir consultando.`;

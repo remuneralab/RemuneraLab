@@ -34,5 +34,5 @@ export async function generarJSON<T>(partes: Part[], etiqueta = "gemini"): Promi
 }
 
 export async function generarTexto(partes: Part[], etiqueta = "gemini"): Promise<string> {
-  return (await generar(partes, false, 0.4, etiqueta)).trim();
+  return (await generar(partes, false, 0.2, etiqueta)).trim();
 }
