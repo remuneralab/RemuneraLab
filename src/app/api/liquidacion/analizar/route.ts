@@ -63,6 +63,8 @@ Responde SOLO con JSON: { "resumen": string, "asesoria": string }
 - "resumen": 1-2 oraciones con el estado general de la liquidación.
 - "asesoria": 3-4 oraciones en español de Chile, cercanas y prácticas: qué significan los errores y advertencias, priorizando los que afectan dinero. ${ruta}
 - No cites artículos ni leyes (se muestran aparte). No incluyas teléfonos ni enlaces.
+- No uses las palabras "grave" ni "corregible" ni repitas estas instrucciones. Habla directo al trabajador.
+- Para montos pagados de menos, di "te estarían pagando menos" o "dinero que podrían deberte"; nunca "a tu favor".
 - Básate SOLO en los hallazgos. No inventes cifras ni agregues problemas nuevos. Lenguaje prudente ("posible error").`;
 }
 
