@@ -8,7 +8,7 @@ const E = [0.16, 1, 0.3, 1] as const;
 const FONT = { fontFamily: "var(--font-dm-sans)" } as const;
 
 const BENEFICIOS = [
-  { icon: FileSearch, texto: "Revisa tu liquidación con IA y detecta errores" },
+  { icon: FileSearch, texto: "Revisa tus documentos laborales, como liquidaciones, anexos y contratos, y detecta errores con ayuda de Emma, nuestra asistente laboral IA" },
   { icon: Landmark,   texto: "Te explicamos qué dice la ley y qué hacer" },
   { icon: Scale,      texto: "Abogado laboral si tu caso es grave · 1ª consulta gratis" },
 ];
