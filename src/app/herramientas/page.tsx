@@ -35,7 +35,6 @@ export default async function HerramientasPage() {
 
       <div className="mt-10 grid gap-4 sm:grid-cols-2">
         {[
-          { t: "Asesoría laboral con IA", d: "Chat para resolver dudas sobre tus derechos laborales." },
           { t: "Revisión de anexos y contratos", d: "Detecta cláusulas problemáticas antes de firmar." },
         ].map(({ t, d }) => (
           <div key={t} className="rounded-xl p-5"
