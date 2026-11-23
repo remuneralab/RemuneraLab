@@ -18,6 +18,7 @@ interface Props {
   contexto: ContextoCaso;
   hallazgos: Hallazgo[];
   diferencia_total: number;
+  datos: Record<string, string | number | null>;
 }
 
 function AvatarEmma({ size = 40 }: { size?: number }) {
@@ -62,7 +63,7 @@ function Escribiendo() {
   );
 }
 
-export default function Emma({ nivel, contexto, hallazgos, diferencia_total }: Props) {
+export default function Emma({ nivel, contexto, hallazgos, diferencia_total, datos }: Props) {
   const [abierta,    setAbierta]    = useState(false);
   const [turnos,     setTurnos]     = useState<Turno[]>([]);
   const [pensando,   setPensando]   = useState(false);
@@ -81,7 +82,7 @@ export default function Emma({ nivel, contexto, hallazgos, diferencia_total }: P
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          modo, pregunta: texto, nivel, contexto, hallazgos, diferencia_total,
+          modo, pregunta: texto, nivel, contexto, hallazgos, diferencia_total, datos,
           historial: turnos.map(({ pregunta, respuesta }) => ({ pregunta, respuesta })),
         }),
       });
@@ -160,7 +161,7 @@ export default function Emma({ nivel, contexto, hallazgos, diferencia_total }: P
                 {t.pregunta}
               </p>
             )}
-            <p className="max-w-[95%] rounded-2xl rounded-tl-sm px-4 py-3 text-white/90"
+            <p className="max-w-[95%] rounded-2xl rounded-tl-sm px-4 py-3 text-white/90 whitespace-pre-line"
               style={{ ...FONT, fontSize: "0.93rem", lineHeight: "1.65", background: "rgba(255,255,255,0.06)" }}>
               {i === turnos.length - 1 && escribiendo
                 ? <TextoEscrito texto={t.respuesta} onFin={() => setEscribiendo(false)} />

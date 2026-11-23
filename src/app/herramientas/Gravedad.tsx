@@ -100,7 +100,7 @@ export function NivelGravedad({ base, nivel, contexto, onContexto }: {
 // ── Línea de acción escalonada ────────────────────────────────────────────
 const DT = {
   sitio:    "https://www.dt.gob.cl",
-  denuncia: "https://www.dt.gob.cl/portal/1626/w3-article-126452.html",
+  midt:     "https://midt.dirtrab.cl/welcome", // portal Mi DT de la Inspección del Trabajo
   telefono: "600 450 4000",
   tel:      "tel:6004504000",
 };
@@ -169,10 +169,10 @@ export function LineaAccion({ nivel, analisis }: { nivel: NivelCaso; analisis: A
                 style={{ ...FONT, fontSize: "0.85rem", color: "#e7e4fd", border: "1px solid rgba(46,196,182,0.45)" }}>
                 <Phone size={14} style={{ color: "#2EC4B6" }} /> Inspección: {DT.telefono}
               </a>
-              <a href={DT.denuncia} target="_blank" rel="noopener noreferrer" onClick={() => sendGAEvent("event", "dt_denuncia")}
+              <a href={DT.midt} target="_blank" rel="noopener noreferrer" onClick={() => sendGAEvent("event", "dt_midt")}
                 className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg hover:bg-white/5 transition-colors"
                 style={{ ...FONT, fontSize: "0.85rem", color: "#e7e4fd", border: "1px solid rgba(46,196,182,0.45)" }}>
-                Denuncia en línea (Mi DT) <ExternalLink size={13} />
+                Mi DT · Inspección del Trabajo <ExternalLink size={13} />
               </a>
               <a href={DT.sitio} target="_blank" rel="noopener noreferrer"
                 className="inline-flex items-center gap-1.5 px-2 py-2.5 text-white/45 hover:text-white/75 transition-colors"

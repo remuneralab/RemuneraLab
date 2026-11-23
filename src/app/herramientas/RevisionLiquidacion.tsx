@@ -7,6 +7,7 @@ import { sendGAEvent } from "@next/third-parties/google";
 import { LEYES, gravedadFinal, type Hallazgo, type NivelCaso, type ContextoCaso } from "@/lib/liquidacion";
 import { NivelGravedad, LineaAccion } from "./Gravedad";
 import Emma from "./Emma";
+import GuardarLiquidacion from "./GuardarLiquidacion";
 
 export type Analisis = {
   es_liquidacion: boolean;
@@ -234,7 +235,8 @@ export default function RevisionLiquidacion() {
                   Diferencia estimada este mes: <strong>{valor(analisis.diferencia_total)}</strong>
                 </p>
               )}
-              <div className="mb-6" />
+              <div className="mb-4" />
+              <GuardarLiquidacion />
 
               {/* 1. Nivel de gravedad (con preguntas de contexto) */}
               <NivelGravedad base={analisis.nivel} nivel={nivel} contexto={contexto} onContexto={setContexto} />
@@ -243,7 +245,7 @@ export default function RevisionLiquidacion() {
               <CuadrosHallazgos hallazgos={analisis.hallazgos} />
 
               {/* 3. Emma, asistente IA laboral */}
-              <Emma nivel={nivel} contexto={contexto} hallazgos={analisis.hallazgos} diferencia_total={analisis.diferencia_total} />
+              <Emma nivel={nivel} contexto={contexto} hallazgos={analisis.hallazgos} diferencia_total={analisis.diferencia_total} datos={analisis.datos} />
 
               {/* 4. Línea de acción según gravedad */}
               <LineaAccion nivel={nivel} analisis={analisis} />
