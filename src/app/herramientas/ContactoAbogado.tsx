@@ -11,10 +11,11 @@ const INPUT_STYLE = { ...FONT, fontSize: "0.9rem", background: "rgba(255,255,255
 
 interface Props {
   analisis: Analisis | null;
-  destacado: boolean;
+  variante: "destacado" | "secundario";
 }
 
-export default function ContactoAbogado({ analisis, destacado }: Props) {
+export default function ContactoAbogado({ analisis, variante }: Props) {
+  const destacado = variante === "destacado";
   const [abierto,  setAbierto]  = useState(false);
   const [nombre,   setNombre]   = useState("");
   const [email,    setEmail]    = useState("");
@@ -52,6 +53,18 @@ export default function ContactoAbogado({ analisis, destacado }: Props) {
     }
   }
 
+  // Versión discreta: solo un enlace que despliega el formulario
+  if (!destacado && !abierto && estado !== "ok") {
+    return (
+      <button onClick={() => setAbierto(true)}
+        className="self-start inline-flex items-center gap-2 px-1 py-1 text-white/55 hover:text-white/85 transition-colors"
+        style={{ ...FONT, fontSize: "0.85rem" }}>
+        <Scale size={14} style={{ color: "#a387f5" }} />
+        ¿Prefieres hablar con un abogado laboral? Primera consulta gratis <ArrowRight size={14} />
+      </button>
+    );
+  }
+
   return (
     <div className="rounded-xl p-6"
       style={{
@@ -62,10 +75,12 @@ export default function ContactoAbogado({ analisis, destacado }: Props) {
         <Scale size={20} className="mt-0.5 shrink-0" style={{ color: "#a387f5" }} />
         <div>
           <p className="text-white font-semibold mb-1" style={{ ...FONT, fontSize: "1.05rem" }}>
-            {destacado ? "Te recomendamos hablar con un abogado laboral" : "¿Quieres una segunda opinión?"}
+            {destacado ? "Te recomendamos hablar con un abogado laboral" : "Habla con un abogado laboral"}
           </p>
           <p className="text-white/50" style={{ ...FONT, fontSize: "0.875rem", lineHeight: "1.55" }}>
-            Abogados laborales de nuestra red ofrecen la primera consulta gratis. Déjanos tus datos y te contactarán.
+            {destacado
+              ? "Los errores encontrados afectan tu sueldo o tus cotizaciones. Abogados laborales de nuestra red ofrecen la primera consulta gratis: déjanos tus datos y te contactarán."
+              : "Abogados laborales de nuestra red ofrecen la primera consulta gratis. Déjanos tus datos y te contactarán."}
           </p>
         </div>
       </div>

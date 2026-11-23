@@ -1,7 +1,7 @@
 import { GoogleGenerativeAI, type Part } from "@google/generative-ai";
 import { NextRequest, NextResponse } from "next/server";
 import { COOKIE_SUSCRIPCION, tieneSuscripcion } from "@/lib/suscripcion";
-import { revisarLiquidacion, type Extraccion, type Hallazgo } from "@/lib/liquidacion";
+import { revisarLiquidacion, nivelCaso, type Extraccion, type Hallazgo } from "@/lib/liquidacion";
 
 export const maxDuration = 60;
 
@@ -59,6 +59,7 @@ ${JSON.stringify(h, null, 1)}
 Responde SOLO con JSON: { "resumen": string, "asesoria": string }
 - "resumen": 1-2 oraciones con el estado general de la liquidación.
 - "asesoria": 3-5 oraciones en español de Chile, claras y prácticas: qué hacer con los errores y advertencias, priorizando los que afectan dinero (pedir aclaración por escrito al empleador, guardar las liquidaciones, recurrir a la Dirección del Trabajo, considerar un abogado si hay montos importantes).
+- No cites artículos ni leyes (se muestran aparte). No incluyas teléfonos ni enlaces.
 - Básate SOLO en los hallazgos. No inventes cifras ni agregues problemas nuevos. Lenguaje prudente ("posible error").`;
 }
 
@@ -118,6 +119,7 @@ export async function POST(req: NextRequest) {
   if (!x.es_liquidacion || !x.legible) {
     return NextResponse.json({ analisis: {
       es_liquidacion: x.es_liquidacion, legible: x.legible, datos, hallazgos: [], asesoria: "", recomienda_abogado: false,
+      nivel: "sin_problemas", diferencia_total: 0,
       resumen: x.notas?.[0] ?? "El archivo no parece ser una liquidación de sueldo legible. Prueba con un PDF o una foto más nítida.",
     } });
   }
@@ -126,6 +128,7 @@ export async function POST(req: NextRequest) {
   const hallazgos = revisarLiquidacion(x);
   const nErrores  = hallazgos.filter((h) => h.tipo === "error").length;
   const nAdv      = hallazgos.filter((h) => h.tipo === "advertencia").length;
+  const { nivel, diferencia_total } = nivelCaso(hallazgos);
 
   // 3. Redacción (si falla, se usa un texto base)
   let resumen  = nErrores
@@ -142,6 +145,6 @@ export async function POST(req: NextRequest) {
 
   return NextResponse.json({ analisis: {
     es_liquidacion: true, legible: true, resumen, datos, hallazgos, asesoria,
-    recomienda_abogado: nErrores > 0,
+    recomienda_abogado: nivel === "grave", nivel, diferencia_total,
   } });
 }

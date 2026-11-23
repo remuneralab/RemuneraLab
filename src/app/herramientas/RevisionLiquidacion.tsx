@@ -1,12 +1,11 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion } from "motion/react";
-import { Upload, FileText, Loader2, AlertOctagon, AlertTriangle, CheckCircle2, Lightbulb, X } from "lucide-react";
+import { Upload, FileText, Loader2, AlertOctagon, AlertTriangle, CheckCircle2, Lightbulb, X, BookOpen, ChevronRight } from "lucide-react";
 import { sendGAEvent } from "@next/third-parties/google";
-import ContactoAbogado from "./ContactoAbogado";
-
-type Hallazgo = { tipo: "error" | "advertencia" | "ok"; titulo: string; detalle: string };
+import { LEYES, type Hallazgo, type NivelCaso } from "@/lib/liquidacion";
+import ProximoPaso from "./ProximoPaso";
 export type Analisis = {
   es_liquidacion: boolean;
   legible: boolean;
@@ -15,7 +14,37 @@ export type Analisis = {
   hallazgos: Hallazgo[];
   asesoria: string;
   recomienda_abogado: boolean;
+  nivel: NivelCaso;
+  diferencia_total: number;
 };
+
+const MENSAJES_ESPERA = [
+  "Leyendo tu liquidación…",
+  "Revisando cotizaciones y descuentos…",
+  "Verificando horas extra y gratificación…",
+  "Preparando tu asesoría…",
+];
+
+function ReferenciaLey({ codigo }: { codigo: Hallazgo["codigo"] }) {
+  const [abierta, setAbierta] = useState(false);
+  const ley = LEYES[codigo];
+  if (!ley) return null;
+  return (
+    <div className="mt-2">
+      <button onClick={() => setAbierta(!abierta)}
+        className="inline-flex items-center gap-1.5 text-white/40 hover:text-white/70 transition-colors"
+        style={{ ...FONT, fontSize: "0.76rem" }} aria-expanded={abierta}>
+        <ChevronRight size={12} className="transition-transform" style={{ transform: abierta ? "rotate(90deg)" : "none" }} />
+        <BookOpen size={12} /> {ley.norma}
+      </button>
+      {abierta && (
+        <p className="mt-1.5 pl-5 text-white/55 italic" style={{ ...FONT, fontSize: "0.8rem", lineHeight: "1.55" }}>
+          {ley.texto}
+        </p>
+      )}
+    </div>
+  );
+}
 
 const E = [0.16, 1, 0.3, 1] as const;
 const FONT = { fontFamily: "var(--font-dm-sans)" } as const;
@@ -46,6 +75,14 @@ export default function RevisionLiquidacion() {
   const [cargando, setCargando] = useState(false);
   const [error,    setError]    = useState<string | null>(null);
   const [analisis, setAnalisis] = useState<Analisis | null>(null);
+  const [paso,     setPaso]     = useState(0);
+
+  // Mensajes de progreso mientras se espera la respuesta
+  useEffect(() => {
+    if (!cargando) return;
+    const t = setInterval(() => setPaso((p) => Math.min(p + 1, MENSAJES_ESPERA.length - 1)), 6000);
+    return () => clearInterval(t);
+  }, [cargando]);
 
   function elegir(f: File | undefined) {
     if (!f) return;
@@ -54,7 +91,7 @@ export default function RevisionLiquidacion() {
 
   async function analizar() {
     if (!archivo) return;
-    setCargando(true); setError(null); setAnalisis(null);
+    setCargando(true); setError(null); setAnalisis(null); setPaso(0);
     sendGAEvent("event", "liquidacion_analizar");
     try {
       const fd = new FormData();
@@ -110,8 +147,11 @@ export default function RevisionLiquidacion() {
       <button onClick={analizar} disabled={!archivo || cargando}
         className="mt-4 inline-flex w-full sm:w-auto items-center justify-center gap-2 font-semibold px-7 py-3.5 rounded-lg transition-opacity hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed"
         style={{ ...FONT, background: "linear-gradient(135deg, #8568f3, #a387f5)", color: "#fff", fontSize: "0.95rem" }}>
-        {cargando ? <><Loader2 size={17} className="animate-spin" /> Analizando tu liquidación…</> : "Analizar liquidación"}
+        {cargando ? <><Loader2 size={17} className="animate-spin" /> {MENSAJES_ESPERA[paso]}</> : "Analizar liquidación"}
       </button>
+      <p className="mt-2 text-white/35" style={{ ...FONT, fontSize: "0.78rem" }}>
+        {cargando ? "No cierres esta página." : "El análisis puede tardar hasta 30 segundos."}
+      </p>
 
       {error && (
         <p className="mt-4" style={{ ...FONT, fontSize: "0.875rem", color: "#E63946" }}>{error}</p>
@@ -138,7 +178,13 @@ export default function RevisionLiquidacion() {
                   ))}
                 </div>
               </div>
-              <p className="text-white/60 mb-6" style={{ ...FONT, fontSize: "0.95rem", lineHeight: "1.6" }}>{analisis.resumen}</p>
+              <p className="text-white/60 mb-3" style={{ ...FONT, fontSize: "0.95rem", lineHeight: "1.6" }}>{analisis.resumen}</p>
+              {analisis.diferencia_total > 0 && (
+                <p className="mb-6" style={{ ...FONT, fontSize: "0.9rem", color: "#E63946" }}>
+                  Diferencia estimada este mes: <strong>{valor(analisis.diferencia_total)}</strong>
+                </p>
+              )}
+              {!(analisis.diferencia_total > 0) && <div className="mb-3" />}
 
               {/* Datos detectados */}
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-px rounded-xl overflow-hidden mb-8"
@@ -162,6 +208,7 @@ export default function RevisionLiquidacion() {
                       <div>
                         <p className="font-semibold mb-0.5" style={{ ...FONT, fontSize: "0.92rem", color: s.color }}>{h.titulo}</p>
                         <p className="text-white/65" style={{ ...FONT, fontSize: "0.875rem", lineHeight: "1.55" }}>{h.detalle}</p>
+                        {h.tipo !== "ok" && <ReferenciaLey codigo={h.codigo} />}
                       </div>
                     </div>
                   );
@@ -181,7 +228,7 @@ export default function RevisionLiquidacion() {
             </>
           )}
 
-          <ContactoAbogado analisis={analisis.es_liquidacion ? analisis : null} destacado={analisis.recomienda_abogado} />
+          {analisis.es_liquidacion && analisis.legible && <ProximoPaso nivel={analisis.nivel} analisis={analisis} />}
         </motion.div>
       )}
     </div>
