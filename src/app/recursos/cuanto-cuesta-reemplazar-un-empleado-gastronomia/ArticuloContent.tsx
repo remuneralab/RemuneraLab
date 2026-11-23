@@ -227,7 +227,7 @@ export default function ArticuloContent() {
           <ArrowLeft size={14} style={{ color: "#75777f" }} />
           <span className="font-bold" style={{ fontSize: "1rem", color: "#1c1c1a", letterSpacing: "-0.01em" }}>RemuneraLab</span>
         </Link>
-        <Link href="/empresas/restoran"
+        <Link href="/empresas"
           className="flex items-center gap-1 hover:opacity-70 transition-opacity"
           style={{ fontSize: "0.82rem", color: "#44474e" }}>
           Ver el dashboard <ArrowRight size={14} />
@@ -875,7 +875,7 @@ export default function ArticuloContent() {
             ¿Tu restaurante tiene datos de nómina reales? RemuneraLab puede darte el riesgo de rotación
             personalizado por persona, benchmark salarial y plan de acción en minutos.
           </p>
-          <Link href="/empresas/restoran"
+          <Link href="/empresas"
             style={{
               background: "#091b3a",
               color: "#ffffff",

@@ -49,8 +49,8 @@ const CARDS = [
       { label: "Cargo más afectado en finanzas", valor: "Analista Senior: −18%" },
       { label: "Rango óptimo para retener",      valor: "Percentil 60 – 75 del mercado" },
     ],
-    href: "/empresas/salud",
-    cta: "Ver análisis sector salud",
+    href: "/empresas#contacto",
+    cta: "Solicitar este análisis",
   },
   {
     id: "presion",
@@ -70,8 +70,8 @@ const CARDS = [
       { label: "Aumento de avisos en finanzas",         valor: "+42% en 6 meses" },
       { label: "Demora promedio para llenar un cargo TI", valor: "68 días hábiles" },
     ],
-    href: "/empresas/tecnologia",
-    cta: "Ver presión en tecnología",
+    href: "/empresas#contacto",
+    cta: "Solicitar este análisis",
   },
   {
     id: "legal",
@@ -91,8 +91,8 @@ const CARDS = [
       { label: "Ley de Transparencia Salarial",  valor: "Aplica desde 100 trabajadores" },
       { label: "Reducción de jornada a 40 horas", valor: "Progresiva hasta 2028" },
     ],
-    href: "/empresas/finanzas",
-    cta: "Ver cumplimiento en finanzas",
+    href: "/empresas#contacto",
+    cta: "Solicitar este análisis",
   },
 ] as const;
 

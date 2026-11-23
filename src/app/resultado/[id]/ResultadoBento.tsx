@@ -6,7 +6,6 @@ import { ArrowRight, Sparkles, ShieldCheck, TrendingUp, AlertTriangle, Users } f
 import ChartResult from "./ChartResult";
 import AIInterpretacion from "./AIInterpretacion";
 import OfertasPerfil from "./OfertasPerfil";
-import LoginPerfil from "@/components/LoginPerfil";
 import InvitacionSuscripcion from "@/components/InvitacionSuscripcion";
 import { getBrechaCiuo, getBrechaRama, BRECHA_PERIODO } from "@/lib/brecha-genero";
 import type { MercadoResult } from "@/lib/mercado";
@@ -594,9 +593,6 @@ export default function ResultadoBento({
 
       {/* Ofertas de trabajo: solo para perfiles con movilidad real */}
       {!perfilPrecario && <OfertasPerfil cargo={cargo} industria={industria} region={region} />}
-
-      {/* Perfil de carrera */}
-      <LoginPerfil registroId={registroId} />
 
       {/* CTA bottom */}
       <motion.section
