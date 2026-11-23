@@ -202,14 +202,15 @@ export function revisarLiquidacion(x: Extraccion): Hallazgo[] {
 
   // ── 6. Horas extra ──────────────────────────────────────────────────────
   if (sueldoBase > 0) {
-    // Valor hora ordinaria para sueldo mensual: sueldo / 30 × 28 / horas semanales
-    const valorHora   = sueldoBase / 30 * 28 / jornada;
+    // Valor hora ordinaria para sueldo mensual (fórmula de la Dirección del Trabajo):
+    // sueldo / 30 × 28 / (horas semanales × 4)   — 28 días = 4 semanas de jornada
+    const valorHora   = sueldoBase / 30 * 28 / (jornada * 4);
     const minimoExtra = valorHora * 1.5;
     for (const it of items.filter((i) => i.categoria === "horas_extra" && i.horas && i.horas > 0)) {
       const pagadoHora = it.monto / it.horas!;
       if (pagadoHora < minimoExtra * 0.97) {
         h.push({ tipo: "error", codigo: "horas_extra", titulo: "Horas extra pagadas bajo lo legal",
-          detalle: `Se pagan ${it.horas} h extra a ${clp(pagadoHora)} la hora (${clp(it.monto)}). Valor hora ordinaria = sueldo base ${clp(sueldoBase)} ÷ 30 × 28 ÷ ${jornada} h semanales = ${clp(valorHora)}. Con el recargo legal de 50%: ${clp(valorHora)} × 1,5 = ${clp(minimoExtra)} por hora extra. Por ${it.horas} h: ${clp(minimoExtra)} × ${it.horas} = ${clp(minimoExtra * it.horas!)}. Diferencia: ${clp(minimoExtra * it.horas!)} − ${clp(it.monto)} = ${clp(minimoExtra * it.horas! - it.monto)}.`, diferencia: minimoExtra * it.horas! - it.monto, diferencia_tipo: "pago" });
+          detalle: `Se pagan ${it.horas} h extra a ${clp(pagadoHora)} la hora (${clp(it.monto)}). Valor hora ordinaria = sueldo base ${clp(sueldoBase)} ÷ 30 × 28 ÷ (${jornada} h semanales × 4 semanas) = ${clp(valorHora)}. Con el recargo legal de 50%: ${clp(valorHora)} × 1,5 = ${clp(minimoExtra)} por hora extra. Por ${it.horas} h: ${clp(minimoExtra)} × ${it.horas} = ${clp(minimoExtra * it.horas!)}. Diferencia: ${clp(minimoExtra * it.horas!)} − ${clp(it.monto)} = ${clp(minimoExtra * it.horas! - it.monto)}.`, diferencia: minimoExtra * it.horas! - it.monto, diferencia_tipo: "pago" });
       } else {
         h.push({ tipo: "ok", codigo: "horas_extra", titulo: "Horas extra con recargo legal", detalle: `${it.horas} h a ${clp(pagadoHora)} la hora cumplen el recargo mínimo de 50%.` });
       }
