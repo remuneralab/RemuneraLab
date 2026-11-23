@@ -275,7 +275,7 @@ export default function ResultadoBento({
               </h2>
               <p className="text-white/40"
                 style={{ fontFamily: "var(--font-dm-sans)", fontSize: "0.8rem" }}>
-                {industria} · {n > 0 ? `${n} contribuciones` : n_aviso > 0 ? `${n_esi} registros ESI + ${n_aviso} avisos` : `ESI 2024 INE · ${n_esi} registros`}
+                {industria} · {n > 0 ? `${n} contribuciones` : n_aviso > 0 ? `${n_esi} registros ESI + ${n_aviso} avisos` : `INE ESI 2025 / CASEN · ${n_esi} registros`}
               </p>
             </div>
           </div>
@@ -413,7 +413,7 @@ export default function ResultadoBento({
                       <div className="h-1 rounded-full transition-all" style={{ width: total > 0 ? `${Math.round((n / total) * 100)}%` : "0%", background: "#8568f3" }} />
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-white/40 text-xs" style={{ fontFamily: "var(--font-dm-sans)" }}>ESI 2024 · INE</span>
+                      <span className="text-white/40 text-xs" style={{ fontFamily: "var(--font-dm-sans)" }}>INE · ESI 2025 / CASEN</span>
                       <span className="text-sm font-bold tabular-nums" style={{ fontFamily: "var(--font-space-mono)", color: "#a387f5" }}>{n_esi} registros</span>
                     </div>
                     <div className="w-full bg-white/8 rounded-full h-1">
@@ -563,7 +563,7 @@ export default function ResultadoBento({
           <p className="text-amber-400/80"
             style={{ fontFamily: "var(--font-dm-sans)", fontSize: "0.875rem" }}>
             Hay pocos datos de RemuneraLab para tu perfil exacto — los números se basan principalmente en la{" "}
-            <span className="font-bold text-amber-400">Encuesta Suplementaria de Ingresos 2024 (INE)</span>.{" "}
+            <span className="font-bold text-amber-400">Encuesta Suplementaria de Ingresos 2025 (INE) y la CASEN</span>.{" "}
             Mientras más personas compartan su sueldo, más preciso será el resultado para todos.
           </p>
         </motion.div>
