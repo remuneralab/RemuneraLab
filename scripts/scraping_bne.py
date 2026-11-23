@@ -11,6 +11,8 @@ Uso:
   python scripts/scraping_bne.py                  # descarga + inserta
   python scripts/scraping_bne.py --dry-run        # muestra sin insertar (no raspa salarios)
   python scripts/scraping_bne.py --max-pages 3    # limita paginación por keyword
+  python scripts/scraping_bne.py --keywords "enfermera,enfermero" --industria Salud --region Valparaíso
+      # otros rubros: palabras clave, industria (valor del formulario) y región opcional
 """
 
 import sys, os, re, time, hashlib, unicodedata
@@ -85,7 +87,14 @@ KEYWORD_CIUO: dict[str, int] = {
     "despachador":      9333,
 }
 
-KEYWORDS_BUSQUEDA = [
+def _arg(nombre: str) -> str | None:
+    return next((sys.argv[i + 1] for i, a in enumerate(sys.argv) if a == nombre and i + 1 < len(sys.argv)), None)
+
+ARG_KEYWORDS  = _arg("--keywords")
+INDUSTRIA     = _arg("--industria") or "Gastronomía / Restaurantes"
+REGION_FILTRO = _arg("--region")  # si se indica, solo se guardan avisos de esa región
+
+KEYWORDS_BUSQUEDA_DEFAULT = [
     "garzon",
     "cocinero",
     "bartender",
@@ -137,6 +146,15 @@ REGION_MAP: dict[str, str] = {
 
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
+KEYWORDS_BUSQUEDA = [k.strip() for k in ARG_KEYWORDS.split(",")] if ARG_KEYWORDS else KEYWORDS_BUSQUEDA_DEFAULT
+
+# CIUO adicionales para rubros no gastronómicos
+KEYWORD_CIUO.update({
+    "tecnico en enfermeria": 3221, "técnico en enfermería": 3221, "tens": 3221,
+    "enfermera": 2221, "enfermero": 2221, "enfermería": 2221,
+})
+
+
 def normalizar(texto: str) -> str:
     texto = texto.lower().strip()
     texto = unicodedata.normalize("NFKD", texto)
@@ -278,6 +296,8 @@ def scrape_keyword(keyword: str, max_pags: int) -> list[dict]:
 
             ciuo4    = inferir_ciuo(titulo)
             region   = normalizar_region(region_raw)
+            if REGION_FILTRO and region != REGION_FILTRO:
+                continue
             hash_sem = hashlib.md5(f"bne-{codigo}-{fecha_raw}".encode()).hexdigest()[:16]
 
             salario_mid = None
@@ -294,7 +314,7 @@ def scrape_keyword(keyword: str, max_pags: int) -> list[dict]:
             registros.append({
                 "cargo_original":          titulo,
                 "ciuo4":                   ciuo4,
-                "industria":               "Gastronomía / Restaurantes",
+                "industria":               INDUSTRIA,
                 "region":                  region,
                 "salario_mid":             salario_mid,
                 "url_aviso":               f"{BASE_URL}/oferta/{codigo}",
@@ -346,7 +366,7 @@ def upsert_avisos(registros: list[dict]):
 
 # ── Main ───────────────────────────────────────────────────────────────────────
 if __name__ == "__main__":
-    print("=== Scraping BNE — Gastronomía ===")
+    print(f"=== Scraping BNE — {INDUSTRIA}{' · ' + REGION_FILTRO if REGION_FILTRO else ''} ===")
     print(f"Modo: {'DRY-RUN (sin salarios ni DB)' if DRY_RUN else 'PRODUCCIÓN'}")
     print(f"Max páginas por keyword: {MAX_PAGES}\n")
 

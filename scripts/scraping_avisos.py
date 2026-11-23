@@ -12,6 +12,8 @@ Uso:
   python scripts/scraping_avisos.py --dry-run      # sin insertar en DB
   python scripts/scraping_avisos.py --max-pages 2  # limita páginas por búsqueda
   python scripts/scraping_avisos.py --create-table # imprime SQL para crear/migrar la tabla
+  python scripts/scraping_avisos.py --busquedas "enfermera,enfermero" --ciuo 2221 --industria Salud --lugar valparaiso
+      # búsqueda dirigida por cargo y lugar (para actualizar un rubro/región puntual)
 
 SQL para Supabase (copiar al SQL Editor):
   CREATE TABLE IF NOT EXISTS registros_avisos (
@@ -119,6 +121,24 @@ BUSQUEDAS = [
     ("ingeniero-agronomo",          2132, "Agricultura"),
 ]
 
+# ── Búsqueda dirigida (opcional) ──────────────────────────────────────────────
+# Ej: --busquedas "enfermera,enfermero" --ciuo 2221 --industria Salud --lugar valparaiso
+def _arg(nombre: str) -> str | None:
+    return next((sys.argv[i + 1] for i, a in enumerate(sys.argv) if a == nombre and i + 1 < len(sys.argv)), None)
+
+LUGAR = _arg("--lugar")  # sufijo de Computrabajo: empleos-de-<cargo>-en-<lugar>
+# Región a asignar cuando el aviso muestra solo la ciudad (la búsqueda ya está acotada a ese lugar)
+REGION_FALLBACK = _arg("--region")
+# Técnicos/paramédicos que aparecen en búsquedas de enfermería tienen su propia ocupación (CIUO 3221)
+TECNICOS = ("tecnico", "técnico", "tens", "paramedic", "paramédic")
+# Computrabajo devuelve resultados aproximados: en búsquedas dirigidas solo se guardan avisos cuyo
+# título contenga alguna raíz buscada (por defecto, la palabra sin su última letra: enfermera → "enfermer").
+FILTRO_TITULO = ([f.strip().lower() for f in _arg("--filtro-titulo").split(",")] if _arg("--filtro-titulo")
+                 else [s.split("-")[0][:-1].lower() for s, _, _ in BUSQUEDAS] if _arg("--busquedas") else [])
+if _arg("--busquedas"):
+    BUSQUEDAS = [(s.strip(), int(_arg("--ciuo") or 0) or None, _arg("--industria") or "Otro")
+                 for s in _arg("--busquedas").split(",")]
+
 # ── Mapeo región Computrabajo → nombre estándar ───────────────────────────────
 REGION_MAP = {
     "metropolitana":  "Metropolitana",
@@ -192,7 +212,8 @@ def calcular_hash_semantico(cargo: str, ciuo4: int, salario_mid: int | None, reg
 
 # ── Scraping ─────────────────────────────────────────────────────────────────
 def scrape_pagina(session: requests.Session, slug: str, pagina: int) -> list[dict]:
-    url = f"https://cl.computrabajo.com/empleos-de-{slug}?p={pagina}"
+    lugar = f"-en-{LUGAR}" if LUGAR else ""
+    url = f"https://cl.computrabajo.com/empleos-de-{slug}{lugar}?p={pagina}"
     try:
         r = session.get(url, timeout=15)
     except Exception as e:
@@ -281,6 +302,8 @@ def main():
                 break
 
             for r in resultados:
+                if FILTRO_TITULO and not any(f in r["cargo"].lower() for f in FILTRO_TITULO):
+                    continue  # resultado no relacionado con la búsqueda
                 if r["sal_min"] and r["sal_min"] < 50_000:
                     continue  # valor irreal (probablemente por hora o semanal)
 
@@ -305,9 +328,9 @@ def main():
                 registro = {
                     "fuente":                  "Computrabajo",
                     "cargo_original":          r["cargo"],
-                    "ciuo4":                   ciuo4,
+                    "ciuo4":                   3221 if ciuo4 == 2221 and any(t in r["cargo"].lower() for t in TECNICOS) else ciuo4,
                     "industria":               industria,
-                    "region":                  r["region"],
+                    "region":                  r["region"] or REGION_FALLBACK,
                     "salario_min":             r["sal_min"],
                     "salario_max":             r["sal_max"],
                     "salario_mid":             sal_mid,

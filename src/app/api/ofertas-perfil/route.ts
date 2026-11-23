@@ -43,6 +43,13 @@ export async function GET(req: NextRequest) {
 
   // Try: industria + region + cargo keyword
   const keyword = extractKeyword(cargo);
+  // Raíz sin género para encontrar ambas formas: "enfermera" → "enfermer" (enfermera/enfermero/enfermería)
+  const raiz = keyword && keyword.length > 5 && /[ao]$/.test(keyword) ? keyword.slice(0, -1) : keyword;
+  // Enfermería: si el cargo no es de técnico, no mostrar avisos de TENS / técnicos (otra ocupación)
+  const excluirTecnicos = raiz === "enfermer" && !/t[eé]cnic|tens/i.test(cargo);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sinTecnicos = <Q extends { not: (...a: any[]) => Q }>(q: Q): Q =>
+    excluirTecnicos ? q.not("cargo_original", "ilike", "%cnic%").not("cargo_original", "ilike", "tens%").not("cargo_original", "ilike", "% tens%") : q;
 
   let query = supabase
     .from("registros_avisos")
@@ -52,7 +59,7 @@ export async function GET(req: NextRequest) {
 
   if (industria) query = query.eq("industria", industria);
   if (region)    query = query.eq("region", region);
-  if (keyword)   query = query.ilike("cargo_original", `%${keyword}%`);
+  if (keyword)   query = sinTecnicos(query.ilike("cargo_original", `%${raiz}%`));
 
   const { data: dataFull, count: countFull } = await query;
 
@@ -63,13 +70,13 @@ export async function GET(req: NextRequest) {
 
   // Nivel 2: keyword + region (sin filtro de industria) — mismo oficio, misma región
   if (keyword && region) {
-    const q2 = supabase
+    const q2 = sinTecnicos(supabase
       .from("registros_avisos")
       .select(SELECT, { count: "exact" })
       .order("created_at", { ascending: false })
       .limit(LIMIT)
       .eq("region", region)
-      .ilike("cargo_original", `%${keyword}%`);
+      .ilike("cargo_original", `%${raiz}%`));
     const { data: d2, count: c2 } = await q2;
     if ((c2 ?? 0) >= 1 && d2 && d2.length > 0) {
       return NextResponse.json({ ofertas: d2, total: c2 ?? d2.length });
@@ -78,12 +85,12 @@ export async function GET(req: NextRequest) {
 
   // Nivel 3: keyword sin restricciones geográficas/sectoriales — oficio a nivel nacional
   if (keyword) {
-    const q3 = supabase
+    const q3 = sinTecnicos(supabase
       .from("registros_avisos")
       .select(SELECT, { count: "exact" })
       .order("created_at", { ascending: false })
       .limit(LIMIT)
-      .ilike("cargo_original", `%${keyword}%`);
+      .ilike("cargo_original", `%${raiz}%`));
     const { data: d3, count: c3 } = await q3;
     if ((c3 ?? 0) >= 1 && d3 && d3.length > 0) {
       return NextResponse.json({ ofertas: d3, total: c3 ?? d3.length });
