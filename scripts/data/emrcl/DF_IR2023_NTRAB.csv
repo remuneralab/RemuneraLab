@@ -36,8 +36,14 @@ CL01:DF_IR2023_NTRAB(1.0),_T,M,IR2023,VAR12,ENTSIZE1,2025-M10,6.356358522340111,
 CL01:DF_IR2023_NTRAB(1.0),_T,M,IR2023,VAR12,ENTSIZE1,2025-M11,6.199995165868599,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_IR2023_NTRAB(1.0),_T,M,IR2023,VAR12,ENTSIZE1,2025-M12,6.79782669665534,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_IR2023_NTRAB(1.0),_T,M,IR2023,VAR12,ENTSIZE1,2026-M01,6.2534287826149,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
-CL01:DF_IR2023_NTRAB(1.0),_T,M,IR2023,VAR12,ENTSIZE1,2026-M02,5.463485540064439,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
-CL01:DF_IR2023_NTRAB(1.0),_T,M,IR2023,VAR12,ENTSIZE1,2026-M03,6.049406097175991,,Valor provisional,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_IR2023_NTRAB(1.0),_T,M,IR2023,VAR12,ENTSIZE1,2026-M02,5.463485540064461,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_IR2023_NTRAB(1.0),_T,M,IR2023,VAR12,ENTSIZE1,2026-M03,6.321113463431383,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_IR2023_NTRAB(1.0),_T,M,IR2023,VAR12,ENTSIZE1,2026-M04,7.052218842575431,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_IR2023_NTRAB(1.0),_T,M,IR2023,VAR12,ENTSIZE1,2026-M05,8.875825246019108,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_IR2023_NTRAB(1.0),_T,M,IR2023,VAR12,ENTSIZE1,2026-M06,9.22535176477368,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_IR2023_NTRAB(1.0),_T,M,IR2023,VAR12,ENTSIZE1,2026-M07,9.2048277139545,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_IR2023_NTRAB(1.0),_T,M,IR2023,VAR12,ENTSIZE1,2026-M08,9.114661788952283,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_IR2023_NTRAB(1.0),_T,M,IR2023,VAR12,ENTSIZE1,2026-M09,8.563455274850718,,Valor provisional,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_IR2023_NTRAB(1.0),_T,M,IR2023,VAR12,ENTSIZE2,2023-M01,,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_IR2023_NTRAB(1.0),_T,M,IR2023,VAR12,ENTSIZE2,2023-M02,,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_IR2023_NTRAB(1.0),_T,M,IR2023,VAR12,ENTSIZE2,2023-M03,,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
@@ -76,7 +82,13 @@ CL01:DF_IR2023_NTRAB(1.0),_T,M,IR2023,VAR12,ENTSIZE2,2025-M11,6.364358897846145,
 CL01:DF_IR2023_NTRAB(1.0),_T,M,IR2023,VAR12,ENTSIZE2,2025-M12,6.485756280062671,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_IR2023_NTRAB(1.0),_T,M,IR2023,VAR12,ENTSIZE2,2026-M01,5.4218837864043135,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_IR2023_NTRAB(1.0),_T,M,IR2023,VAR12,ENTSIZE2,2026-M02,5.7616190679430135,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
-CL01:DF_IR2023_NTRAB(1.0),_T,M,IR2023,VAR12,ENTSIZE2,2026-M03,5.882368058795984,,Valor provisional,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_IR2023_NTRAB(1.0),_T,M,IR2023,VAR12,ENTSIZE2,2026-M03,5.896846345502582,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_IR2023_NTRAB(1.0),_T,M,IR2023,VAR12,ENTSIZE2,2026-M04,5.853182661892187,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_IR2023_NTRAB(1.0),_T,M,IR2023,VAR12,ENTSIZE2,2026-M05,8.53474810320851,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_IR2023_NTRAB(1.0),_T,M,IR2023,VAR12,ENTSIZE2,2026-M06,8.820280290765314,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_IR2023_NTRAB(1.0),_T,M,IR2023,VAR12,ENTSIZE2,2026-M07,8.418422256678681,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_IR2023_NTRAB(1.0),_T,M,IR2023,VAR12,ENTSIZE2,2026-M08,8.497798689813596,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_IR2023_NTRAB(1.0),_T,M,IR2023,VAR12,ENTSIZE2,2026-M09,8.412708586481665,,Valor provisional,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_IR2023_NTRAB(1.0),_T,M,IR2023,IX,ENTSIZE2,2023-M01,97.61675480088188,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_IR2023_NTRAB(1.0),_T,M,IR2023,IX,ENTSIZE2,2023-M02,96.74615671926193,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_IR2023_NTRAB(1.0),_T,M,IR2023,IX,ENTSIZE2,2023-M03,97.70171399275371,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
@@ -115,7 +127,13 @@ CL01:DF_IR2023_NTRAB(1.0),_T,M,IR2023,IX,ENTSIZE2,2025-M11,118.7756066867412,,,2
 CL01:DF_IR2023_NTRAB(1.0),_T,M,IR2023,IX,ENTSIZE2,2025-M12,119.74260016007308,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_IR2023_NTRAB(1.0),_T,M,IR2023,IX,ENTSIZE2,2026-M01,120.43154546993362,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_IR2023_NTRAB(1.0),_T,M,IR2023,IX,ENTSIZE2,2026-M02,121.03106100099556,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
-CL01:DF_IR2023_NTRAB(1.0),_T,M,IR2023,IX,ENTSIZE2,2026-M03,121.54998989781761,,Valor provisional,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_IR2023_NTRAB(1.0),_T,M,IR2023,IX,ENTSIZE2,2026-M03,121.56661056502774,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_IR2023_NTRAB(1.0),_T,M,IR2023,IX,ENTSIZE2,2026-M04,122.56897254692157,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_IR2023_NTRAB(1.0),_T,M,IR2023,IX,ENTSIZE2,2026-M05,125.784505486282,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_IR2023_NTRAB(1.0),_T,M,IR2023,IX,ENTSIZE2,2026-M06,126.73896168789412,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_IR2023_NTRAB(1.0),_T,M,IR2023,IX,ENTSIZE2,2026-M07,127.36123223332538,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_IR2023_NTRAB(1.0),_T,M,IR2023,IX,ENTSIZE2,2026-M08,127.50155544732887,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_IR2023_NTRAB(1.0),_T,M,IR2023,IX,ENTSIZE2,2026-M09,128.20259601176718,,Valor provisional,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_IR2023_NTRAB(1.0),_T,M,IR2023,IX,ENTSIZE1,2023-M01,97.7043157104449,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_IR2023_NTRAB(1.0),_T,M,IR2023,IX,ENTSIZE1,2023-M02,97.32537113649296,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_IR2023_NTRAB(1.0),_T,M,IR2023,IX,ENTSIZE1,2023-M03,97.51750793665917,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
@@ -153,8 +171,14 @@ CL01:DF_IR2023_NTRAB(1.0),_T,M,IR2023,IX,ENTSIZE1,2025-M10,117.40388588363076,,,
 CL01:DF_IR2023_NTRAB(1.0),_T,M,IR2023,IX,ENTSIZE1,2025-M11,117.62364436980236,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_IR2023_NTRAB(1.0),_T,M,IR2023,IX,ENTSIZE1,2025-M12,119.23394267807835,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_IR2023_NTRAB(1.0),_T,M,IR2023,IX,ENTSIZE1,2026-M01,119.29484460119814,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
-CL01:DF_IR2023_NTRAB(1.0),_T,M,IR2023,IX,ENTSIZE1,2026-M02,119.29789463374694,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
-CL01:DF_IR2023_NTRAB(1.0),_T,M,IR2023,IX,ENTSIZE1,2026-M03,120.12084858110326,,Valor provisional,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_IR2023_NTRAB(1.0),_T,M,IR2023,IX,ENTSIZE1,2026-M02,119.29789463374695,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_IR2023_NTRAB(1.0),_T,M,IR2023,IX,ENTSIZE1,2026-M03,120.42860814903923,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_IR2023_NTRAB(1.0),_T,M,IR2023,IX,ENTSIZE1,2026-M04,121.35146212775227,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_IR2023_NTRAB(1.0),_T,M,IR2023,IX,ENTSIZE1,2026-M05,124.5272012196191,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_IR2023_NTRAB(1.0),_T,M,IR2023,IX,ENTSIZE1,2026-M06,125.88759607502527,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_IR2023_NTRAB(1.0),_T,M,IR2023,IX,ENTSIZE1,2026-M07,126.46131747133089,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_IR2023_NTRAB(1.0),_T,M,IR2023,IX,ENTSIZE1,2026-M08,126.98922541361001,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_IR2023_NTRAB(1.0),_T,M,IR2023,IX,ENTSIZE1,2026-M09,126.80011370443836,,Valor provisional,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_IR2023_NTRAB(1.0),_T,M,IR2023,IX,ENTSIZE3,2023-M01,98.26093615236536,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_IR2023_NTRAB(1.0),_T,M,IR2023,IX,ENTSIZE3,2023-M02,97.75989737891855,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_IR2023_NTRAB(1.0),_T,M,IR2023,IX,ENTSIZE3,2023-M03,98.39780220074388,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
@@ -193,7 +217,13 @@ CL01:DF_IR2023_NTRAB(1.0),_T,M,IR2023,IX,ENTSIZE3,2025-M11,115.95238351613439,,,
 CL01:DF_IR2023_NTRAB(1.0),_T,M,IR2023,IX,ENTSIZE3,2025-M12,116.52021495708284,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_IR2023_NTRAB(1.0),_T,M,IR2023,IX,ENTSIZE3,2026-M01,117.31486153251906,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_IR2023_NTRAB(1.0),_T,M,IR2023,IX,ENTSIZE3,2026-M02,117.46333040660569,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
-CL01:DF_IR2023_NTRAB(1.0),_T,M,IR2023,IX,ENTSIZE3,2026-M03,118.17001792462607,,Valor provisional,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_IR2023_NTRAB(1.0),_T,M,IR2023,IX,ENTSIZE3,2026-M03,118.18785794234105,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_IR2023_NTRAB(1.0),_T,M,IR2023,IX,ENTSIZE3,2026-M04,119.15078620543561,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_IR2023_NTRAB(1.0),_T,M,IR2023,IX,ENTSIZE3,2026-M05,120.84184796290383,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_IR2023_NTRAB(1.0),_T,M,IR2023,IX,ENTSIZE3,2026-M06,122.2357941241024,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_IR2023_NTRAB(1.0),_T,M,IR2023,IX,ENTSIZE3,2026-M07,122.98877360486048,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_IR2023_NTRAB(1.0),_T,M,IR2023,IX,ENTSIZE3,2026-M08,123.133394231141,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_IR2023_NTRAB(1.0),_T,M,IR2023,IX,ENTSIZE3,2026-M09,123.76737828653108,,Valor provisional,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_IR2023_NTRAB(1.0),_T,M,IR2023,VAR12,ENTSIZE3,2023-M01,,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_IR2023_NTRAB(1.0),_T,M,IR2023,VAR12,ENTSIZE3,2023-M02,,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_IR2023_NTRAB(1.0),_T,M,IR2023,VAR12,ENTSIZE3,2023-M03,,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
@@ -232,4 +262,10 @@ CL01:DF_IR2023_NTRAB(1.0),_T,M,IR2023,VAR12,ENTSIZE3,2025-M11,5.814554796458626,
 CL01:DF_IR2023_NTRAB(1.0),_T,M,IR2023,VAR12,ENTSIZE3,2025-M12,5.637986419644436,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_IR2023_NTRAB(1.0),_T,M,IR2023,VAR12,ENTSIZE3,2026-M01,4.242860187886266,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_IR2023_NTRAB(1.0),_T,M,IR2023,VAR12,ENTSIZE3,2026-M02,4.562849021684956,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
-CL01:DF_IR2023_NTRAB(1.0),_T,M,IR2023,VAR12,ENTSIZE3,2026-M03,4.459972483704888,,Valor provisional,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_IR2023_NTRAB(1.0),_T,M,IR2023,VAR12,ENTSIZE3,2026-M03,4.475742708609198,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_IR2023_NTRAB(1.0),_T,M,IR2023,VAR12,ENTSIZE3,2026-M04,5.065042095867689,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_IR2023_NTRAB(1.0),_T,M,IR2023,VAR12,ENTSIZE3,2026-M05,6.361794807440591,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_IR2023_NTRAB(1.0),_T,M,IR2023,VAR12,ENTSIZE3,2026-M06,6.826957992231653,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_IR2023_NTRAB(1.0),_T,M,IR2023,VAR12,ENTSIZE3,2026-M07,7.074449989897724,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_IR2023_NTRAB(1.0),_T,M,IR2023,VAR12,ENTSIZE3,2026-M08,7.063184981850301,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_IR2023_NTRAB(1.0),_T,M,IR2023,VAR12,ENTSIZE3,2026-M09,7.205617771103956,,Valor provisional,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0

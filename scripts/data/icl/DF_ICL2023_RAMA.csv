@@ -37,7 +37,13 @@ CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,R,2025-M11,7.596133969691743,,,2,,E
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,R,2025-M12,8.361551115926558,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,R,2026-M01,7.441873606311522,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,R,2026-M02,7.850641532840785,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
-CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,R,2026-M03,8.79566249376984,,Valor provisional,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,R,2026-M03,9.201362777873223,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,R,2026-M04,8.788141870446587,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,R,2026-M05,8.497630682443425,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,R,2026-M06,8.034477544735253,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,R,2026-M07,9.406955497246683,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,R,2026-M08,9.074797586750382,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,R,2026-M09,8.308698000205105,,Valor provisional,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,Q,2023-M01,98.39609975809063,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,Q,2023-M02,97.58152522683359,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,Q,2023-M03,98.80578033693702,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
@@ -76,7 +82,13 @@ CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,Q,2025-M11,117.26750175150323,,,2,,Enc
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,Q,2025-M12,117.90551210205346,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,Q,2026-M01,118.0640934039661,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,Q,2026-M02,117.58557104124164,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
-CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,Q,2026-M03,119.46606771552517,,Valor provisional,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,Q,2026-M03,119.30332718599088,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,Q,2026-M04,119.9095535772667,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,Q,2026-M05,120.89975555188094,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,Q,2026-M06,122.84704777099142,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,Q,2026-M07,123.3786271494905,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,Q,2026-M08,123.62343949650406,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,Q,2026-M09,124.8793496418892,,Valor provisional,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,J,2023-M01,,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,J,2023-M02,,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,J,2023-M03,,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
@@ -115,7 +127,13 @@ CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,J,2025-M11,5.747552899460939,,,2,,E
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,J,2025-M12,6.272745339167285,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,J,2026-M01,6.435080209381661,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,J,2026-M02,7.3468793593760795,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
-CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,J,2026-M03,7.734499735807376,,Valor provisional,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,J,2026-M03,7.837465189679649,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,J,2026-M04,7.726367516964805,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,J,2026-M05,9.662755853484706,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,J,2026-M06,9.990513317588846,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,J,2026-M07,10.2490090691713,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,J,2026-M08,9.587985932715636,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,J,2026-M09,10.088439760543611,,Valor provisional,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,R,2023-M01,97.73829017343347,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,R,2023-M02,97.23975249775205,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,R,2023-M03,99.72814852059587,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
@@ -153,8 +171,14 @@ CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,R,2025-M10,120.43088392743987,,,2,,Enc
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,R,2025-M11,120.70032725900592,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,R,2025-M12,121.9456437797529,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,R,2026-M01,123.69907621839394,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
-CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,R,2026-M02,124.41364344379453,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
-CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,R,2026-M03,126.9039919650238,,Valor provisional,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,R,2026-M02,124.41364344379454,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,R,2026-M03,127.37721841922192,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,R,2026-M04,127.13256772302256,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,R,2026-M05,128.1679246467302,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,R,2026-M06,129.73919067717273,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,R,2026-M07,130.543989700572,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,R,2026-M08,131.6731415034598,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,R,2026-M09,132.23680533454768,,Valor provisional,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,B,2023-M01,98.15388750675903,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,B,2023-M02,97.03963301962614,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,B,2023-M03,98.34217935156981,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
@@ -193,7 +217,13 @@ CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,B,2025-M11,116.08999755210057,,,2,,Enc
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,B,2025-M12,117.67526170864066,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,B,2026-M01,118.59746538230563,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,B,2026-M02,116.56600870730227,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
-CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,B,2026-M03,118.65403226450402,,Valor provisional,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,B,2026-M03,118.69117258242757,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,B,2026-M04,122.85903089203492,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,B,2026-M05,123.52007042076218,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,B,2026-M06,124.7384483995033,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,B,2026-M07,127.86680647191797,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,B,2026-M08,126.65083577212945,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,B,2026-M09,128.8741152504947,,Valor provisional,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,M,2023-M01,98.18636060961666,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,M,2023-M02,97.16396370403301,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,M,2023-M03,98.0374347256792,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
@@ -232,7 +262,13 @@ CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,M,2025-M11,119.08690615799466,,,2,,Enc
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,M,2025-M12,121.93729654652853,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,M,2026-M01,121.46395512162306,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,M,2026-M02,122.28492943760253,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
-CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,M,2026-M03,122.74727796588331,,Valor provisional,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,M,2026-M03,123.10867896688691,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,M,2026-M04,124.46486473887538,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,M,2026-M05,128.14727932060939,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,M,2026-M06,129.03412209940933,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,M,2026-M07,130.84467747005596,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,M,2026-M08,131.7427539577712,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,M,2026-M09,132.43043304765575,,Valor provisional,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,M,2023-M01,,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,M,2023-M02,,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,M,2023-M03,,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
@@ -271,7 +307,13 @@ CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,M,2025-M11,6.710031722420662,,,2,,E
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,M,2025-M12,7.984648797656413,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,M,2026-M01,6.885853082799609,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,M,2026-M02,5.503906449420826,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
-CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,M,2026-M03,6.9534009257006035,,Valor provisional,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,M,2026-M03,7.2683005047041505,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,M,2026-M04,8.6033364973521,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,M,2026-M05,11.769725644044371,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,M,2026-M06,11.57889880361087,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,M,2026-M07,11.857480050189405,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,M,2026-M08,12.060222982216207,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,M,2026-M09,11.246907767927405,,Valor provisional,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,H,2023-M01,,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,H,2023-M02,,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,H,2023-M03,,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
@@ -309,8 +351,14 @@ CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,H,2025-M10,6.409246521334211,,,2,,E
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,H,2025-M11,6.182386459790146,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,H,2025-M12,6.200352817583932,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,H,2026-M01,6.671583877604914,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
-CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,H,2026-M02,7.290182842127146,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
-CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,H,2026-M03,6.927239902388971,,Valor provisional,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,H,2026-M02,7.290182842127124,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,H,2026-M03,7.110550367523882,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,H,2026-M04,8.131446121100062,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,H,2026-M05,8.957641244765746,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,H,2026-M06,9.808260273067692,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,H,2026-M07,9.234248339010653,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,H,2026-M08,9.791211203069427,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,H,2026-M09,10.368511285131454,,Valor provisional,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,B,2023-M01,,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,B,2023-M02,,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,B,2023-M03,,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
@@ -349,7 +397,13 @@ CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,B,2025-M11,6.284639527634384,,,2,,E
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,B,2025-M12,7.739505945024994,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,B,2026-M01,6.743950527452491,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,B,2026-M02,7.61997552932836,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
-CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,B,2026-M03,7.127474230815367,,Valor provisional,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,B,2026-M03,7.161006580077722,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,B,2026-M04,7.601319781252847,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,B,2026-M05,9.11894862328213,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,B,2026-M06,10.433553958295082,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,B,2026-M07,11.452955369739026,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,B,2026-M08,9.500875058807011,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,B,2026-M09,10.518191752871298,,Valor provisional,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,K,2023-M01,97.39831057408173,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,K,2023-M02,97.5558987125908,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,K,2023-M03,97.91697924615325,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
@@ -387,8 +441,14 @@ CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,K,2025-M10,114.46011017771686,,,2,,Enc
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,K,2025-M11,114.67250572945112,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,K,2025-M12,115.06474456963056,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,K,2026-M01,115.81830955126482,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
-CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,K,2026-M02,116.62528619872316,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
-CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,K,2026-M03,115.99655089615243,,Valor provisional,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,K,2026-M02,116.62528619872315,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,K,2026-M03,115.99709264530156,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,K,2026-M04,116.88749982455398,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,K,2026-M05,118.25590481573144,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,K,2026-M06,119.43194475874867,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,K,2026-M07,121.14099447641026,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,K,2026-M08,122.00142252459834,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,K,2026-M09,122.11761434697077,,Valor provisional,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,D,2023-M01,,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,D,2023-M02,,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,D,2023-M03,,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
@@ -426,8 +486,14 @@ CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,D,2025-M10,7.347446186179041,,,2,,E
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,D,2025-M11,7.391553331419876,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,D,2025-M12,6.398817279119551,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,D,2026-M01,5.814166751908623,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
-CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,D,2026-M02,4.783637576452904,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
-CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,D,2026-M03,4.054827357265411,,Valor provisional,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,D,2026-M02,4.783637576452926,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,D,2026-M03,4.243571531186108,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,D,2026-M04,5.947709950229196,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,D,2026-M05,8.355146821295257,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,D,2026-M06,8.692204089242717,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,D,2026-M07,8.788475672267904,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,D,2026-M08,10.591708364164653,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,D,2026-M09,9.166097186889122,,Valor provisional,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,O,2023-M01,99.81991030339502,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,O,2023-M02,98.84517962720484,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,O,2023-M03,99.86782283631871,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
@@ -465,8 +531,14 @@ CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,O,2025-M10,110.95697385316535,,,2,,Enc
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,O,2025-M11,111.07035540300038,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,O,2025-M12,113.21874039461741,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,O,2026-M01,111.47957336266695,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
-CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,O,2026-M02,114.14935435334009,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
-CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,O,2026-M03,114.9754958166082,,Valor provisional,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,O,2026-M02,114.14935435334007,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,O,2026-M03,115.09473211855216,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,O,2026-M04,113.9394065388275,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,O,2026-M05,113.90513610596287,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,O,2026-M06,116.59116130745556,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,O,2026-M07,115.94154469731993,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,O,2026-M08,116.80241305789374,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,O,2026-M09,117.92740805719052,,Valor provisional,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,G,2023-M01,97.04881367371394,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,G,2023-M02,95.93891648403427,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,G,2023-M03,97.5226412264108,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
@@ -505,7 +577,13 @@ CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,G,2025-M11,118.49891088465229,,,2,,Enc
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,G,2025-M12,121.09451189344055,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,G,2026-M01,119.87547280519976,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,G,2026-M02,119.01679668432158,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
-CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,G,2026-M03,120.24293516658481,,Valor provisional,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,G,2026-M03,120.42527922344776,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,G,2026-M04,122.00095685664952,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,G,2026-M05,125.26251227501076,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,G,2026-M06,126.52951679414078,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,G,2026-M07,127.10076230347289,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,G,2026-M08,127.60724001941945,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,G,2026-M09,128.63450300005024,,Valor provisional,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,C,2023-M01,,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,C,2023-M02,,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,C,2023-M03,,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
@@ -544,7 +622,13 @@ CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,C,2025-M11,5.646753828399764,,,2,,E
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,C,2025-M12,6.054223668210135,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,C,2026-M01,5.394625311481871,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,C,2026-M02,5.598405808047779,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
-CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,C,2026-M03,6.054556505215336,,Valor provisional,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,C,2026-M03,6.010578747363904,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,C,2026-M04,6.333069880584752,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,C,2026-M05,9.177420781589984,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,C,2026-M06,9.980508291389501,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,C,2026-M07,10.50934186020025,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,C,2026-M08,10.539783606868202,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,C,2026-M09,10.679321875030423,,Valor provisional,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,L,2023-M01,,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,L,2023-M02,,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,L,2023-M03,,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
@@ -583,7 +667,13 @@ CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,L,2025-M11,8.919362495188654,,,2,,E
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,L,2025-M12,8.476262516135268,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,L,2026-M01,7.391766639945385,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,L,2026-M02,7.728788677071163,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
-CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,L,2026-M03,7.543912075623371,,Valor provisional,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,L,2026-M03,7.955106890693409,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,L,2026-M04,9.030680763347455,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,L,2026-M05,8.448635237024838,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,L,2026-M06,8.754475623711254,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,L,2026-M07,8.626081048478952,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,L,2026-M08,8.751179157087519,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,L,2026-M09,11.306865198878713,,Valor provisional,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,N,2023-M01,95.67202387928437,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,N,2023-M02,96.04845758636968,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,N,2023-M03,96.76896906974874,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
@@ -621,8 +711,14 @@ CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,N,2025-M10,122.18658448191088,,,2,,Enc
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,N,2025-M11,123.33305616329888,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,N,2025-M12,125.06319846168236,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,N,2026-M01,125.51732017232406,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
-CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,N,2026-M02,124.56861108592037,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
-CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,N,2026-M03,126.16583298174197,,Valor provisional,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,N,2026-M02,124.56861108592038,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,N,2026-M03,126.16809305611687,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,N,2026-M04,128.245602035642,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,N,2026-M05,130.59389261067625,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,N,2026-M06,132.24569790247017,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,N,2026-M07,133.61476156514172,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,N,2026-M08,133.50219544213425,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,N,2026-M09,135.48422211406117,,Valor provisional,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,G,2023-M01,,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,G,2023-M02,,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,G,2023-M03,,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
@@ -661,7 +757,13 @@ CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,G,2025-M11,6.322161334528653,,,2,,E
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,G,2025-M12,7.0857896470226445,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,G,2026-M01,5.604768068494126,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,G,2026-M02,5.221518186630947,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
-CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,G,2026-M03,5.783345816726526,,Valor provisional,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,G,2026-M03,5.943762429960686,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,G,2026-M04,6.613751410046076,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,G,2026-M05,9.113258411912394,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,G,2026-M06,9.63312901594271,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,G,2026-M07,9.043792871228874,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,G,2026-M08,8.58580667984976,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,G,2026-M09,8.065448279577048,,Valor provisional,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,F,2023-M01,96.39657698209594,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,F,2023-M02,96.40415105924993,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,F,2023-M03,97.45474271075211,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
@@ -700,7 +802,13 @@ CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,F,2025-M11,120.22311897180563,,,2,,Enc
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,F,2025-M12,121.39584826202578,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,F,2026-M01,121.44169562452879,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,F,2026-M02,120.8246320748431,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
-CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,F,2026-M03,121.51248010143496,,Valor provisional,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,F,2026-M03,121.5021051938096,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,F,2026-M04,123.14631014887482,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,F,2026-M05,126.81004628566487,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,F,2026-M06,127.45688285869272,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,F,2026-M07,128.94118326724808,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,F,2026-M08,128.8614529322527,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,F,2026-M09,129.1967536456478,,Valor provisional,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,E,2023-M01,,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,E,2023-M02,,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,E,2023-M03,,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
@@ -739,7 +847,13 @@ CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,E,2025-M11,8.303961707964147,,,2,,E
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,E,2025-M12,7.957211547649035,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,E,2026-M01,8.107356434132429,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,E,2026-M02,7.768476596867857,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
-CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,E,2026-M03,8.527139297238385,,Valor provisional,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,E,2026-M03,8.665545433916556,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,E,2026-M04,7.791543802756817,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,E,2026-M05,10.358872032849863,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,E,2026-M06,10.603383503445052,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,E,2026-M07,11.367067448360736,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,E,2026-M08,10.50432720435368,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,E,2026-M09,10.435976036537786,,Valor provisional,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,I,2023-M01,94.30067905619732,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,I,2023-M02,95.27298283509641,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,I,2023-M03,96.02693951249017,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
@@ -778,7 +892,13 @@ CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,I,2025-M11,123.78503835425798,,,2,,Enc
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,I,2025-M12,124.2478237330976,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,I,2026-M01,125.83067398360738,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,I,2026-M02,126.12637395504161,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
-CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,I,2026-M03,126.76241003373651,,Valor provisional,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,I,2026-M03,126.87032243997557,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,I,2026-M04,127.21094299729114,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,I,2026-M05,130.18033330325295,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,I,2026-M06,131.8838524926693,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,I,2026-M07,133.51322735798013,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,I,2026-M08,135.12979048129714,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,I,2026-M09,135.7244361525322,,Valor provisional,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,C,2023-M01,97.27786194090783,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,C,2023-M02,96.6178138753445,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,C,2023-M03,97.3266155865378,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
@@ -817,7 +937,13 @@ CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,C,2025-M11,118.42195584688885,,,2,,Enc
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,C,2025-M12,120.13010810889023,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,C,2026-M01,120.12772576537016,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,C,2026-M02,119.72988566324415,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
-CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,C,2026-M03,120.88903375406221,,Valor provisional,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,C,2026-M03,120.8389045674575,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,C,2026-M04,121.92322285876367,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,C,2026-M05,126.36609676418139,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,C,2026-M06,127.35967187890623,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,C,2026-M07,128.49599920458164,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,C,2026-M08,129.23600618516653,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,C,2026-M09,129.98728701807764,,Valor provisional,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,F,2023-M01,,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,F,2023-M02,,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,F,2023-M03,,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
@@ -856,7 +982,13 @@ CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,F,2025-M11,8.516011539529323,,,2,,E
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,F,2025-M12,8.903640286791648,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,F,2026-M01,8.100046414939266,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,F,2026-M02,7.4617059216451675,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
-CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,F,2026-M03,7.0532636731792,,Valor provisional,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,F,2026-M03,7.04412331392823,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,F,2026-M04,6.919571851949202,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,F,2026-M05,9.046814807021942,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,F,2026-M06,9.35353720758345,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,F,2026-M07,10.141001387901794,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,F,2026-M08,9.252796826393194,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,F,2026-M09,8.484118719774347,,Valor provisional,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,H,2023-M01,98.08357038145111,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,H,2023-M02,96.8928665096046,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,H,2023-M03,96.59509945687401,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
@@ -894,8 +1026,14 @@ CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,H,2025-M10,119.0963700208842,,,2,,Encu
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,H,2025-M11,119.90427647583523,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,H,2025-M12,120.96624457778368,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,H,2026-M01,122.90185119695002,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
-CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,H,2026-M02,122.79129532636907,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
-CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,H,2026-M03,122.771196453326,,Valor provisional,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,H,2026-M02,122.79129532636905,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,H,2026-M03,122.9816689685389,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,H,2026-M04,124.93516466629659,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,H,2026-M05,127.22171450166894,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,H,2026-M06,129.1685237470505,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,H,2026-M07,129.49017520174652,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,H,2026-M08,130.78553635140435,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,H,2026-M09,131.7683638505042,,Valor provisional,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,K,2023-M01,,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,K,2023-M02,,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,K,2023-M03,,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
@@ -933,8 +1071,14 @@ CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,K,2025-M10,6.262393377886544,,,2,,E
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,K,2025-M11,5.391605498948415,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,K,2025-M12,5.7588465259704735,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,K,2026-M01,6.03935808952023,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
-CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,K,2026-M02,6.236549493986043,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
-CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,K,2026-M03,5.431684004370374,,Valor provisional,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,K,2026-M02,6.236549493986021,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,K,2026-M03,5.432176411469203,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,K,2026-M04,4.433199748604566,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,K,2026-M05,5.471940828417798,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,K,2026-M06,5.65894243992191,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,K,2026-M07,6.946530052082123,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,K,2026-M08,5.919981099891647,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,K,2026-M09,6.651699743627604,,Valor provisional,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,Q,2023-M01,,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,Q,2023-M02,,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,Q,2023-M03,,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
@@ -973,7 +1117,13 @@ CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,Q,2025-M11,6.171220725534332,,,2,,E
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,Q,2025-M12,6.161881340123188,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,Q,2026-M01,4.780716918657735,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,Q,2026-M02,4.178347533768156,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
-CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,Q,2026-M03,4.534077792601243,,Valor provisional,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,Q,2026-M03,4.391678101210594,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,Q,2026-M04,5.3242249947346165,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,Q,2026-M05,5.6979154637540885,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,Q,2026-M06,5.892484753618676,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,Q,2026-M07,6.2653269892824826,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,Q,2026-M08,5.9221855467299855,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,Q,2026-M09,6.163483930005098,,Valor provisional,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,P,2023-M01,,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,P,2023-M02,,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,P,2023-M03,,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
@@ -1012,7 +1162,13 @@ CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,P,2025-M11,7.495113573656265,,,2,,E
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,P,2025-M12,6.448069038368254,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,P,2026-M01,4.791429602986863,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,P,2026-M02,5.240795978996493,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
-CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,P,2026-M03,5.17455385246568,,Valor provisional,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,P,2026-M03,5.073518410444922,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,P,2026-M04,4.784405203746589,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,P,2026-M05,5.139086855568276,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,P,2026-M06,6.160539233075224,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,P,2026-M07,6.09833022087245,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,P,2026-M08,5.710972267762848,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,P,2026-M09,5.4317551827383515,,Valor provisional,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,E,2023-M01,97.40502288060767,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,E,2023-M02,96.92198804286546,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,E,2023-M03,96.85091942680451,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
@@ -1051,7 +1207,13 @@ CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,E,2025-M11,122.05146746583323,,,2,,Enc
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,E,2025-M12,123.23185937611002,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,E,2026-M01,125.01790705190434,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,E,2026-M02,124.74641538189167,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
-CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,E,2026-M03,125.56297934673604,,Valor provisional,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,E,2026-M03,125.72311152191101,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,E,2026-M04,126.59142536970646,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,E,2026-M05,130.61329860692638,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,E,2026-M06,132.25093951162305,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,E,2026-M07,133.72746710091724,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,E,2026-M08,133.63728430213726,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,E,2026-M09,134.546740134908,,Valor provisional,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,O,2023-M01,,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,O,2023-M02,,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,O,2023-M03,,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
@@ -1089,8 +1251,14 @@ CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,O,2025-M10,5.549117213553734,,,2,,E
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,O,2025-M11,5.806459288956667,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,O,2025-M12,5.667893982403416,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,O,2026-M01,2.4278134357931025,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
-CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,O,2026-M02,4.475836806487066,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
-CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,O,2026-M03,4.145116782144509,,Valor provisional,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,O,2026-M02,4.4758368064870435,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,O,2026-M03,4.253121348703925,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,O,2026-M04,4.173487868344572,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,O,2026-M05,3.9481516781660453,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,O,2026-M06,4.760947200601939,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,O,2026-M07,4.752306388455918,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,O,2026-M08,5.477243340746196,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,O,2026-M09,5.515077145580438,,Valor provisional,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,I,2023-M01,,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,I,2023-M02,,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,I,2023-M03,,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
@@ -1129,7 +1297,13 @@ CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,I,2025-M11,6.920651894680896,,,2,,E
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,I,2025-M12,7.2437388229007915,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,I,2026-M01,7.691768830394219,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,I,2026-M02,7.6734854812430475,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
-CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,I,2026-M03,7.887715913999638,,Valor provisional,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,I,2026-M03,7.979560357670401,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,I,2026-M04,6.983335305249505,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,I,2026-M05,9.27914329311761,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,I,2026-M06,10.174924025446774,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,I,2026-M07,10.528564781063254,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,I,2026-M08,10.927869745888351,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,I,2026-M09,10.875906652907785,,Valor provisional,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,J,2023-M01,98.49913070338141,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,J,2023-M02,98.27251391849593,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,J,2023-M03,98.92462964113399,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
@@ -1167,8 +1341,14 @@ CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,J,2025-M10,117.20690908611469,,,2,,Enc
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,J,2025-M11,117.13233091425589,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,J,2025-M12,118.54289515424009,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,J,2026-M01,120.18604446418907,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
-CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,J,2026-M02,120.56376284468894,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
-CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,J,2026-M03,121.73301382990559,,Valor provisional,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,J,2026-M02,120.56376284468892,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,J,2026-M03,121.84935813048688,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,J,2026-M04,122.10658388932882,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,J,2026-M05,124.77433872794562,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,J,2026-M06,125.49928551797235,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,J,2026-M07,127.29423649025512,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,J,2026-M08,127.68727661644033,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,J,2026-M09,128.62131804392672,,Valor provisional,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,L,2023-M01,97.2422878490778,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,L,2023-M02,97.61355810679942,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,L,2023-M03,98.18546598908418,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
@@ -1207,7 +1387,13 @@ CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,L,2025-M11,121.12124192930416,,,2,,Enc
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,L,2025-M12,122.88545142206789,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,L,2026-M01,122.12840413138183,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,L,2026-M02,122.23289270232664,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
-CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,L,2026-M03,123.70806910669103,,Valor provisional,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,L,2026-M03,124.18106767645877,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,L,2026-M04,125.86006392213284,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,L,2026-M05,126.08851397610101,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,L,2026-M06,127.75565496638886,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,L,2026-M07,128.6961302895623,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,L,2026-M08,130.4238077789595,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,L,2026-M09,133.66435042326248,,Valor provisional,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,N,2023-M01,,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,N,2023-M02,,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,N,2023-M03,,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
@@ -1245,8 +1431,14 @@ CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,N,2025-M10,6.6793715579287705,,,2,,
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,N,2025-M11,7.496586764432522,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,N,2025-M12,7.191582015242259,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,N,2026-M01,7.108837754152808,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
-CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,N,2026-M02,6.552185060079374,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
-CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,N,2026-M03,6.984057084160655,,Valor provisional,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,N,2026-M02,6.552185060079396,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,N,2026-M03,6.985973545378599,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,N,2026-M04,7.526201335656291,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,N,2026-M05,8.754199685638199,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,N,2026-M06,9.102215235743794,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,N,2026-M07,9.952491858362134,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,N,2026-M08,9.18010753963765,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,VAR12,N,2026-M09,9.541179191821358,,Valor provisional,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,P,2023-M01,99.69681824496088,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,P,2023-M02,98.191642126408,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,P,2023-M03,98.807339877351,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
@@ -1285,7 +1477,13 @@ CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,P,2025-M11,115.7842128849479,,,2,,Encu
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,P,2025-M12,116.86526610596437,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,P,2026-M01,116.62955122574914,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,P,2026-M02,117.22029993277884,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
-CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,P,2026-M03,119.10421734893538,,Valor provisional,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,P,2026-M03,118.98980044098948,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,P,2026-M04,118.82437704827802,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,P,2026-M05,118.36551361984762,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,P,2026-M06,120.35139817244817,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,P,2026-M07,121.64709007102995,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,P,2026-M08,121.7691894531851,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,P,2026-M09,122.29348818542152,,Valor provisional,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,D,2023-M01,97.37263679840493,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,D,2023-M02,97.41702507137619,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,D,2023-M03,98.72008555765044,R,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
@@ -1323,5 +1521,11 @@ CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,D,2025-M10,117.46530734877918,,,2,,Enc
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,D,2025-M11,117.67940897622012,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,D,2025-M12,119.04211336442395,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
 CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,D,2026-M01,119.93528265953309,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
-CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,D,2026-M02,119.64607663539918,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
-CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,D,2026-M03,119.67118196663486,,Valor provisional,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,D,2026-M02,119.6460766353992,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,D,2026-M03,119.88825251449956,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,D,2026-M04,123.80075669629116,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,D,2026-M05,124.7746231613299,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,D,2026-M06,125.3114187676578,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,D,2026-M07,127.3974187041173,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,D,2026-M08,129.28977180329196,,,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0
+CL01:DF_ICL2023_RAMA(1.0),_T,M,ICL2023,IX,D,2026-M09,128.61890462962725,,Valor provisional,2,,Encuesta Mensual de Remuneraciones y Costos Laborales,0

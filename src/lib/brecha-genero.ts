@@ -1,44 +1,45 @@
 // Fuente: INE · Encuesta Suplementaria de Ingresos (ESI)
 // Dataset: DF_BGYMEDIOOCU_CIUO + DF_BGYMEDIOOCU_RAMA
-// Período de referencia: 2024 (anual)
+// Período de referencia: 2025 (anual; ESI 2025)
+// Se excluyen estimaciones marcadas "no fiables" (OBS_STATUS=X) por el INE: D, U, SC
 // Indicador: brecha en ingreso mediano (% que ganan menos las mujeres respecto a los hombres)
 // Valores negativos = mujeres ganan menos; positivos = mujeres ganan más
 
-export const BRECHA_PERIODO = "2024";
+export const BRECHA_PERIODO = "2025";
 
 // Brecha por grupo ocupacional CIUO
 const BRECHA_CIUO: Record<string, number> = {
-  CIUO_1: -22.7, // Directivos y gerentes
-  CIUO_2: -26.6, // Profesionales universitarios
-  CIUO_3: -31.9, // Técnicos de nivel medio
-  CIUO_4: -10.6, // Trabajadores administrativos
-  CIUO_5: -30.0, // Trabajadores de servicios y ventas
-  CIUO_6: -29.3, // Trabajadores agropecuarios
-  CIUO_7: -47.5, // Artesanos y trabajadores de oficio
-  CIUO_8: -3.3,  // Operadores de maquinaria y conductores
-  CIUO_9: -22.0, // Trabajadores de apoyo
+  CIUO_1: -27.3, // Directivos y gerentes
+  CIUO_2: -24.0, // Profesionales universitarios
+  CIUO_3: -27.9, // Técnicos de nivel medio
+  CIUO_4: -5.9, // Trabajadores administrativos
+  CIUO_5: -28.9, // Trabajadores de servicios y ventas
+  CIUO_6: -34.1, // Trabajadores agropecuarios
+  CIUO_7: -51.8, // Artesanos y trabajadores de oficio
+  CIUO_8: -12.1,  // Operadores de maquinaria y conductores
+  CIUO_9: -17.1, // Trabajadores de apoyo
 };
 
 // Brecha por sector económico (RAMA CIIU4)
 const BRECHA_RAMA: Record<string, number> = {
-  A: -16.0, // Agricultura
-  B: -2.4,  // Minería
-  C: -35.4, // Manufactura / Industria
-  E: -29.4, // Agua y gestión de residuos
-  F: 9.9,   // Construcción (mujeres ganan más — muestra pequeña)
-  G: -36.9, // Retail / Comercio
-  H: -9.4,  // Transporte y logística
-  I: -11.7, // Alojamiento y gastronomía
-  J: -26.3, // Tecnología e información
-  K: -35.6, // Finanzas y seguros
-  L: -23.4, // Inmobiliarias
-  M: -32.6, // Actividades profesionales
-  N: -42.4, // Servicios administrativos
-  O: -1.2,  // Sector público
-  P: -30.5, // Educación
-  Q: -40.6, // Salud
-  R: -16.3, // Arte y recreación
-  S: -20.5, // Otros servicios
+  A: -20.7, // Agricultura
+  B: -4.8,  // Minería
+  C: -37.3, // Manufactura / Industria
+  E: -3.8, // Agua y gestión de residuos
+  F: 25.2,   // Construcción (mujeres ganan más — muestra pequeña)
+  G: -33.3, // Retail / Comercio
+  H: -13.8,  // Transporte y logística
+  I: -22.9, // Alojamiento y gastronomía
+  J: -13.3, // Tecnología e información
+  K: -29.1, // Finanzas y seguros
+  L: -6.1, // Inmobiliarias
+  M: -28.1, // Actividades profesionales
+  N: -25.8, // Servicios administrativos
+  O: -3.1,  // Sector público
+  P: -20.2, // Educación
+  Q: -34.1, // Salud
+  R: -28.0, // Arte y recreación
+  S: -21.6, // Otros servicios
 };
 
 const INDUSTRIA_A_RAMA: Record<string, string> = {

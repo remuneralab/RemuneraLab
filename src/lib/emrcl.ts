@@ -1,45 +1,45 @@
 // Fuente: INE · Encuesta Mensual de Remuneraciones y Costos Laborales (EMRCL)
-// Período de referencia: marzo 2026
+// Período de referencia: septiembre 2026 (provisional; publicado nov 2026)
 // Dato: variación nominal en 12 meses del Índice de Remuneraciones (IR)
 
-export const EMRCL_PERIODO = "marzo 2026";
+export const EMRCL_PERIODO = "septiembre 2026";
 
 const RAMA_VAR12: Record<string, number> = {
-  B: 6.96, // Minería
-  C: 5.11, // Manufactura / Industria
-  D: 3.39, // Electricidad y gas
-  E: 7.40, // Agua y gestión de residuos
-  F: 6.36, // Construcción
-  G: 4.89, // Retail / Comercio
-  H: 6.20, // Transporte y logística
-  I: 6.77, // Alojamiento y gastronomía
-  J: 7.11, // Tecnología e información
-  K: 4.64, // Finanzas y seguros
-  L: 7.04, // Inmobiliarias
-  M: 5.73, // Actividades profesionales
-  N: 6.08, // Servicios administrativos
-  O: 3.10, // Sector público
-  P: 4.10, // Educación
-  Q: 3.14, // Salud
-  R: 7.37, // Arte y recreación
+  B: 9.41, // Minería
+  C: 9.66, // Manufactura / Industria
+  D: 8.28, // Electricidad y gas
+  E: 9.85, // Agua y gestión de residuos
+  F: 8.19, // Construcción
+  G: 7.64, // Retail / Comercio
+  H: 9.17, // Transporte y logística
+  I: 9.87, // Alojamiento y gastronomía
+  J: 9.51, // Tecnología e información
+  K: 6.20, // Finanzas y seguros
+  L: 10.68, // Inmobiliarias
+  M: 10.70, // Actividades profesionales
+  N: 9.32, // Servicios administrativos
+  O: 4.81, // Sector público
+  P: 4.81, // Educación
+  Q: 5.59, // Salud
+  R: 7.73, // Arte y recreación
 };
 
 const NTRAB_VAR12: Record<string, number> = {
-  ENTSIZE1: 6.05,
-  ENTSIZE2: 5.88,
-  ENTSIZE3: 4.46,
+  ENTSIZE1: 8.56,
+  ENTSIZE2: 8.41,
+  ENTSIZE3: 7.21,
 };
 
 const CIUO_VAR12: Record<string, number> = {
-  CIUO_1: 5.24,
-  CIUO_2: 4.24,
-  CIUO_3: 5.45,
-  CIUO_4: 5.38,
-  CIUO_5A: 5.33,
-  CIUO_5B: 5.41,
-  CIUO_7: 5.51,
-  CIUO_8: 6.40,
-  CIUO_9: 6.47,
+  CIUO_1: 9.10,
+  CIUO_2: 6.62,
+  CIUO_3: 7.79,
+  CIUO_4: 8.46,
+  CIUO_5A: 8.03,
+  CIUO_5B: 5.34,
+  CIUO_7: 9.30,
+  CIUO_8: 8.62,
+  CIUO_9: 9.01,
 };
 
 const INDUSTRIA_A_RAMA: Record<string, string> = {
@@ -69,8 +69,8 @@ const TAMANO_LABEL: Record<string, string> = {
 };
 
 const SEXO_VAR12: Record<string, number> = {
-  M: 5.34, // Hombres
-  F: 4.64, // Mujeres
+  M: 8.22, // Hombres
+  F: 6.92, // Mujeres
 };
 
 export function getTendenciaSexo(sexo: "M" | "F"): number {

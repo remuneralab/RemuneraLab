@@ -1,4 +1,5 @@
-import csv
+import csv, os, sys
+sys.stdout.reconfigure(encoding="utf-8")
 
 def leer_csv(path):
     datos = {}
@@ -16,8 +17,9 @@ def leer_csv(path):
                     pass
     return datos
 
-des = leer_csv(r"C:\Users\Antres\remuneralab\scripts\data\ene\DF_DES_SEXO.csv")
-fdt = leer_csv(r"C:\Users\Antres\remuneralab\scripts\data\ene\DF_FDT_SEXO.csv")
+DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "ene")
+des = leer_csv(os.path.join(DATA_DIR, "DF_DES_SEXO.csv"))
+fdt = leer_csv(os.path.join(DATA_DIR, "DF_FDT_SEXO.csv"))
 
 periodos_nac = sorted(set(p for (a,s,p) in des if a=="_T"), reverse=True)
 print("Periodos nacionales (ultimos 5):", periodos_nac[:5])
@@ -38,12 +40,13 @@ for p in periodos_nac:
         PERIODO_ENE = p
         break
 
+# Codigos oficiales de region INE (AREA_REF): no siguen el orden norte-sur
 REGIONES = {
-  "01":"Arica y Parinacota","02":"Tarapaca","03":"Antofagasta",
-  "04":"Atacama","05":"Coquimbo","06":"Valparaiso",
-  "07":"Metropolitana","08":"O'Higgins","09":"Maule",
-  "10":"Nuble","11":"Biobio","12":"La Araucania",
-  "13":"Los Rios","14":"Los Lagos","15":"Aysen","16":"Magallanes",
+  "15":"Arica y Parinacota","01":"Tarapacá","02":"Antofagasta",
+  "03":"Atacama","04":"Coquimbo","05":"Valparaíso",
+  "13":"Metropolitana","06":"O'Higgins","07":"Maule",
+  "16":"Ñuble","08":"Biobío","09":"La Araucanía",
+  "14":"Los Ríos","10":"Los Lagos","11":"Aysén","12":"Magallanes",
 }
 
 areas_des = sorted(set(a for (a,s,p) in des if a!="_T"))
