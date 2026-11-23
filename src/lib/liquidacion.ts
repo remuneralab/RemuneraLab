@@ -161,7 +161,7 @@ export function revisarLiquidacion(x: Extraccion): Hallazgo[] {
     } else if (bajoTope) {
       const tasa = afp / imponible;
       if (tasa < 0.0995) h.push({ tipo: "error", codigo: "afp", titulo: "Cotización AFP menor a lo legal",
-        detalle: `Se descuenta ${clp(afp)} (${pct(tasa)} del imponible). Lo obligatorio es 10% más la comisión de tu AFP: 10% × ${clp(imponible)} = ${clp(imponible * 0.10)} como mínimo. Faltarían ${clp(imponible * 0.10 - afp)} en tu fondo de pensiones; no es dinero que recibes en mano, pero afecta tu pensión.`, diferencia: imponible * 0.10 - afp, diferencia_tipo: "cotizacion" });
+        detalle: `Se descuenta ${clp(afp)} (${pct(tasa)} del imponible) para la AFP.${Math.abs(tasa - 0.07) < 0.002 ? " Ese 7% es la tasa de salud, no la de AFP: parece que se aplicó la tasa equivocada." : ""} Lo obligatorio es 10% más la comisión de tu AFP: 10% × ${clp(imponible)} = ${clp(imponible * 0.10)} como mínimo. Faltarían ${clp(imponible * 0.10 - afp)} en tu fondo de pensiones; no es dinero que recibes en mano, pero afecta tu pensión.`, diferencia: imponible * 0.10 - afp, diferencia_tipo: "cotizacion" });
       else if (tasa > 0.125) h.push({ tipo: "advertencia", codigo: "afp", titulo: "Descuento AFP más alto de lo habitual",
         detalle: `Se descuenta ${clp(afp)} (${pct(tasa)} del imponible). Lo normal es 10% más una comisión de entre 0,5% y 1,5%. Revisa si incluye ahorro voluntario (APV) o cuenta 2.` });
       else h.push({ tipo: "ok", codigo: "afp", titulo: "Cotización AFP correcta", detalle: `${clp(afp)} equivale al ${pct(tasa)} del imponible (10% + comisión).` });

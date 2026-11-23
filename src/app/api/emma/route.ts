@@ -73,7 +73,7 @@ function prompt(c: Cuerpo) {
 
   const hallazgos = c.hallazgos
     .filter((h) => h.tipo !== "ok")
-    .map((h) => `- [${h.tipo}] ${h.titulo}: ${h.detalle}${h.diferencia ? ` | ${h.diferencia_tipo === "cotizacion" ? "Cotización faltante (no es dinero en mano)" : "Dinero que deberían pagarle"}: $${Math.round(h.diferencia).toLocaleString("es-CL")}` : ""} (norma: ${LEYES[h.codigo]?.norma ?? "s/i"})`)
+    .map((h) => `- [${h.tipo}] ${h.titulo}: ${h.detalle}${h.diferencia ? ` | ${h.diferencia_tipo === "cotizacion" ? `Falta en ${h.codigo === "afp" ? "su AFP" : "su salud"} (no es dinero en mano)` : "Dinero que deberían pagarle"}: $${Math.round(h.diferencia).toLocaleString("es-CL")}` : ""} (norma: ${LEYES[h.codigo]?.norma ?? "s/i"})`)
     .join("\n") || "- Sin errores ni advertencias.";
 
   const historial = c.historial.slice(-4)
@@ -90,7 +90,10 @@ Datos leídos de la liquidación: ${JSON.stringify(c.datos ?? {})}
 Revisión de la liquidación del usuario (ya verificada por el sistema; las cifras están calculadas y son correctas):
 ${hallazgos}
 Dinero que deberían pagarle al trabajador: ${c.diferencia_total > 0 ? "$" + c.diferencia_total.toLocaleString("es-CL") : "no aplica"}
-Cotizaciones faltantes en AFP/salud (van a sus fondos, NO es dinero en mano): ${(c.cotizaciones_faltantes ?? 0) > 0 ? "$" + Math.round(c.cotizaciones_faltantes ?? 0).toLocaleString("es-CL") : "no aplica"}
+Cotizaciones faltantes (van a sus fondos, NO es dinero en mano): ${["afp", "salud"].map((cod) => {
+    const d = c.hallazgos.find((h) => h.codigo === cod && h.tipo === "error" && h.diferencia_tipo === "cotizacion")?.diferencia;
+    return d ? `${cod === "afp" ? "AFP" : "Salud"} $${Math.round(d).toLocaleString("es-CL")}` : null;
+  }).filter(Boolean).join("; ") || "no aplica"}
 Contexto: ${contexto}
 Gravedad: ${c.nivel}
 
@@ -108,7 +111,7 @@ Reglas:
 - ${FORMATO[c.modo]}
 - Sin markdown (nada de asteriscos ni #), sin emojis, sin saludos.
 - Tono cercano y prudente: habla de "posibles errores" o "diferencias a tu favor que deberían pagarte"; nunca acuses al empleador de abuso ni de mala fe.
-- NUNCA sumes el dinero que deberían pagarle con las cotizaciones faltantes ni digas que "pierde" el total: son dos cosas distintas. En el bloque de cálculo usa dos totales separados: "Te deberían pagar: $X" y "Faltan en tu AFP/salud: $Y" (omite el que no aplique).
+- NUNCA sumes el dinero que deberían pagarle con las cotizaciones faltantes ni digas que "pierde" el total: son dos cosas distintas. En el bloque de cálculo usa dos totales separados: "Te deberían pagar: $X" y "Falta en tu AFP: $Y" y/o "Falta en tu salud: $Z" (por separado, nunca "AFP/salud") (omite el que no aplique).
 - Cuando expliques un cálculo, copia la fórmula completa que trae el detalle del hallazgo (por ejemplo, cómo se obtiene el valor hora).
 - NO hagas cálculos nuevos ni multipliques/dividas cifras por tu cuenta: usa solo las cifras que aparecen arriba. No inventes montos ni datos. Si citas una norma, usa SOLO las indicadas arriba (hallazgos o base de conocimiento); nunca inventes artículos.
 - Si la pregunta es sobre un tema laboral que no está en la base de conocimiento, responde en términos generales, sin cifras ni números de artículo, y sugiere confirmarlo en dt.gob.cl.

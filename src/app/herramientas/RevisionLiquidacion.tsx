@@ -236,11 +236,14 @@ export default function RevisionLiquidacion() {
                   Dinero que deberían pagarte este mes: <strong>{valor(analisis.diferencia_total)}</strong>
                 </p>
               )}
-              {analisis.cotizaciones_faltantes > 0 && (
-                <p style={{ ...FONT, fontSize: "0.9rem", color: "#FF9F1C" }}>
-                  Cotizaciones que faltan en tu AFP/salud: <strong>{valor(analisis.cotizaciones_faltantes)}</strong>
-                </p>
-              )}
+              {([["afp", "Falta en tu AFP (fondo de pensiones)"], ["salud", "Falta en tu cotización de salud"]] as const).map(([cod, label]) => {
+                const falta = analisis.hallazgos.find((h) => h.codigo === cod && h.tipo === "error" && h.diferencia_tipo === "cotizacion")?.diferencia;
+                return falta ? (
+                  <p key={cod} style={{ ...FONT, fontSize: "0.9rem", color: "#FF9F1C" }}>
+                    {label}: <strong>{valor(Math.round(falta))}</strong>
+                  </p>
+                ) : null;
+              })}
               <div className="mb-4" />
               <GuardarLiquidacion />
 
