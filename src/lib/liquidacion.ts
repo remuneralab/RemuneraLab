@@ -120,7 +120,8 @@ export function revisarLiquidacion(x: Extraccion): Hallazgo[] {
       errAritm.push(`el líquido debería ser ${clp(haberes)} − ${clp(totDesc)} = ${clp(esperado)}, pero dice ${clp(x.liquido_a_pagar)} (${dif > 0 ? "+" : "−"}${clp(Math.abs(dif))})`);
     }
   }
-  const difLiquido = x.liquido_a_pagar != null ? Math.abs(x.liquido_a_pagar - (haberes - totDesc)) : 0;
+  // Solo cuenta como diferencia en contra si el líquido declarado es MENOR al que corresponde
+  const difLiquido = x.liquido_a_pagar != null ? Math.max(0, (haberes - totDesc) - x.liquido_a_pagar) : 0;
   h.push(errAritm.length
     ? { tipo: "error", codigo: "aritmetica", titulo: "Los totales no cuadran", detalle: `Posible error de cálculo: ${errAritm.join("; ")}.`, diferencia: difLiquido }
     : { tipo: "ok", codigo: "aritmetica", titulo: "Los totales cuadran", detalle: "Las sumas de haberes, descuentos y el líquido a pagar son consistentes." });
