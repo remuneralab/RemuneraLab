@@ -41,6 +41,8 @@ export interface Hallazgo {
   titulo: string;
   detalle: string;
   diferencia?: number; // pesos en contra del trabajador, cuando se puede estimar
+  // "pago": dinero que deberían pagarle al trabajador. "cotizacion": falta en su AFP/salud (no es dinero en mano).
+  diferencia_tipo?: "pago" | "cotizacion";
 }
 
 export interface ReferenciaLegal { norma: string; texto: string }
@@ -74,12 +76,15 @@ export interface ContextoCaso {
 }
 
 // Nivel según el documento: errores → corregible; solo puntos a revisar → leve.
-export function nivelCaso(h: Hallazgo[]): { nivel: NivelCaso; diferencia_total: number } {
+export function nivelCaso(h: Hallazgo[]): { nivel: NivelCaso; diferencia_total: number; cotizaciones_faltantes: number } {
   const errores = h.filter((x) => x.tipo === "error");
-  const diferencia_total = Math.round(errores.reduce((s, x) => s + (x.diferencia ?? 0), 0));
-  if (errores.length) return { nivel: "corregible", diferencia_total };
-  if (h.some((x) => x.tipo === "advertencia")) return { nivel: "leve", diferencia_total };
-  return { nivel: "sin_problemas", diferencia_total };
+  const sumar = (t: "pago" | "cotizacion") =>
+    Math.round(errores.filter((x) => (x.diferencia_tipo ?? "pago") === t).reduce((s, x) => s + (x.diferencia ?? 0), 0));
+  const diferencia_total = sumar("pago");
+  const cotizaciones_faltantes = sumar("cotizacion");
+  if (errores.length) return { nivel: "corregible", diferencia_total, cotizaciones_faltantes };
+  if (h.some((x) => x.tipo === "advertencia")) return { nivel: "leve", diferencia_total, cotizaciones_faltantes };
+  return { nivel: "sin_problemas", diferencia_total, cotizaciones_faltantes };
 }
 
 // Un problema reiterado o la negativa del empleador a corregirlo hacen el caso grave.
@@ -156,7 +161,7 @@ export function revisarLiquidacion(x: Extraccion): Hallazgo[] {
     } else if (bajoTope) {
       const tasa = afp / imponible;
       if (tasa < 0.0995) h.push({ tipo: "error", codigo: "afp", titulo: "Cotización AFP menor a lo legal",
-        detalle: `Se descuenta ${clp(afp)} (${pct(tasa)} del imponible). Lo obligatorio es 10% más la comisión de tu AFP, es decir, al menos ${clp(imponible * 0.10)}. Si te descuentan menos, puede que no se esté enterando completa tu cotización.`, diferencia: imponible * 0.10 - afp });
+        detalle: `Se descuenta ${clp(afp)} (${pct(tasa)} del imponible). Lo obligatorio es 10% más la comisión de tu AFP: 10% × ${clp(imponible)} = ${clp(imponible * 0.10)} como mínimo. Faltarían ${clp(imponible * 0.10 - afp)} en tu fondo de pensiones; no es dinero que recibes en mano, pero afecta tu pensión.`, diferencia: imponible * 0.10 - afp, diferencia_tipo: "cotizacion" });
       else if (tasa > 0.125) h.push({ tipo: "advertencia", codigo: "afp", titulo: "Descuento AFP más alto de lo habitual",
         detalle: `Se descuenta ${clp(afp)} (${pct(tasa)} del imponible). Lo normal es 10% más una comisión de entre 0,5% y 1,5%. Revisa si incluye ahorro voluntario (APV) o cuenta 2.` });
       else h.push({ tipo: "ok", codigo: "afp", titulo: "Cotización AFP correcta", detalle: `${clp(afp)} equivale al ${pct(tasa)} del imponible (10% + comisión).` });
@@ -172,7 +177,7 @@ export function revisarLiquidacion(x: Extraccion): Hallazgo[] {
     } else if (bajoTope) {
       const tasa = salud / imponible;
       if (tasa < 0.0695) h.push({ tipo: "error", codigo: "salud", titulo: "Cotización de salud menor al 7%",
-        detalle: `Se descuenta ${clp(salud)} (${pct(tasa)} del imponible). El mínimo legal es 7%: ${clp(imponible * 0.07)}.`, diferencia: imponible * 0.07 - salud });
+        detalle: `Se descuenta ${clp(salud)} (${pct(tasa)} del imponible). El mínimo legal es 7% × ${clp(imponible)} = ${clp(imponible * 0.07)}. Faltarían ${clp(imponible * 0.07 - salud)} en tu cotización de salud.`, diferencia: imponible * 0.07 - salud, diferencia_tipo: "cotizacion" });
       else if (x.sistema_salud === "fonasa" && tasa > 0.0705) h.push({ tipo: "advertencia", codigo: "salud", titulo: "Descuento Fonasa sobre el 7%",
         detalle: `Se descuenta ${clp(salud)} (${pct(tasa)}). En Fonasa la cotización es exactamente 7% (${clp(imponible * 0.07)}).` });
       else h.push({ tipo: "ok", codigo: "salud", titulo: "Cotización de salud correcta", detalle: `${clp(salud)} equivale al ${pct(tasa)} del imponible.` });
@@ -204,7 +209,7 @@ export function revisarLiquidacion(x: Extraccion): Hallazgo[] {
       const pagadoHora = it.monto / it.horas!;
       if (pagadoHora < minimoExtra * 0.97) {
         h.push({ tipo: "error", codigo: "horas_extra", titulo: "Horas extra pagadas bajo lo legal",
-          detalle: `Se pagan ${it.horas} h extra a ${clp(pagadoHora)} la hora (${clp(it.monto)}). Con tu sueldo base, cada hora extra debe pagarse al menos a ${clp(minimoExtra)} (valor hora ${clp(valorHora)} + 50%), es decir, ${clp(minimoExtra * it.horas!)} en total. Diferencia: ${clp(minimoExtra * it.horas! - it.monto)}.`, diferencia: minimoExtra * it.horas! - it.monto });
+          detalle: `Se pagan ${it.horas} h extra a ${clp(pagadoHora)} la hora (${clp(it.monto)}). Valor hora ordinaria = sueldo base ${clp(sueldoBase)} ÷ 30 × 28 ÷ ${jornada} h semanales = ${clp(valorHora)}. Con el recargo legal de 50%: ${clp(valorHora)} × 1,5 = ${clp(minimoExtra)} por hora extra. Por ${it.horas} h: ${clp(minimoExtra)} × ${it.horas} = ${clp(minimoExtra * it.horas!)}. Diferencia: ${clp(minimoExtra * it.horas!)} − ${clp(it.monto)} = ${clp(minimoExtra * it.horas! - it.monto)}.`, diferencia: minimoExtra * it.horas! - it.monto, diferencia_tipo: "pago" });
       } else {
         h.push({ tipo: "ok", codigo: "horas_extra", titulo: "Horas extra con recargo legal", detalle: `${it.horas} h a ${clp(pagadoHora)} la hora cumplen el recargo mínimo de 50%.` });
       }

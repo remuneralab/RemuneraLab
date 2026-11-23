@@ -78,7 +78,7 @@ export async function POST(req: NextRequest) {
   if (!x.es_liquidacion || !x.legible) {
     return NextResponse.json({ analisis: {
       es_liquidacion: x.es_liquidacion, legible: x.legible, datos, hallazgos: [],
-      nivel: "sin_problemas", diferencia_total: 0,
+      nivel: "sin_problemas", diferencia_total: 0, cotizaciones_faltantes: 0,
       resumen: x.notas?.[0] ?? "El archivo no parece ser una liquidación de sueldo legible. Prueba con un PDF o una foto más nítida.",
     } });
   }
@@ -87,7 +87,7 @@ export async function POST(req: NextRequest) {
   const hallazgos = revisarLiquidacion(x);
   const nErrores  = hallazgos.filter((h) => h.tipo === "error").length;
   const nAdv      = hallazgos.filter((h) => h.tipo === "advertencia").length;
-  const { nivel, diferencia_total } = nivelCaso(hallazgos);
+  const { nivel, diferencia_total, cotizaciones_faltantes } = nivelCaso(hallazgos);
   const plural = (n: number, s: string, p: string) => `${n} ${n === 1 ? s : p}`;
 
   const resumen = nErrores
@@ -97,6 +97,6 @@ export async function POST(req: NextRequest) {
 
   // La explicación la entrega Emma (/api/emma) cuando el usuario la pide.
   return NextResponse.json({ analisis: {
-    es_liquidacion: true, legible: true, resumen, datos, hallazgos, nivel, diferencia_total,
+    es_liquidacion: true, legible: true, resumen, datos, hallazgos, nivel, diferencia_total, cotizaciones_faltantes,
   } });
 }

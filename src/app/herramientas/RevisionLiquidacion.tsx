@@ -16,7 +16,8 @@ export type Analisis = {
   datos: Record<string, string | number | null>;
   hallazgos: Hallazgo[];
   nivel: NivelCaso; // nivel según el documento (sin contexto de reiteración)
-  diferencia_total: number;
+  diferencia_total: number;       // dinero que deberían pagarle
+  cotizaciones_faltantes: number; // falta en AFP/salud (no es dinero en mano)
 };
 
 const SIN_CONTEXTO: ContextoCaso = { reiterado: null, negativa: null };
@@ -232,7 +233,12 @@ export default function RevisionLiquidacion() {
               <p className="text-white/60 mb-1" style={{ ...FONT, fontSize: "0.95rem", lineHeight: "1.6" }}>{analisis.resumen}</p>
               {analisis.diferencia_total > 0 && (
                 <p style={{ ...FONT, fontSize: "0.9rem", color: "#E63946" }}>
-                  Diferencia estimada este mes: <strong>{valor(analisis.diferencia_total)}</strong>
+                  Dinero que deberían pagarte este mes: <strong>{valor(analisis.diferencia_total)}</strong>
+                </p>
+              )}
+              {analisis.cotizaciones_faltantes > 0 && (
+                <p style={{ ...FONT, fontSize: "0.9rem", color: "#FF9F1C" }}>
+                  Cotizaciones que faltan en tu AFP/salud: <strong>{valor(analisis.cotizaciones_faltantes)}</strong>
                 </p>
               )}
               <div className="mb-4" />
@@ -245,7 +251,7 @@ export default function RevisionLiquidacion() {
               <CuadrosHallazgos hallazgos={analisis.hallazgos} />
 
               {/* 3. Emma, asistente IA laboral */}
-              <Emma nivel={nivel} contexto={contexto} hallazgos={analisis.hallazgos} diferencia_total={analisis.diferencia_total} datos={analisis.datos} />
+              <Emma nivel={nivel} contexto={contexto} hallazgos={analisis.hallazgos} diferencia_total={analisis.diferencia_total} cotizaciones_faltantes={analisis.cotizaciones_faltantes} datos={analisis.datos} />
 
               {/* 4. Línea de acción según gravedad */}
               <LineaAccion nivel={nivel} analisis={analisis} />

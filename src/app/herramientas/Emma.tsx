@@ -18,6 +18,7 @@ interface Props {
   contexto: ContextoCaso;
   hallazgos: Hallazgo[];
   diferencia_total: number;
+  cotizaciones_faltantes: number;
   datos: Record<string, string | number | null>;
 }
 
@@ -63,7 +64,7 @@ function Escribiendo() {
   );
 }
 
-export default function Emma({ nivel, contexto, hallazgos, diferencia_total, datos }: Props) {
+export default function Emma({ nivel, contexto, hallazgos, diferencia_total, cotizaciones_faltantes, datos }: Props) {
   const [abierta,    setAbierta]    = useState(false);
   const [turnos,     setTurnos]     = useState<Turno[]>([]);
   const [pensando,   setPensando]   = useState(false);
@@ -82,7 +83,7 @@ export default function Emma({ nivel, contexto, hallazgos, diferencia_total, dat
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          modo, pregunta: texto, nivel, contexto, hallazgos, diferencia_total, datos,
+          modo, pregunta: texto, nivel, contexto, hallazgos, diferencia_total, cotizaciones_faltantes, datos,
           historial: turnos.map(({ pregunta, respuesta }) => ({ pregunta, respuesta })),
         }),
       });
