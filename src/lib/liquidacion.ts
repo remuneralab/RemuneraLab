@@ -65,18 +65,27 @@ export const LEYES: Record<CodigoHallazgo, ReferenciaLegal> = {
                    texto: "El empleador solo puede descontar lo que exige la ley o lo que el trabajador autorizó por escrito." },
 };
 
-export type NivelCaso = "sin_problemas" | "advertencias" | "menor" | "grave";
-export const UMBRAL_GRAVE_CLP = 50_000;
-const CODIGOS_GRAVES: CodigoHallazgo[] = ["minimo", "afp", "salud", "cesantia"]; // piso legal y cotizaciones previsionales
+export type NivelCaso = "sin_problemas" | "leve" | "corregible" | "grave";
 
+// Contexto que el documento no muestra y que responde el trabajador
+export interface ContextoCaso {
+  reiterado: boolean | null; // ¿el error se ha repetido en meses anteriores?
+  negativa:  boolean | null; // ¿pidió la corrección y el empleador se negó?
+}
+
+// Nivel según el documento: errores → corregible; solo puntos a revisar → leve.
 export function nivelCaso(h: Hallazgo[]): { nivel: NivelCaso; diferencia_total: number } {
   const errores = h.filter((x) => x.tipo === "error");
   const diferencia_total = Math.round(errores.reduce((s, x) => s + (x.diferencia ?? 0), 0));
-  if (errores.some((x) => CODIGOS_GRAVES.includes(x.codigo)) || diferencia_total > UMBRAL_GRAVE_CLP)
-    return { nivel: "grave", diferencia_total };
-  if (errores.length) return { nivel: "menor", diferencia_total };
-  if (h.some((x) => x.tipo === "advertencia")) return { nivel: "advertencias", diferencia_total };
+  if (errores.length) return { nivel: "corregible", diferencia_total };
+  if (h.some((x) => x.tipo === "advertencia")) return { nivel: "leve", diferencia_total };
   return { nivel: "sin_problemas", diferencia_total };
+}
+
+// Un problema reiterado o la negativa del empleador a corregirlo hacen el caso grave.
+export function gravedadFinal(base: NivelCaso, c: ContextoCaso): NivelCaso {
+  if (base === "sin_problemas") return base;
+  return c.reiterado || c.negativa ? "grave" : base;
 }
 
 // Referencias (mismas que usa el resto de RemuneraLab). Verificar vigencia periódicamente.

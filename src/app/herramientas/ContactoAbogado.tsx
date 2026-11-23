@@ -13,7 +13,7 @@ interface Props {
   analisis: Analisis | null;
 }
 
-// Solo se muestra en casos graves (ver ProximoPaso).
+// Solo se muestra en casos graves (ver LineaAccion en Gravedad.tsx).
 export default function ContactoAbogado({ analisis }: Props) {
   const [abierto,  setAbierto]  = useState(false);
   const [nombre,   setNombre]   = useState("");
@@ -62,10 +62,10 @@ export default function ContactoAbogado({ analisis }: Props) {
         <Scale size={20} className="mt-0.5 shrink-0" style={{ color: "#a387f5" }} />
         <div>
           <p className="text-white font-semibold mb-1" style={{ ...FONT, fontSize: "1.05rem" }}>
-            Te recomendamos hablar con un abogado laboral
+            Habla con un abogado laboral
           </p>
           <p className="text-white/50" style={{ ...FONT, fontSize: "0.875rem", lineHeight: "1.55" }}>
-            {"Los errores encontrados afectan tu sueldo o tus cotizaciones. Abogados laborales de nuestra red ofrecen la primera consulta gratis: déjanos tus datos y te contactarán."}
+            {"Abogados laborales de nuestra red ofrecen la primera consulta gratis. Déjanos tus datos y te contactarán."}
           </p>
         </div>
       </div>

@@ -2,27 +2,29 @@
 
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { Upload, FileText, Loader2, AlertOctagon, AlertTriangle, CheckCircle2, Lightbulb, X, BookOpen, ChevronRight, ChevronDown } from "lucide-react";
+import { Upload, FileText, Loader2, AlertOctagon, AlertTriangle, CheckCircle2, X, BookOpen, ChevronRight, ChevronDown } from "lucide-react";
 import { sendGAEvent } from "@next/third-parties/google";
-import { LEYES, type Hallazgo, type NivelCaso } from "@/lib/liquidacion";
-import ProximoPaso from "./ProximoPaso";
+import { LEYES, gravedadFinal, type Hallazgo, type NivelCaso, type ContextoCaso } from "@/lib/liquidacion";
+import { NivelGravedad, LineaAccion } from "./Gravedad";
+import Emma from "./Emma";
+
 export type Analisis = {
   es_liquidacion: boolean;
   legible: boolean;
   resumen: string;
   datos: Record<string, string | number | null>;
   hallazgos: Hallazgo[];
-  asesoria: string;
-  recomienda_abogado: boolean;
-  nivel: NivelCaso;
+  nivel: NivelCaso; // nivel según el documento (sin contexto de reiteración)
   diferencia_total: number;
 };
+
+const SIN_CONTEXTO: ContextoCaso = { reiterado: null, negativa: null };
 
 const MENSAJES_ESPERA = [
   "Leyendo tu liquidación…",
   "Revisando cotizaciones y descuentos…",
   "Verificando horas extra y gratificación…",
-  "Preparando tu asesoría…",
+  "Calculando diferencias…",
 ];
 
 function ReferenciaLey({ codigo }: { codigo: Hallazgo["codigo"] }) {
@@ -134,6 +136,8 @@ export default function RevisionLiquidacion() {
   const [error,    setError]    = useState<string | null>(null);
   const [analisis, setAnalisis] = useState<Analisis | null>(null);
   const [paso,     setPaso]     = useState(0);
+  const [contexto, setContexto] = useState<ContextoCaso>(SIN_CONTEXTO);
+  const nivel = analisis ? gravedadFinal(analisis.nivel, contexto) : "sin_problemas";
 
   // Mensajes de progreso mientras se espera la respuesta
   useEffect(() => {
@@ -149,7 +153,7 @@ export default function RevisionLiquidacion() {
 
   async function analizar() {
     if (!archivo) return;
-    setCargando(true); setError(null); setAnalisis(null); setPaso(0);
+    setCargando(true); setError(null); setAnalisis(null); setPaso(0); setContexto(SIN_CONTEXTO);
     sendGAEvent("event", "liquidacion_analizar");
     try {
       const fd = new FormData();
@@ -223,19 +227,32 @@ export default function RevisionLiquidacion() {
             </div>
           ) : (
             <>
-              <div className="flex flex-wrap items-baseline justify-between gap-3 mb-4">
-                <h2 className="text-white font-bold" style={{ ...FONT, fontSize: "1.35rem" }}>Resultado de la revisión</h2>
-              </div>
-              <p className="text-white/60 mb-3" style={{ ...FONT, fontSize: "0.95rem", lineHeight: "1.6" }}>{analisis.resumen}</p>
+              <h2 className="text-white font-bold mb-2" style={{ ...FONT, fontSize: "1.35rem" }}>Resultado de la revisión</h2>
+              <p className="text-white/60 mb-1" style={{ ...FONT, fontSize: "0.95rem", lineHeight: "1.6" }}>{analisis.resumen}</p>
               {analisis.diferencia_total > 0 && (
-                <p className="mb-6" style={{ ...FONT, fontSize: "0.9rem", color: "#E63946" }}>
+                <p style={{ ...FONT, fontSize: "0.9rem", color: "#E63946" }}>
                   Diferencia estimada este mes: <strong>{valor(analisis.diferencia_total)}</strong>
                 </p>
               )}
-              {!(analisis.diferencia_total > 0) && <div className="mb-3" />}
+              <div className="mb-6" />
 
-              {/* Datos detectados */}
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-px rounded-xl overflow-hidden mb-8"
+              {/* 1. Nivel de gravedad (con preguntas de contexto) */}
+              <NivelGravedad base={analisis.nivel} nivel={nivel} contexto={contexto} onContexto={setContexto} />
+
+              {/* 2. Hallazgos */}
+              <CuadrosHallazgos hallazgos={analisis.hallazgos} />
+
+              {/* 3. Emma, asistente IA laboral */}
+              <Emma nivel={nivel} contexto={contexto} hallazgos={analisis.hallazgos} diferencia_total={analisis.diferencia_total} />
+
+              {/* 4. Línea de acción según gravedad */}
+              <LineaAccion nivel={nivel} analisis={analisis} />
+
+              {/* 5. Datos leídos de la liquidación */}
+              <p className="uppercase tracking-[0.2em] mb-3" style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.6rem", color: "rgba(255,255,255,0.4)" }}>
+                Datos leídos de tu liquidación
+              </p>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-px rounded-xl overflow-hidden"
                 style={{ background: "rgba(133,104,243,0.15)", border: "1px solid rgba(133,104,243,0.15)" }}>
                 {Object.entries(ETIQUETAS).map(([k, label]) => (
                   <div key={k} className="px-4 py-3" style={{ background: "#1d0f45" }}>
@@ -244,24 +261,8 @@ export default function RevisionLiquidacion() {
                   </div>
                 ))}
               </div>
-
-              {/* Hallazgos */}
-              <CuadrosHallazgos hallazgos={analisis.hallazgos} />
-
-              {/* Asesoría */}
-              <div className="rounded-xl px-6 py-5 mb-8" style={{ border: "1px solid rgba(133,104,243,0.30)", background: "rgba(133,104,243,0.08)" }}>
-                <div className="flex items-center gap-2 mb-2">
-                  <Lightbulb size={16} style={{ color: "#a387f5" }} />
-                  <p className="uppercase tracking-[0.18em]" style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.6rem", color: "#a387f5" }}>
-                    Asesoría laboral
-                  </p>
-                </div>
-                <p className="text-white/75" style={{ ...FONT, fontSize: "0.92rem", lineHeight: "1.65" }}>{analisis.asesoria}</p>
-              </div>
             </>
           )}
-
-          {analisis.es_liquidacion && analisis.legible && <ProximoPaso nivel={analisis.nivel} analisis={analisis} />}
         </motion.div>
       )}
     </div>
