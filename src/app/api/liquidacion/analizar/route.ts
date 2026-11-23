@@ -1,7 +1,7 @@
 import { GoogleGenerativeAI, type Part } from "@google/generative-ai";
 import { NextRequest, NextResponse } from "next/server";
 import { COOKIE_SUSCRIPCION, tieneSuscripcion } from "@/lib/suscripcion";
-import { revisarLiquidacion, nivelCaso, type Extraccion, type Hallazgo } from "@/lib/liquidacion";
+import { revisarLiquidacion, nivelCaso, type Extraccion, type Hallazgo, type NivelCaso } from "@/lib/liquidacion";
 
 export const maxDuration = 60;
 
@@ -51,14 +51,17 @@ Reglas:
 - Si no es una liquidación o no se puede leer, marca es_liquidacion/legible en false y deja items vacío.`;
 
 // Paso 3: la IA redacta a partir de hallazgos YA verificados por código.
-function promptAsesoria(x: Extraccion, h: Hallazgo[]) {
+function promptAsesoria(x: Extraccion, h: Hallazgo[], nivel: NivelCaso) {
+  const ruta = nivel === "grave"
+    ? "El caso es GRAVE: recomienda consultar a un abogado laboral, y como alternativa la Inspección del Trabajo."
+    : "El caso es CORREGIBLE: recomienda primero conversar con la jefatura o RR.HH. y pedir la corrección por escrito; si no se corrige, acudir a la Inspección del Trabajo. NO menciones abogados.";
   return `Eres asesor laboral en Chile. Estos son los hallazgos, ya verificados, de la revisión de una liquidación de sueldo
 (período ${x.periodo ?? "s/i"}, cargo ${x.cargo ?? "s/i"}, contrato ${x.tipo_contrato ?? "s/i"}):
 ${JSON.stringify(h, null, 1)}
 
 Responde SOLO con JSON: { "resumen": string, "asesoria": string }
 - "resumen": 1-2 oraciones con el estado general de la liquidación.
-- "asesoria": 3-5 oraciones en español de Chile, claras y prácticas: qué hacer con los errores y advertencias, priorizando los que afectan dinero (pedir aclaración por escrito al empleador, guardar las liquidaciones, recurrir a la Dirección del Trabajo, considerar un abogado si hay montos importantes).
+- "asesoria": 3-4 oraciones en español de Chile, cercanas y prácticas: qué significan los errores y advertencias, priorizando los que afectan dinero. ${ruta}
 - No cites artículos ni leyes (se muestran aparte). No incluyas teléfonos ni enlaces.
 - Básate SOLO en los hallazgos. No inventes cifras ni agregues problemas nuevos. Lenguaje prudente ("posible error").`;
 }
@@ -129,16 +132,19 @@ export async function POST(req: NextRequest) {
   const nErrores  = hallazgos.filter((h) => h.tipo === "error").length;
   const nAdv      = hallazgos.filter((h) => h.tipo === "advertencia").length;
   const { nivel, diferencia_total } = nivelCaso(hallazgos);
+  const grave = nivel === "grave";
 
   // 3. Redacción (si falla, se usa un texto base)
   let resumen  = nErrores
     ? `Encontramos ${nErrores} posible${nErrores > 1 ? "s" : ""} error${nErrores > 1 ? "es" : ""} y ${nAdv} punto${nAdv !== 1 ? "s" : ""} a revisar en tu liquidación.`
     : nAdv ? `No encontramos errores de cálculo, pero hay ${nAdv} punto${nAdv !== 1 ? "s" : ""} a revisar.` : "Tu liquidación no presenta problemas en los puntos revisados.";
-  let asesoria = nErrores
-    ? "Pide a tu empleador una aclaración por escrito sobre los puntos marcados como posible error y guarda tus liquidaciones. Si no se corrigen, puedes reclamar en la Dirección del Trabajo o consultar a un abogado laboral."
+  let asesoria = grave
+    ? "Los errores encontrados afectan tu sueldo o tus cotizaciones. Guarda tus liquidaciones y te recomendamos consultar a un abogado laboral; también puedes acudir a la Inspección del Trabajo."
+    : nErrores
+    ? "Conversa con tu jefatura o RR.HH. y pide por escrito que corrijan los puntos marcados como posible error. Si no se corrigen, puedes consultar gratis en la Inspección del Trabajo."
     : "Guarda tus liquidaciones y revisa tu contrato para confirmar los puntos marcados. Ante cualquier duda, puedes consultar en la Dirección del Trabajo.";
   try {
-    const r = await generarJSON<{ resumen: string; asesoria: string }>([{ text: promptAsesoria(x, hallazgos) }]);
+    const r = await generarJSON<{ resumen: string; asesoria: string }>([{ text: promptAsesoria(x, hallazgos, nivel) }]);
     if (r.resumen) resumen = r.resumen;
     if (r.asesoria) asesoria = r.asesoria;
   } catch { /* se mantiene el texto base */ }

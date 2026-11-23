@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { motion } from "motion/react";
-import { Upload, FileText, Loader2, AlertOctagon, AlertTriangle, CheckCircle2, Lightbulb, X, BookOpen, ChevronRight } from "lucide-react";
+import { motion, AnimatePresence } from "motion/react";
+import { Upload, FileText, Loader2, AlertOctagon, AlertTriangle, CheckCircle2, Lightbulb, X, BookOpen, ChevronRight, ChevronDown } from "lucide-react";
 import { sendGAEvent } from "@next/third-parties/google";
 import { LEYES, type Hallazgo, type NivelCaso } from "@/lib/liquidacion";
 import ProximoPaso from "./ProximoPaso";
@@ -56,9 +56,9 @@ const ETIQUETAS: Record<string, string> = {
 };
 
 const ESTILO_HALLAZGO = {
-  error:       { icon: AlertOctagon,  color: "#E63946", bg: "rgba(230,57,70,0.08)",  borde: "rgba(230,57,70,0.30)",  label: "Posible error" },
-  advertencia: { icon: AlertTriangle, color: "#F7C948", bg: "rgba(247,201,72,0.07)", borde: "rgba(247,201,72,0.28)", label: "Revisar" },
-  ok:          { icon: CheckCircle2,  color: "#06D6A0", bg: "rgba(6,214,160,0.06)",  borde: "rgba(6,214,160,0.22)",  label: "Correcto" },
+  error:       { icon: AlertOctagon,  color: "#E63946", bg: "rgba(230,57,70,0.08)",  bgActivo: "rgba(230,57,70,0.16)",  borde: "rgba(230,57,70,0.30)",  label: "Posible error" },
+  advertencia: { icon: AlertTriangle, color: "#F7C948", bg: "rgba(247,201,72,0.07)", bgActivo: "rgba(247,201,72,0.15)", borde: "rgba(247,201,72,0.28)", label: "Revisar" },
+  ok:          { icon: CheckCircle2,  color: "#06D6A0", bg: "rgba(6,214,160,0.06)",  bgActivo: "rgba(6,214,160,0.14)",  borde: "rgba(6,214,160,0.22)",  label: "Correcto" },
 };
 
 function valor(v: string | number | null) {
@@ -66,6 +66,64 @@ function valor(v: string | number | null) {
   return typeof v === "number"
     ? new Intl.NumberFormat("es-CL", { style: "currency", currency: "CLP", maximumFractionDigits: 0 }).format(v)
     : v;
+}
+
+const GRUPOS = [
+  { tipo: "error",       titulo: "Errores",   vacio: "No encontramos errores." },
+  { tipo: "advertencia", titulo: "A revisar", vacio: "Nada que revisar." },
+  { tipo: "ok",          titulo: "Correctos", vacio: "Sin puntos verificados." },
+] as const;
+
+function CuadrosHallazgos({ hallazgos }: { hallazgos: Hallazgo[] }) {
+  const [abierto, setAbierto] = useState<Hallazgo["tipo"] | null>(null);
+  const grupo = GRUPOS.find((g) => g.tipo === abierto);
+  const items = abierto ? hallazgos.filter((h) => h.tipo === abierto) : [];
+
+  return (
+    <div className="mb-8">
+      <div className="grid grid-cols-3 gap-2.5 sm:gap-3">
+        {GRUPOS.map((g) => {
+          const s = ESTILO_HALLAZGO[g.tipo];
+          const Icon = s.icon;
+          const n = hallazgos.filter((h) => h.tipo === g.tipo).length;
+          const activo = abierto === g.tipo;
+          return (
+            <button key={g.tipo} onClick={() => setAbierto(activo ? null : g.tipo)} aria-expanded={activo}
+              className="rounded-xl px-3 sm:px-5 py-4 text-left transition-all hover:brightness-125"
+              style={{ background: activo ? s.bgActivo : s.bg, border: `1.5px solid ${activo ? s.color : s.borde}` }}>
+              <div className="flex items-center justify-between mb-2">
+                <Icon size={18} style={{ color: s.color }} />
+                <ChevronDown size={16} className="transition-transform text-white/50" style={{ transform: activo ? "rotate(180deg)" : "none" }} />
+              </div>
+              <p className="font-bold leading-none mb-1" style={{ ...FONT, fontSize: "1.8rem", color: s.color }}>{n}</p>
+              <p className="text-white/75 font-semibold" style={{ ...FONT, fontSize: "0.85rem" }}>{g.titulo}</p>
+            </button>
+          );
+        })}
+      </div>
+
+      <AnimatePresence initial={false}>
+        {abierto && grupo && (
+          <motion.div key={abierto} initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.3, ease: E }} className="overflow-hidden">
+            <div className="mt-3 rounded-xl divide-y"
+              style={{ border: `1px solid ${ESTILO_HALLAZGO[abierto].borde}`, background: "rgba(255,255,255,0.02)", borderColor: ESTILO_HALLAZGO[abierto].borde }}>
+              {items.length === 0 && (
+                <p className="px-5 py-4 text-white/45" style={{ ...FONT, fontSize: "0.875rem" }}>{grupo.vacio}</p>
+              )}
+              {items.map((h, i) => (
+                <div key={i} className="px-5 py-4" style={{ borderColor: "rgba(255,255,255,0.06)" }}>
+                  <p className="font-semibold mb-0.5" style={{ ...FONT, fontSize: "0.92rem", color: ESTILO_HALLAZGO[h.tipo].color }}>{h.titulo}</p>
+                  <p className="text-white/65" style={{ ...FONT, fontSize: "0.875rem", lineHeight: "1.55" }}>{h.detalle}</p>
+                  {h.tipo !== "ok" && <ReferenciaLey codigo={h.codigo} />}
+                </div>
+              ))}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
 }
 
 export default function RevisionLiquidacion() {
@@ -106,9 +164,6 @@ export default function RevisionLiquidacion() {
       setCargando(false);
     }
   }
-
-  const conteo = analisis?.hallazgos.reduce((acc, h) => ({ ...acc, [h.tipo]: (acc[h.tipo] ?? 0) + 1 }), {} as Record<string, number>);
-  const orden  = { error: 0, advertencia: 1, ok: 2 };
 
   return (
     <div>
@@ -170,13 +225,6 @@ export default function RevisionLiquidacion() {
             <>
               <div className="flex flex-wrap items-baseline justify-between gap-3 mb-4">
                 <h2 className="text-white font-bold" style={{ ...FONT, fontSize: "1.35rem" }}>Resultado de la revisión</h2>
-                <div className="flex gap-3" style={{ ...FONT, fontSize: "0.8rem" }}>
-                  {(["error", "advertencia", "ok"] as const).map((t) => (
-                    <span key={t} style={{ color: ESTILO_HALLAZGO[t].color }}>
-                      {conteo?.[t] ?? 0} {ESTILO_HALLAZGO[t].label.toLowerCase()}
-                    </span>
-                  ))}
-                </div>
               </div>
               <p className="text-white/60 mb-3" style={{ ...FONT, fontSize: "0.95rem", lineHeight: "1.6" }}>{analisis.resumen}</p>
               {analisis.diferencia_total > 0 && (
@@ -198,22 +246,7 @@ export default function RevisionLiquidacion() {
               </div>
 
               {/* Hallazgos */}
-              <div className="flex flex-col gap-3 mb-8">
-                {[...analisis.hallazgos].sort((a, b) => orden[a.tipo] - orden[b.tipo]).map((h, i) => {
-                  const s = ESTILO_HALLAZGO[h.tipo] ?? ESTILO_HALLAZGO.advertencia;
-                  const Icon = s.icon;
-                  return (
-                    <div key={i} className="rounded-xl px-5 py-4 flex gap-3" style={{ background: s.bg, border: `1px solid ${s.borde}` }}>
-                      <Icon size={18} className="mt-0.5 shrink-0" style={{ color: s.color }} />
-                      <div>
-                        <p className="font-semibold mb-0.5" style={{ ...FONT, fontSize: "0.92rem", color: s.color }}>{h.titulo}</p>
-                        <p className="text-white/65" style={{ ...FONT, fontSize: "0.875rem", lineHeight: "1.55" }}>{h.detalle}</p>
-                        {h.tipo !== "ok" && <ReferenciaLey codigo={h.codigo} />}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
+              <CuadrosHallazgos hallazgos={analisis.hallazgos} />
 
               {/* Asesoría */}
               <div className="rounded-xl px-6 py-5 mb-8" style={{ border: "1px solid rgba(133,104,243,0.30)", background: "rgba(133,104,243,0.08)" }}>

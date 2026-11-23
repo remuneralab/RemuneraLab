@@ -1,15 +1,16 @@
 "use client";
 
 import { motion } from "motion/react";
-import { ArrowRight, Bot, FileSearch, Scale, Heart } from "lucide-react";
+import { ArrowRight, FileSearch, Landmark, Scale, Sparkles } from "lucide-react";
 import { sendGAEvent } from "@next/third-parties/google";
 
 const E = [0.16, 1, 0.3, 1] as const;
+const FONT = { fontFamily: "var(--font-dm-sans)" } as const;
 
 const BENEFICIOS = [
-  { icon: Bot,        texto: "Asesoría laboral con IA" },
-  { icon: FileSearch, texto: "Revisión de liquidación, anexos y contratos" },
-  { icon: Scale,      texto: "Contacto con abogados laborales · primera consulta gratis" },
+  { icon: FileSearch, texto: "Revisa tu liquidación con IA y detecta errores" },
+  { icon: Landmark,   texto: "Te explicamos qué dice la ley y qué hacer" },
+  { icon: Scale,      texto: "Abogado laboral si tu caso es grave · 1ª consulta gratis" },
 ];
 
 interface Props {
@@ -19,61 +20,84 @@ interface Props {
 export default function InvitacionSuscripcion({ origen }: Props) {
   return (
     <motion.section
-      initial={{ opacity: 0, y: 16 }}
+      initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-40px" }}
-      transition={{ duration: 0.5, ease: E }}
+      transition={{ duration: 0.55, ease: E }}
       onViewportEnter={() => sendGAEvent("event", "suscripcion_invitacion_vista", { origen })}
-      className="mt-10 rounded-xl p-6 sm:p-8"
-      style={{
-        background: "linear-gradient(135deg, rgba(133,104,243,0.14), rgba(133,104,243,0.04))",
-        border: "1px solid rgba(133,104,243,0.30)",
-      }}
+      className="mt-10"
     >
-      <div className="flex items-center gap-2 mb-3">
-        <Heart size={14} style={{ color: "#a387f5" }} />
-        <p className="uppercase tracking-[0.2em]"
-          style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.6rem", color: "#a387f5" }}>
-          Súmate · $1.000 al mes
-        </p>
-      </div>
-
-      <h2 className="text-white font-bold leading-snug mb-3"
-        style={{ fontFamily: "var(--font-dm-sans)", fontSize: "1.35rem" }}>
-        Ayúdanos a construir la infraestructura de transparencia salarial que Chile necesita
-      </h2>
-      <p className="text-white/50 mb-6"
-        style={{ fontFamily: "var(--font-dm-sans)", fontSize: "0.9rem", lineHeight: "1.6" }}>
-        Con una suscripción de $1.000 mensuales sostienes un proyecto abierto que les da información
-        real a trabajadoras y trabajadores, y además accedes a herramientas para defender tus derechos laborales.
-      </p>
-
-      <ul className="flex flex-col gap-2.5 mb-7">
-        {BENEFICIOS.map(({ icon: Icon, texto }) => (
-          <li key={texto} className="flex items-start gap-3">
-            <Icon size={16} className="mt-0.5 shrink-0" style={{ color: "#8568f3" }} />
-            <span className="text-white/70"
-              style={{ fontFamily: "var(--font-dm-sans)", fontSize: "0.875rem" }}>
-              {texto}
-            </span>
-          </li>
-        ))}
-      </ul>
-
-      <a
-        href="/suscripcion"
-        onClick={() => sendGAEvent("event", "suscripcion_click", { origen })}
-        className="inline-flex w-full sm:w-auto items-center justify-center gap-2 font-semibold px-7 py-3.5 rounded-lg hover:opacity-90 transition-opacity"
+      {/* Borde degradado animado */}
+      <motion.div
+        className="rounded-2xl p-[2px]"
         style={{
-          background: "linear-gradient(135deg, #8568f3, #a387f5)",
-          color: "#ffffff",
-          fontFamily: "var(--font-dm-sans)",
-          fontSize: "0.95rem",
-          boxShadow: "0 0 36px rgba(133,104,243,0.35)",
+          background: "linear-gradient(120deg, #8568f3, #06D6A0, #a387f5, #F7C948, #8568f3)",
+          backgroundSize: "300% 300%",
+          boxShadow: "0 0 70px rgba(133,104,243,0.35)",
         }}
+        animate={{ backgroundPosition: ["0% 50%", "100% 50%"] }}
+        transition={{ duration: 6, repeat: Infinity, repeatType: "mirror", ease: "linear" }}
       >
-        Quiero suscribirme <ArrowRight size={16} />
-      </a>
+        <div className="rounded-[14px] px-5 py-7 sm:px-10 sm:py-9 grid gap-7 md:grid-cols-[1.4fr_1fr] md:items-center"
+          style={{ background: "linear-gradient(135deg, #22105a 0%, #180b3b 70%)" }}>
+
+          <div>
+            <span className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 mb-4"
+              style={{ background: "rgba(247,201,72,0.14)", border: "1px solid rgba(247,201,72,0.45)" }}>
+              <Sparkles size={13} style={{ color: "#F7C948" }} />
+              <span className="uppercase tracking-[0.18em] font-bold"
+                style={{ fontFamily: "var(--font-space-mono)", fontSize: "0.6rem", color: "#F7C948" }}>
+                Nuevo · Plan Trabajador
+              </span>
+            </span>
+            <h2 className="text-white font-bold leading-tight mb-3"
+              style={{ ...FONT, fontSize: "clamp(1.4rem, 3.2vw, 1.9rem)" }}>
+              ¿Te están pagando bien? Revisa tu liquidación por solo $1.000 al mes
+            </h2>
+            <p className="text-white/55 mb-5" style={{ ...FONT, fontSize: "0.92rem", lineHeight: "1.6" }}>
+              Y ayúdanos a construir la infraestructura de transparencia salarial que Chile necesita.
+            </p>
+            <ul className="flex flex-col gap-2.5">
+              {BENEFICIOS.map(({ icon: Icon, texto }) => (
+                <li key={texto} className="flex items-start gap-3">
+                  <Icon size={17} className="mt-0.5 shrink-0" style={{ color: "#06D6A0" }} />
+                  <span className="text-white/80" style={{ ...FONT, fontSize: "0.9rem" }}>{texto}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="flex flex-col items-center text-center rounded-xl px-5 py-6"
+            style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(133,104,243,0.30)" }}>
+            <p className="text-white/50 mb-1" style={{ ...FONT, fontSize: "0.82rem" }}>Todo incluido</p>
+            <p className="text-white font-bold mb-5 leading-none" style={{ ...FONT, fontSize: "3rem" }}>
+              $1.000<span className="text-white/45 font-normal" style={{ fontSize: "1rem" }}> /mes</span>
+            </p>
+            <motion.a
+              href="/suscripcion"
+              onClick={() => sendGAEvent("event", "suscripcion_click", { origen })}
+              className="relative overflow-hidden inline-flex w-full items-center justify-center gap-2 font-bold px-6 py-4 rounded-xl"
+              style={{
+                ...FONT,
+                fontSize: "1.05rem",
+                color: "#ffffff",
+                background: "linear-gradient(135deg, #8568f3, #a387f5)",
+                boxShadow: "0 0 40px rgba(133,104,243,0.55), 0 4px 18px rgba(133,104,243,0.35)",
+              }}
+              whileHover={{ scale: 1.04 }}
+              whileTap={{ scale: 0.97 }}
+              animate={{ boxShadow: [
+                "0 0 30px rgba(133,104,243,0.45), 0 4px 18px rgba(133,104,243,0.30)",
+                "0 0 55px rgba(133,104,243,0.75), 0 4px 18px rgba(133,104,243,0.40)",
+              ] }}
+              transition={{ boxShadow: { duration: 1.6, repeat: Infinity, repeatType: "mirror" } }}
+            >
+              Suscribirme ahora <ArrowRight size={18} />
+            </motion.a>
+            <p className="mt-3 text-white/35" style={{ ...FONT, fontSize: "0.75rem" }}>Cancela cuando quieras</p>
+          </div>
+        </div>
+      </motion.div>
     </motion.section>
   );
 }

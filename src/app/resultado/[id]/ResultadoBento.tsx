@@ -497,6 +497,9 @@ export default function ResultadoBento({
         ))}
       </div>
 
+      {/* Invitación a suscripción ($1.000/mes) — justo después del resultado principal */}
+      <InvitacionSuscripcion origen="resultado" />
+
       {/* Drift salarial — tendencia de avisos de empleo */}
       {mercado.drift !== null && (() => {
         const { pct_cambio, mediana_reciente, mediana_anterior } = mercado.drift;
@@ -591,9 +594,6 @@ export default function ResultadoBento({
 
       {/* Ofertas de trabajo: solo para perfiles con movilidad real */}
       {!perfilPrecario && <OfertasPerfil cargo={cargo} industria={industria} region={region} />}
-
-      {/* Invitación a suscripción ($1.000/mes) */}
-      <InvitacionSuscripcion origen="resultado" />
 
       {/* Perfil de carrera */}
       <LoginPerfil registroId={registroId} />

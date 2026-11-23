@@ -11,11 +11,10 @@ const INPUT_STYLE = { ...FONT, fontSize: "0.9rem", background: "rgba(255,255,255
 
 interface Props {
   analisis: Analisis | null;
-  variante: "destacado" | "secundario";
 }
 
-export default function ContactoAbogado({ analisis, variante }: Props) {
-  const destacado = variante === "destacado";
+// Solo se muestra en casos graves (ver ProximoPaso).
+export default function ContactoAbogado({ analisis }: Props) {
   const [abierto,  setAbierto]  = useState(false);
   const [nombre,   setNombre]   = useState("");
   const [email,    setEmail]    = useState("");
@@ -53,34 +52,20 @@ export default function ContactoAbogado({ analisis, variante }: Props) {
     }
   }
 
-  // Versión discreta: solo un enlace que despliega el formulario
-  if (!destacado && !abierto && estado !== "ok") {
-    return (
-      <button onClick={() => setAbierto(true)}
-        className="self-start inline-flex items-center gap-2 px-1 py-1 text-white/55 hover:text-white/85 transition-colors"
-        style={{ ...FONT, fontSize: "0.85rem" }}>
-        <Scale size={14} style={{ color: "#a387f5" }} />
-        ¿Prefieres hablar con un abogado laboral? Primera consulta gratis <ArrowRight size={14} />
-      </button>
-    );
-  }
-
   return (
     <div className="rounded-xl p-6"
       style={{
-        border: `1px solid ${destacado ? "rgba(133,104,243,0.55)" : "rgba(133,104,243,0.22)"}`,
-        background: destacado ? "linear-gradient(135deg, rgba(133,104,243,0.16), rgba(133,104,243,0.05))" : "rgba(255,255,255,0.03)",
+        border: "1px solid rgba(133,104,243,0.55)",
+        background: "linear-gradient(135deg, rgba(133,104,243,0.16), rgba(133,104,243,0.05))",
       }}>
       <div className="flex items-start gap-3 mb-4">
         <Scale size={20} className="mt-0.5 shrink-0" style={{ color: "#a387f5" }} />
         <div>
           <p className="text-white font-semibold mb-1" style={{ ...FONT, fontSize: "1.05rem" }}>
-            {destacado ? "Te recomendamos hablar con un abogado laboral" : "Habla con un abogado laboral"}
+            Te recomendamos hablar con un abogado laboral
           </p>
           <p className="text-white/50" style={{ ...FONT, fontSize: "0.875rem", lineHeight: "1.55" }}>
-            {destacado
-              ? "Los errores encontrados afectan tu sueldo o tus cotizaciones. Abogados laborales de nuestra red ofrecen la primera consulta gratis: déjanos tus datos y te contactarán."
-              : "Abogados laborales de nuestra red ofrecen la primera consulta gratis. Déjanos tus datos y te contactarán."}
+            {"Los errores encontrados afectan tu sueldo o tus cotizaciones. Abogados laborales de nuestra red ofrecen la primera consulta gratis: déjanos tus datos y te contactarán."}
           </p>
         </div>
       </div>

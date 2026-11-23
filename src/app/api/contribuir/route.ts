@@ -3,6 +3,8 @@ import { supabase } from "@/lib/supabase";
 import { calcularBenchmark } from "@/lib/benchmark";
 
 const MAX_PERFILES_POR_IP = 3;
+// MODO PRUEBA: límite de perfiles por IP desactivado. Volver a `true` al salir de la etapa de pruebas.
+const LIMITE_POR_IP_ACTIVO = false;
 const VENTANA_HORAS       = 24;
 
 function normalizarCargo(c: string): string {
@@ -96,7 +98,7 @@ export async function POST(request: Request) {
   }
 
   // ── Rate limiting por perfiles distintos ─────────────────────────────────
-  if (ip && !skipLimits) {
+  if (ip && !skipLimits && LIMITE_POR_IP_ACTIVO) {
     const desde24h = new Date(Date.now() - VENTANA_HORAS * 60 * 60 * 1000).toISOString();
     const { count } = await supabase
       .from("registros_salariales")

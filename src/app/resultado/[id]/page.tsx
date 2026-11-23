@@ -96,11 +96,23 @@ export default async function ResultadoPage({ params, searchParams }: Props) {
               style={{ height: "32px", width: "auto", filter: "drop-shadow(0 0 10px rgba(133,104,243,0.30))" }}
             />
           </Link>
-          <nav className="flex items-center gap-5">
+          <nav className="flex items-center gap-3 sm:gap-5">
+
+            <Link
+              href="/suscripcion"
+              className="inline-flex items-center gap-1.5 font-bold px-4 py-1.5 rounded transition-opacity hover:opacity-90"
+              style={{
+                fontFamily: "var(--font-dm-sans)", fontSize: "0.8rem", color: "#ffffff",
+                background: "linear-gradient(135deg, #8568f3, #a387f5)",
+                boxShadow: "0 0 18px rgba(133,104,243,0.45)",
+              }}
+            >
+              Suscríbete · $1.000
+            </Link>
 
             <Link
               href="/formulario"
-              className="inline-flex items-center gap-1.5 font-semibold px-4 py-1.5 rounded transition-colors hover:bg-[#8568f3]/10"
+              className="hidden sm:inline-flex items-center gap-1.5 font-semibold px-4 py-1.5 rounded transition-colors hover:bg-[#8568f3]/10"
               style={{ fontFamily: "var(--font-dm-sans)", fontSize: "0.8rem", border: "1px solid rgba(133,104,243,0.40)", color: "#8568f3" }}
             >
               Nuevo análisis
