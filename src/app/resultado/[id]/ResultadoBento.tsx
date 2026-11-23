@@ -7,6 +7,7 @@ import ChartResult from "./ChartResult";
 import AIInterpretacion from "./AIInterpretacion";
 import OfertasPerfil from "./OfertasPerfil";
 import LoginPerfil from "@/components/LoginPerfil";
+import InvitacionSuscripcion from "@/components/InvitacionSuscripcion";
 import { getBrechaCiuo, getBrechaRama, BRECHA_PERIODO } from "@/lib/brecha-genero";
 import type { MercadoResult } from "@/lib/mercado";
 
@@ -590,6 +591,9 @@ export default function ResultadoBento({
 
       {/* Ofertas de trabajo: solo para perfiles con movilidad real */}
       {!perfilPrecario && <OfertasPerfil cargo={cargo} industria={industria} region={region} />}
+
+      {/* Invitación a suscripción ($1.000/mes) */}
+      <InvitacionSuscripcion origen="resultado" />
 
       {/* Perfil de carrera */}
       <LoginPerfil registroId={registroId} />
